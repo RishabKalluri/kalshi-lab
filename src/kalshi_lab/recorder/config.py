@@ -1,0 +1,55 @@
+"""The one place markets are configured. Adding a Kalshi series = one entry in MARKETS:
+
+  live_spot      exchange feeds the recorder streams to track the settlement index ("exchange:symbol";
+                 exchanges: coinbase, kraken, bitstamp, okx)
+  backfill_spot  public history for backtests: {"binance": "BTCUSDT"} (1s), {"okx": "XAU-USDT-SWAP"} (1m),
+                 {"coinbase": "BTC-USD"} (1m)
+  settlement     "avg60": 60s average vs 60s average before open (CF Benchmarks crypto)
+                 "point": one 1-minute close vs the close at open (Pyth gold)
+  record         whether the recorder captures it by default
+
+Backfill of Kalshi trades works for any series without an entry (no spot), e.g. KXBTC / KXBTCD ladders.
+"""
+
+MARKETS = {
+    "KXBTC15M": dict(live_spot=["coinbase:BTC-USD", "kraken:BTC/USD", "bitstamp:btcusd"],  # BRTI constituents
+                     backfill_spot={"binance": "BTCUSDT", "coinbase": "BTC-USD"}, settlement="avg60", record=True),
+    "KXETH15M": dict(live_spot=["coinbase:ETH-USD", "kraken:ETH/USD", "bitstamp:ethusd"],
+                     backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"}, settlement="avg60", record=True),
+    # Gold settles on Pyth (key-gated). OKX's XAU perp tracks it within ~$1 over 15 minutes.
+    "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
+                      settlement="point", record=True),
+}
+
+# Backward-compatible views.
+SERIES = {s: m["live_spot"] for s, m in MARKETS.items()}
+RECORD_DEFAULT = [s for s, m in MARKETS.items() if m.get("record")]
+
+
+def stream_name(spec: str) -> str:
+    """'coinbase:BTC-USD' -> 'coinbase_btcusd' (the recorder's spot/<name> stream)."""
+    exchange, sym = spec.split(":", 1)
+    return f"{exchange}_{sym.replace('/', '').replace('-', '').lower()}"
+
+
+def backfill_stream(exchange: str, symbol: str) -> str:
+    """Name of the backfilled spot stream for (exchange, symbol), matching data/backfill.py."""
+    base = f"{exchange}_{symbol.replace('-', '').replace('/', '').lower()}"
+    return base + ("_1m" if exchange == "okx" else "")
+
+
+def settlement(series: str) -> str:
+    return MARKETS.get(series, {}).get("settlement", "avg60")
+
+
+def spot_map(series: list[str], backfill: bool = False) -> dict[str, list[str]]:
+    """series -> the spot streams that track its settlement index."""
+    if backfill:
+        # Prefer the highest-resolution history: binance 1s, then okx 1m, then coinbase 1m.
+        out = {}
+        for s in series:
+            bs = MARKETS.get(s, {}).get("backfill_spot", {})
+            pick = next((backfill_stream(ex, bs[ex]) for ex in ("binance", "okx", "coinbase") if ex in bs), None)
+            out[s] = [pick] if pick else []
+        return out
+    return {s: [stream_name(f) for f in SERIES.get(s, [])] for s in series}

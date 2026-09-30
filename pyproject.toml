@@ -1,0 +1,36 @@
+[project]
+name = "kalshi-lab"
+version = "0.1.0"
+description = "Record, backtest, paper trade and live trade Kalshi 15-minute markets"
+readme = "README.md"
+authors = [
+    { name = "Kalluri, Rishab", email = "rkalluri7@gatech.edu" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "cryptography>=50.0.1",
+    "httpx>=0.28.1",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "plotly>=7.1.0",
+    "pyarrow>=24.0.0",
+    "python-dotenv>=1.2.3",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
+    "streamlit>=1.59.2",
+    "websockets>=17.1",
+    "zstandard>=0.25.0",
+]
+
+[project.scripts]
+kalshi-lab = "kalshi_lab:main"
+
+[build-system]
+requires = ["uv_build>=0.9.22,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "playwright>=1.63.0",
+    "pytest>=9.1.1",
+]

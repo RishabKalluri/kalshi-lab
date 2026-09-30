@@ -1,0 +1,298 @@
+[
+  {
+    "id": "eth-volfav",
+    "name": "ETH VolFavorite",
+    "file": "strategies/vol_favorite.py",
+    "series": [
+      "KXETH15M"
+    ],
+    "stage": "paper",
+    "summary": "Buy the favorite when the market's implied vol is high relative to our vol forecast (T-6m to T-1m).",
+    "evidence": "30-day out-of-sample: +4.2c/contract (95% CI +1.7 to +6.5), 13/15 days up. Engine backtest on the test half: +$384 (+38%) in 15 days, t=1.29. Same test on BTC loses (good control). 8 of 9 parameter variants profitable. Latest 3 days (quick stage): -4.5c/contract, 0/3 days positive.",
+    "next": "Accumulate paper markets (~3 weeks for a few hundred); compare live \u00a2/contract to the walk-forward's +2.1c; BTC 12-month control.",
+    "updated": "2026-09-30",
+    "description": "On Kalshi's 15-minute ETH up/down markets, a few minutes before close, compare how much the market 'expects' ETH to move (implied volatility, read off the contract price) with how much it will probably move (our forecast from recent price action). When the market expects far more movement than is likely, the side that's currently winning is underpriced, so we buy it.",
+    "history": {
+      "idea": {
+        "date": "2026-09-30",
+        "result": "Hypothesis",
+        "detail": "Retail-heavy ETH markets may overreact to recent volatility, pricing too much chance of a reversal late in the window."
+      },
+      "research": {
+        "date": "2026-09-30",
+        "result": "Edge found",
+        "detail": "30 days, 2,771 markets, split by date. When implied/forecast vol was in the top 20% (threshold set on the first half), buying the favorite made +4.2c/contract after fees in the second half (95% CI +1.7c to +6.5c), 13 of 15 days positive, at every horizon and price level. Same test on BTC: negative in both halves.",
+        "metrics": {
+          "markets (30 days)": "2,771",
+          "test \u00a2/contract": "+4.18",
+          "test 95% CI (\u00a2)": "+1.7 to +6.5",
+          "test days +": "13 / 15",
+          "train \u00a2/contract": "+2.42",
+          "BTC control \u00a2/ct": "\u22122.08"
+        }
+      },
+      "smoke": {
+        "date": "2026-09-30",
+        "result": "Passed",
+        "detail": "Automated pipeline (job vol_favorite-0930-002340): last 2h of recorded books, 2 markets traded, +$3.40.",
+        "status": "done",
+        "runs": [
+          "vol_favorite-0930-002340-smoke"
+        ]
+      },
+      "quick": {
+        "date": "2026-09-30",
+        "result": "Negative, not conclusive",
+        "status": "done",
+        "detail": "Automated pipeline. Last 3 days of backfill: -$94.80 over 119 markets (-4.5c/contract, 95% CI -13.6 to +4.5), 0 of 3 days positive; last 6h of recorded books: -$20.57 over 6 markets. The model was fit on data including these days, so this is a warning sign: the September edge may not persist. The 12-month walk-forward test decides."
+      },
+      "full": {
+        "date": "2026-09-30",
+        "status": "done",
+        "result": "Promising (automated walk-forward through the engine)",
+        "detail": "Pipeline job vol_favorite-0930-124526: 8 out-of-sample months (Feb-Sep 2026), model refit before each month on earlier data only, fixed checkpoints, next-trade-style fills from backfill, after fees. Pooled +2.13c/contract (95% CI +0.62 to +3.64), 5 of 8 months positive (Apr/May/Jun slightly negative), 148/240 days positive. Still positive at 2x latency (+3.85c, CI +1.67 to +6.03). August is partial (history gap since fixed; rerun pending). Earlier finding kept for the record: entering on the first second the signal crossed lost money (-0.16c).",
+        "metrics": {
+          "pooled \u00a2/contract": "+2.13",
+          "95% CI (\u00a2)": "+0.62 to +3.64",
+          "months positive": "5 / 8",
+          "days positive": "148 / 240",
+          "2x latency \u00a2/contract": "+3.85",
+          "pooled PnL ($1k/month)": "+$709",
+          "worst chained drawdown": "$190",
+          "markets": "3,568"
+        }
+      },
+      "paper": {
+        "date": "2026-09-30",
+        "result": "Running",
+        "detail": "Live on the server with simulated money. Since Sep 30 17:40 UTC it preloads 4h of recorded spot on start (no warm-up after restarts) and trades at fixed checkpoints with a model fit on all 9.5 months. Expect ~15 markets/day, so a few hundred markets takes ~3 weeks.",
+        "metrics": {
+          "backtest expects \u00a2/contract": "\u2248 +1.6",
+          "goal": "~350 markets"
+        }
+      }
+    },
+    "depends_on": [
+      {
+        "log": "backfill-eth-trades",
+        "label": "12-month ETH data: Kalshi trades"
+      },
+      {
+        "log": "backfill-1y",
+        "label": "12-month ETH data: spot prices"
+      }
+    ],
+    "parallel_note": "Paper trading started alongside the full test (paper risks no money). Live needs both finished."
+  },
+  {
+    "id": "gold-maker",
+    "name": "Gold Maker",
+    "file": "strategies/gold_maker.py",
+    "series": [
+      "KXGOLD15M"
+    ],
+    "stage": "rejected",
+    "summary": "Zero-fee market making on gold 15m, gated by an OKX-gold model; tight inventory, flattens before close.",
+    "evidence": "Parked Sep 30 to focus on ETH VolFavorite. Backtest about break-even (+$4.89 over 21 markets); paper -$31 over ~35 markets with live adverse selection ~2c/contract vs ~0.3c in backtest (OKX feed ~170ms behind).",
+    "next": "Accumulate ~100 paper markets; judge on adverse selection, split by US hours vs overnight.",
+    "updated": "2026-09-30",
+    "description": "Acts as a market maker on Kalshi's 15-minute gold markets: rests buy and sell orders at the best prices (makers pay no fees) and earns the spread. It watches the OKX gold price, which tracks Kalshi's settlement source, and skips any side of the book the model says is mispriced, so it avoids getting run over when gold moves.",
+    "history": {
+      "idea": {
+        "date": "2026-09-29",
+        "result": "Hypothesis",
+        "detail": "Gold settles on one public oracle print; a spot model plus zero maker fees might beat the thinner gold market."
+      },
+      "research": {
+        "date": "2026-09-29",
+        "result": "Mixed",
+        "detail": "OKX gold tracks the Pyth settlement within ~$1 over 15 min (92% direction match). Taking liquidity on the model: CI spans zero. Model-gated making cut backtest losses from -$100 to about break-even.",
+        "metrics": {
+          "OKX\u2194Pyth direction match": "92%",
+          "basis drift, 15m (sd)": "$0.94",
+          "maker loss ungated \u2192 gated": "\u2212$100 \u2192 $0"
+        }
+      },
+      "full": {
+        "date": "2026-09-29",
+        "result": "Break-even",
+        "detail": "Recorded books, 21 markets: +$4.89 with 1% sizing. First half -$11, second half +$22 (US hours better). Tuned on the same data, so optimistic.",
+        "runs": [
+          "gold-maker-1pct",
+          "gold-maker-halfa-q1.0",
+          "gold-maker-halfb-q1.0"
+        ],
+        "metrics": {
+          "PnL (21 markets, $1k)": "+$4.89",
+          "first half": "\u2212$11.25 (8 mkts)",
+          "second half": "+$21.79 (10 mkts)"
+        },
+        "status": "partial"
+      },
+      "paper": {
+        "date": "2026-09-29",
+        "result": "Running, weak",
+        "detail": "Live adverse selection ~2c/contract (backtest ~0.3c) over the first markets. OKX feed is ~170ms behind from Virginia.",
+        "metrics": {
+          "backtest adverse sel. (\u00a2/ct)": "\u22120.3",
+          "live adverse sel. (\u00a2/ct)": "\u22122.2"
+        }
+      }
+    },
+    "parallel_note": "Paper trading started alongside testing (paper risks no money). Live needs a finished full test and paper results."
+  },
+  {
+    "id": "btc-maker",
+    "name": "BTC Spread Maker",
+    "file": "strategies/maker.py",
+    "series": [
+      "KXBTC15M"
+    ],
+    "stage": "rejected",
+    "summary": "Post-only market making at the touch with spot-driven quote protection.",
+    "evidence": "Parked Sep 30: back-of-queue fills average -0.6c vs mid; quick stage negative.",
+    "next": "Parked: needs better queue position (speed) to work.",
+    "updated": "2026-09-30",
+    "description": "Market making on Kalshi's 15-minute BTC markets: rests orders at the best bid and ask for zero fees, and pulls them when the BTC price moves sharply so faster traders can't pick them off.",
+    "history": {
+      "research": {
+        "date": "2026-09-29",
+        "result": "Weak",
+        "detail": "Resting liquidity earns a tiny positive markout on average, but our back-of-queue fills average -0.6c vs mid.",
+        "metrics": {
+          "fill edge vs mid (\u00a2/ct)": "\u22120.61",
+          "adverse sel. 30s (\u00a2/ct)": "\u22120.07",
+          "best config (12 mkts)": "\u2212$3.77"
+        }
+      },
+      "full": {
+        "date": "2026-09-30",
+        "result": "Cancelled",
+        "detail": "Stopped to free CPU: a weak strategy, and the quick stage already verified the pipeline end to end."
+      },
+      "quick": {
+        "date": "2026-09-30",
+        "result": "Negative",
+        "detail": "Automated quick stage (pipeline job maker-0929-224549).",
+        "job": "maker-0929-224549"
+      }
+    }
+  },
+  {
+    "id": "ladder-rv",
+    "name": "BTC Ladder Relative Value",
+    "file": "",
+    "series": [
+      "KXBTC",
+      "KXBTCD"
+    ],
+    "stage": "research",
+    "summary": "Quote thin hourly range markets (KXBTC) around the fair value implied by the liquid above/below ladder (KXBTCD).",
+    "evidence": "7 days, 178k range trades: makers earned +1.3c/contract when takers paid >3c over ladder fair, in both halves. Fill realism untested.",
+    "next": "Record KXBTC/KXBTCD books near the money, then build + test a maker.",
+    "updated": "2026-09-30",
+    "description": "Kalshi lists hourly BTC 'price range' markets that trade thinly, and hourly 'above/below' markets on the same number that trade heavily. The busy market's prices imply a fair price for each range; the idea is to quote the thin range markets around that fair price and profit when uninformed traders pay too much.",
+    "history": {
+      "idea": {
+        "date": "2026-09-29",
+        "result": "Hypothesis",
+        "detail": "Same settlement number, very different liquidity: the thin market should lag the liquid one."
+      },
+      "research": {
+        "date": "2026-09-29",
+        "result": "Promising signal",
+        "detail": "7 days, 178k range trades: when a range taker paid >3c over ladder fair, the maker side earned +1.3c/contract in both halves. No free arbitrage after fees. Needs recorded books to test real fills.",
+        "metrics": {
+          "range trades": "178,249",
+          "hours": "164",
+          "maker \u00a2/ct, taker >3\u00a2 over": "+1.29 / +1.38",
+          "Brier range vs ladder": "0.1655 / 0.1620"
+        }
+      }
+    }
+  },
+  {
+    "id": "btc-fair-value",
+    "name": "BTC Spot Fair Value (taker)",
+    "file": "strategies/fair_value.py",
+    "series": [
+      "KXBTC15M"
+    ],
+    "stage": "rejected",
+    "summary": "Price from spot + settlement-average model, take when the book disagrees.",
+    "evidence": "Market beats the model at every horizon (Brier); loses after fees in every setting.",
+    "next": "",
+    "updated": "2026-09-29",
+    "description": "Prices BTC 15-minute markets from the live BTC price and the settlement rule, and trades when the market disagrees. Rejected: the market's own price is more accurate than our model.",
+    "history": {
+      "research": {
+        "date": "2026-09-29",
+        "result": "Rejected",
+        "detail": "Market beats the model at every horizon (Brier); loses after fees in every setting."
+      }
+    }
+  },
+  {
+    "id": "btc-vol",
+    "name": "BTC Vol Favorite / Underdog",
+    "file": "strategies/vol_favorite.py",
+    "series": [
+      "KXBTC15M"
+    ],
+    "stage": "rejected",
+    "summary": "Same vol-ratio signal as ETH VolFavorite, on BTC.",
+    "evidence": "Negative in both halves (-1.6c, -2.1c). BTC prices vol correctly.",
+    "next": "",
+    "updated": "2026-09-30",
+    "description": "The ETH VolFavorite idea applied to BTC. Rejected: BTC's market prices volatility correctly.",
+    "history": {
+      "research": {
+        "date": "2026-09-30",
+        "result": "Rejected",
+        "detail": "Negative in both halves (-1.6c, -2.1c). BTC prices vol correctly."
+      }
+    }
+  },
+  {
+    "id": "gold-taker",
+    "name": "Gold Model Taker",
+    "file": "",
+    "series": [
+      "KXGOLD15M"
+    ],
+    "stage": "rejected",
+    "summary": "Take when the OKX-gold model disagrees with the market late in the window.",
+    "evidence": "Train -1.4c, test +3.2c, CI spans zero. US-hours subset +3.6c in both halves but CI still includes zero; its information is used by Gold Maker instead.",
+    "next": "",
+    "updated": "2026-09-29",
+    "description": "Takes liquidity on gold markets when the OKX-based model disagrees late in the window. Rejected: edge not reliable after the spread and fees.",
+    "history": {
+      "research": {
+        "date": "2026-09-29",
+        "result": "Rejected",
+        "detail": "Train -1.4c, test +3.2c, CI spans zero. US-hours subset +3.6c in both halves but CI still includes zero; its information is used by Gold Maker instead."
+      }
+    }
+  },
+  {
+    "id": "favorites",
+    "name": "Favorite-longshot (BTC)",
+    "file": "",
+    "series": [
+      "KXBTC15M"
+    ],
+    "stage": "rejected",
+    "summary": "Buy contracts priced 90c+ near close.",
+    "evidence": "No consistent edge; flips sign between halves.",
+    "next": "",
+    "updated": "2026-09-29",
+    "description": "Buys contracts priced 90c+ shortly before close, betting favorites are underpriced. Rejected: no consistent edge.",
+    "history": {
+      "research": {
+        "date": "2026-09-29",
+        "result": "Rejected",
+        "detail": "No consistent edge; flips sign between halves."
+      }
+    }
+  }
+]
