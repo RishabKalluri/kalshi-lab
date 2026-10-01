@@ -11,7 +11,8 @@ wheels/
 
 .env
 *.pem
-data/
+/data/
+research/data/
 results/*
 !results/_ledger/
 *.lock

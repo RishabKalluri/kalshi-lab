@@ -70,6 +70,7 @@ flowchart TB
     subgraph PAST[Downloaded history backfill]
         T[Kalshi trades + settlements<br/>BTC, ETH: Dec 2025 to now; SOL: Jan 2026 to now]
         P[Binance 1-second BTC/ETH/SOL,<br/>OKX 1-minute gold]
+        F[Order flow per second, BTC/ETH/SOL:<br/>Binance spot + OKX perpetuals, Dec 2025 to now]
     end
     LIVE --> R1[Realistic fills incl. queue position:<br/>needed for market makers]
     PAST --> R2[Months of history:<br/>needed for statistical confidence]
@@ -83,6 +84,11 @@ flowchart TB
 - **Format:** compressed zstd JSON lines, one file per stream per hour (recordings) or per market/day
   (history). Raw messages are stored untouched and normalized when replayed.
 - **Size:** ~1.8 GB/day recorded; ETH's 9.5 months of history is ~1 GB.
+
+- **Order flow** (`backfill/flow/`, added Oct 1): per-second taker buy/sell volume from Binance spot and
+  OKX perpetuals (OKX instead of Binance futures because Binance's API is blocked from US IPs, which
+  would make it unusable live). Research only so far: not recorded live and not replayed by the engine.
+  Loader: `kalshi_lab.data.flow`.
 
 **One config table** (`src/kalshi_lab/recorder/config.py → MARKETS`) says, per Kalshi series, which spot
 feeds track its settlement index, which public history to download, and how it settles (60-second average
@@ -296,7 +302,7 @@ kalshi/
 ├── SYSTEM.md, README.md
 ├── src/kalshi_lab/
 │   ├── recorder/     config.py (MARKETS table) · kalshi.py · spot.py · sink.py (zstd logs) · main.py
-│   ├── data/         backfill.py (history downloads) · normalize.py · source.py (replay)
+│   ├── data/         backfill.py (history downloads) · flow.py (order-flow loader) · normalize.py · source.py (replay)
 │   ├── core/         types.py · book.py · fees.py · portfolio.py · risk.py
 │   ├── sim/          exchange.py (simulated matching)
 │   ├── live/         run.py (paper/live runner) · exchange.py (real orders) · source.py · history.py
@@ -304,7 +310,7 @@ kalshi/
 │   ├── validate.py (smoke/quick/full/lockbox, audit) · strategy_dir.py (folders, ledger) · jobs.py · remote.py
 │   ├── paper_ctl.py (paper-start/stop) · auth.py · rest.py
 │   └── dashboard/    app.py · pipeline.py (Strategies page) · background.py
-├── strategies/       <slug>/ (strategy.py, config.json, NOTES.md, results.json) · _template/ · _archive/
+├── strategies/       <slug>/ (strategy.py, config.json, NOTES.md, results.json) · IDEAS.md (backlog) · _template/ · _archive/
 ├── research/         screening scripts (walk_forward.py, build_dataset.py, ...) · data/
 ├── scripts/          one-off checks (check_books, markouts, decompose, ...)
 ├── .claude/          skills/develop-strategy/ (SKILL.md, reference.md) · hooks/strategy_agent_guard.py · settings.json

@@ -73,7 +73,8 @@ for old in kalshi-paper-gold kalshi-paper-eth; do
 done
 unit kalshi-worker "kalshi-lab background validation worker" "env KALSHI_TEST_WORKERS=1 $UV run kalshi-lab worker" 15
 
-# Daily backfill (idempotent: skips days/markets already on disk) keeps the history growing.
+# Daily backfill (idempotent: skips days/markets already on disk) keeps the history growing: Kalshi trades,
+# spot prices and order flow (backfill/flow/).
 sudo tee /etc/systemd/system/kalshi-backfill.service >/dev/null <<UNIT
 [Unit]
 Description=kalshi-lab daily backfill
@@ -82,7 +83,7 @@ Type=oneshot
 Nice=15
 User=$USER
 WorkingDirectory=$PWD
-ExecStart=$UV run kalshi-lab backfill --series KXBTC15M KXETH15M KXGOLD15M --days 3
+ExecStart=$UV run kalshi-lab backfill --series KXBTC15M KXETH15M KXSOL15M KXGOLD15M --days 3
 StandardOutput=append:$HOME/kalshi-data/logs/kalshi-backfill.log
 StandardError=append:$HOME/kalshi-data/logs/kalshi-backfill.log
 UNIT

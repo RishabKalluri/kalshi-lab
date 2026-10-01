@@ -21,6 +21,13 @@ All commands run from `~/Downloads/kalshi` with `uv run`.
   and spot prices (`~/kalshi-data/backfill/spot/<stream>/<date>.jsonl.zst`: Binance 1-second BTC/ETH/SOL, OKX
   1-minute gold, Coinbase 1-minute). BTC and ETH from Dec 2025; SOL from Jan 2026 (check `kalshi-lab data`).
   No order books in history: backtests show `MARKETS[series].book_depth` contracts at the trade price.
+- **Order flow** (`~/kalshi-data/backfill/flow/<source>/<date>.parquet`, BTC/ETH/SOL from Dec 2025): per
+  second, taker buy and sell volume, trade count, last price (and largest trade, OKX only) for Binance spot
+  (`binance_<coin>usdt`) and OKX perpetuals (`okx_<coin>usdtswap`). Load with
+  `from kalshi_lab.data.flow import load_flow, flow_sources`. **Research and backtest-in-`fit()` only for now:**
+  the engine doesn't replay it and the recorder doesn't stream it live, so a strategy that needs it at trade
+  time needs infrastructure (a recorder stream + engine replay). If your flow research is promising, stop
+  and report exactly what you need.
 - **Recorded books**: every order-book change and trade since late Sep 2026 for BTC/ETH/SOL/gold 15m, plus
   live spot (`~/kalshi-data/raw/...`). These are all inside the lockbox; they're used by the lockbox stage.
 - **Research dataset**: `research/build_dataset.py <SERIES>` builds `research/data/<SERIES>.parquet`

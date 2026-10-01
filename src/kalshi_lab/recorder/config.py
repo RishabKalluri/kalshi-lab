@@ -4,6 +4,10 @@
                  exchanges: coinbase, kraken, bitstamp, okx)
   backfill_spot  public history for backtests: {"binance": "BTCUSDT"} (1s), {"okx": "XAU-USDT-SWAP"} (1m),
                  {"coinbase": "BTC-USD"} (1m)
+  flow           order-flow history (taker buy/sell volume per second, data/backfill.py backfill_flow):
+                 {"binance": "BTCUSDT"} spot 1s klines, {"okx": "BTC-USDT-SWAP"} perpetual trades. Research
+                 only for now: the recorder doesn't stream these live yet. (Binance futures would be the
+                 natural perp source, but its API is blocked from US IPs, so live trading couldn't use it.)
   settlement     "avg60": 60s average vs 60s average before open (CF Benchmarks crypto)
                  "point": one 1-minute close vs the close at open (Pyth gold)
   record         whether the recorder captures it by default
@@ -15,15 +19,18 @@ Backfill of Kalshi trades works for any series without an entry (no spot), e.g. 
 
 MARKETS = {
     "KXBTC15M": dict(live_spot=["coinbase:BTC-USD", "kraken:BTC/USD", "bitstamp:btcusd"],  # BRTI constituents
-                     backfill_spot={"binance": "BTCUSDT", "coinbase": "BTC-USD"}, settlement="avg60", record=True,
+                     backfill_spot={"binance": "BTCUSDT", "coinbase": "BTC-USD"},
+                     flow={"binance": "BTCUSDT", "okx": "BTC-USDT-SWAP"}, settlement="avg60", record=True,
                      book_depth=2088),
     "KXETH15M": dict(live_spot=["coinbase:ETH-USD", "kraken:ETH/USD", "bitstamp:ethusd"],
-                     backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"}, settlement="avg60", record=True,
+                     backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"},
+                     flow={"binance": "ETHUSDT", "okx": "ETH-USDT-SWAP"}, settlement="avg60", record=True,
                      book_depth=43),
     # Added Oct 1 2026: about 1/3 of ETH's volume, so likely less efficient. book_depth is provisional
     # until a day of recorded SOL books exists to measure it.
     "KXSOL15M": dict(live_spot=["coinbase:SOL-USD", "kraken:SOL/USD", "bitstamp:solusd"],
-                     backfill_spot={"binance": "SOLUSDT", "coinbase": "SOL-USD"}, settlement="avg60", record=True,
+                     backfill_spot={"binance": "SOLUSDT", "coinbase": "SOL-USD"},
+                     flow={"binance": "SOLUSDT", "okx": "SOL-USDT-SWAP"}, settlement="avg60", record=True,
                      book_depth=40),
     # Gold settles on Pyth (key-gated). OKX's XAU perp tracks it within ~$1 over 15 minutes.
     "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
