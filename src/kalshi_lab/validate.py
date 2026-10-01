@@ -438,3 +438,8 @@ def data_status(argv=None):
             print("  history  none (download: kalshi-lab backfill --series ... on the server, or ask the user)")
         print(f"  spot     {', '.join(have_spot) or 'none'}" + (f" (expected {spot})" if spot and not have_spot else ""))
         print(f"  books    {'recorded ' + rec[0].strftime('%Y-%m-%d') + ' -> ' + rec[1].strftime('%Y-%m-%d') if rec else 'not recorded'}")
+        from .data.flow import FLOW, flow_sources
+        for src in flow_sources(s).values():
+            fd = sorted(p.stem for p in (FLOW / src).glob("*.parquet"))
+            print(f"  flow     {src}: " + (f"{fd[0]} -> {fd[-1]} ({len(fd)} days)" if fd else
+                                          "not on this laptop (kalshi-lab pull; if the server lacks it, ask the user)"))
