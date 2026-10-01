@@ -1,0 +1,341 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "dog-seller-1001-122628",
+   "started": "2026-10-01T16:27:40.328424+00:00",
+   "finished": "2026-10-01T16:27:55.943412+00:00",
+   "git": "7c951cb",
+   "code": "16f231c06f19d095",
+   "code_v": 2,
+   "params": [],
+   "note": "v1: post-only underdog offers 870-360s, 10-30c, no protection",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-19T18:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 179.08,
+     "contracts": 3544.67,
+     "markets": 45,
+     "fees": 0.0,
+     "pnl_per_contract_c": 5.052,
+     "t_stat": 0.91,
+     "max_drawdown": 194.32,
+     "rejects": 0,
+     "ci95_c": [
+      -6.325,
+      16.426
+     ],
+     "days_positive": "2/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "",
+   "hash": "5d911173849039703fdbc4ec32ab121f99e43cdbf5ef586cc7ae50f770f164a3"
+  },
+  {
+   "stage": "quick",
+   "job": "dog-seller-1001-122803",
+   "started": "2026-10-01T16:28:28.726343+00:00",
+   "finished": "2026-10-01T16:31:19.685950+00:00",
+   "git": "7c951cb",
+   "code": "16f231c06f19d095",
+   "code_v": 2,
+   "params": [],
+   "note": "v1: post-only underdog offers 870-360s, 10-30c, no protection; ad-hoc May 1-8 -2.3c, Jun 1-8 -3.0c",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-17T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 329.26,
+     "contracts": 46122.72,
+     "markets": 546,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.714,
+     "t_stat": 0.46,
+     "max_drawdown": 583.27,
+     "rejects": 0,
+     "ci95_c": [
+      -2.485,
+      3.731
+     ],
+     "days_positive": "3/4"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "5d911173849039703fdbc4ec32ab121f99e43cdbf5ef586cc7ae50f770f164a3",
+   "hash": "d3b6f51b7731ee753a473f0653c02e05c0d1ccc791f6dfc5198545470c0e3905"
+  },
+  {
+   "stage": "full",
+   "job": "dog-seller-1001-123136",
+   "started": "2026-10-01T16:32:03.349485+00:00",
+   "finished": "2026-10-01T20:00:37.983240+00:00",
+   "git": "7c951cb",
+   "code": "16f231c06f19d095",
+   "code_v": 2,
+   "params": [],
+   "note": "v1: post-only underdog offers 870-360s, 10-30c, no protection",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-01": [
+     "2026-01-09T00:00:00+00:00",
+     "2026-02-01T00:00:00+00:00"
+    ],
+    "wf-2026-02": [
+     "2026-02-01T00:00:00+00:00",
+     "2026-03-01T00:00:00+00:00"
+    ],
+    "wf-2026-03": [
+     "2026-03-01T00:00:00+00:00",
+     "2026-04-01T00:00:00+00:00"
+    ],
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ],
+    "lat2x-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-01": {
+     "pnl": -675.36,
+     "contracts": 20348.0,
+     "markets": 1489,
+     "fees": 0.0,
+     "pnl_per_contract_c": -3.319,
+     "t_stat": -2.47,
+     "max_drawdown": 765.0,
+     "rejects": 0,
+     "ci95_c": [
+      -5.976,
+      -0.762
+     ],
+     "days_positive": "8/24"
+    },
+    "wf-2026-02": {
+     "pnl": -930.4,
+     "contracts": 46660.0,
+     "markets": 2604,
+     "fees": 0.0,
+     "pnl_per_contract_c": -1.994,
+     "t_stat": -1.98,
+     "max_drawdown": 1059.22,
+     "rejects": 0,
+     "ci95_c": [
+      -3.992,
+      0.018
+     ],
+     "days_positive": "3/17"
+    },
+    "wf-2026-03": {
+     "pnl": -731.21,
+     "contracts": 160152.0,
+     "markets": 5146,
+     "fees": 0.0,
+     "pnl_per_contract_c": -0.457,
+     "t_stat": -0.68,
+     "max_drawdown": 1624.55,
+     "rejects": 0,
+     "ci95_c": [
+      -1.798,
+      0.804
+     ],
+     "days_positive": "15/32"
+    },
+    "wf-2026-04": {
+     "pnl": -145.8,
+     "contracts": 242390.95,
+     "markets": 4797,
+     "fees": 0.0,
+     "pnl_per_contract_c": -0.06,
+     "t_stat": -0.09,
+     "max_drawdown": 1859.38,
+     "rejects": 0,
+     "ci95_c": [
+      -1.389,
+      1.142
+     ],
+     "days_positive": "17/31"
+    },
+    "wf-2026-05": {
+     "pnl": -933.01,
+     "contracts": 58586.02,
+     "markets": 3499,
+     "fees": 0.0,
+     "pnl_per_contract_c": -1.593,
+     "t_stat": -1.69,
+     "max_drawdown": 1299.13,
+     "rejects": 0,
+     "ci95_c": [
+      -3.467,
+      0.215
+     ],
+     "days_positive": "9/22"
+    },
+    "wf-2026-06": {
+     "pnl": -930.3,
+     "contracts": 27204.76,
+     "markets": 1743,
+     "fees": 0.0,
+     "pnl_per_contract_c": -3.42,
+     "t_stat": -2.86,
+     "max_drawdown": 930.3,
+     "rejects": 0,
+     "ci95_c": [
+      -5.776,
+      -1.226
+     ],
+     "days_positive": "2/11"
+    },
+    "wf-2026-07": {
+     "pnl": -931.06,
+     "contracts": 187228.47,
+     "markets": 4892,
+     "fees": 0.0,
+     "pnl_per_contract_c": -0.497,
+     "t_stat": -0.8,
+     "max_drawdown": 1716.99,
+     "rejects": 0,
+     "ci95_c": [
+      -1.686,
+      0.713
+     ],
+     "days_positive": "12/28"
+    },
+    "wf-2026-08": {
+     "pnl": 178.95,
+     "contracts": 244476.82,
+     "markets": 3431,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.073,
+     "t_stat": 0.11,
+     "max_drawdown": 1905.17,
+     "rejects": 0,
+     "ci95_c": [
+      -1.236,
+      1.295
+     ],
+     "days_positive": "11/20"
+    },
+    "lat2x-2026-06": {
+     "pnl": -930.83,
+     "contracts": 33029.29,
+     "markets": 2498,
+     "fees": 0.0,
+     "pnl_per_contract_c": -2.818,
+     "t_stat": -2.72,
+     "max_drawdown": 930.83,
+     "rejects": 0,
+     "ci95_c": [
+      -4.832,
+      -0.902
+     ],
+     "days_positive": "4/15"
+    },
+    "lat2x-2026-07": {
+     "pnl": -932.53,
+     "contracts": 177983.98,
+     "markets": 4916,
+     "fees": 0.0,
+     "pnl_per_contract_c": -0.524,
+     "t_stat": -0.85,
+     "max_drawdown": 1650.24,
+     "rejects": 0,
+     "ci95_c": [
+      -1.758,
+      0.689
+     ],
+     "days_positive": "12/28"
+    },
+    "lat2x-2026-08": {
+     "pnl": 80.6,
+     "contracts": 226474.64,
+     "markets": 3427,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.036,
+     "t_stat": 0.05,
+     "max_drawdown": 1790.05,
+     "rejects": 0,
+     "ci95_c": [
+      -1.219,
+      1.28
+     ],
+     "days_positive": "11/20"
+    },
+    "POOLED": {
+     "pnl": -5098.18,
+     "contracts": 987047.02,
+     "markets": 27601,
+     "pnl_per_contract_c": -0.517,
+     "ci95_c": [
+      -1.08,
+      0.081
+     ],
+     "days_positive": "76/182",
+     "max_drawdown": 5972.02
+    },
+    "POOLED-lat2x": {
+     "pnl": -1782.76,
+     "contracts": 437487.91000000003,
+     "markets": 10841,
+     "pnl_per_contract_c": -0.407,
+     "ci95_c": [
+      -1.247,
+      0.41
+     ],
+     "days_positive": "27/63",
+     "max_drawdown": 2537.42
+    }
+   },
+   "verdict": "reject",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "d3b6f51b7731ee753a473f0653c02e05c0d1ccc791f6dfc5198545470c0e3905",
+   "hash": "1938054a5377d3b13253338e0ed214fac29347251a58fb86aad68e73b2e0128a"
+  }
+ ]
+}

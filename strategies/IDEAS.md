@@ -9,18 +9,18 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 
 ## Ready to try (data exists)
 
-- **Last-minute momentum in ETH.** In `research/settlement_manipulation.py`, 59% of large (2σ)
+- **Last-minute momentum in ETH.** → taken: `settle-lockin` (see Tried). In `research/settlement_manipulation.py`, 59% of large (2σ)
   settlement-minute ETH moves continued *away* from the strike (BTC 51%, SOL 55%). Not yet compared
   with other minutes, so it could be general momentum. If it's real, the favourite at T−60s is
   underpriced. Check it against the other minutes before building anything.
 - **BTC leads ETH/SOL.** BTC spot (or BTC's Kalshi market) moves first; ETH/SOL Kalshi quotes reprice
   late. Trade ETH/SOL markets on fresh BTC moves. *Slow retail quotes on the thinner markets.* Data:
   spot 1s for all three, Kalshi trades.
-- **Cross-market consistency (ETH vs BTC Kalshi).** The two markets' implied probabilities should be
+- **Cross-market consistency (ETH vs BTC Kalshi).** → taken: `btc-anchor-vol` (vol version; see Tried). The two markets' implied probabilities should be
   consistent given the BTC–ETH correlation; when ETH's is far off given BTC's, fade it.
-- **Kalshi trade-size signals.** Big Kalshi taker prints (top 1% size) in the last minutes: informed (copy)
+- **Kalshi trade-size signals.** → taken: `settle-lockin` (see Tried). Big Kalshi taker prints (top 1% size) in the last minutes: informed (copy)
   or fat-finger/overreaction (fade)? Data: Kalshi trades with aggressor side (backfill).
-- **Time-of-day and weekend regimes.** Thin hours (weekends, 00–08 UTC) may be less efficient; condition
+- **Time-of-day and weekend regimes.** → partly screened in `btc-anchor-vol/research/bias_scan.py` (see Tried). Thin hours (weekends, 00–08 UTC) may be less efficient; condition
   existing signals on the hour, or find hour-specific biases.
 - **Scheduled macro events** (CPI, FOMC, NFP at 8:30/14:00 ET). Vol jumps at known times; does the
   market price the jump properly in the window around the release? Needs an event calendar (public).
@@ -57,3 +57,14 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **SOL VolFavorite / vol-of-vol (vomma) pricing** (`strategies/sol-vomma/`): rejected at the lockbox. The vomma
   (vol-uncertainty) correction to the binary's price is under 1¢, below a taker's fee plus spread. The eth-volfav method on
   SOL was promising in the walk-forward (+1.93¢, CI +0.57..+3.25, 5/6 months) but lost in the lockbox (−0.89¢; Sep −2.2¢).
+- **Settlement-average lock-in / last-minute favourites** (`strategies/settle-lockin/`): rejected at research. The
+  market prices the partly fixed 60 s settlement average better than a Binance-based partial-average model at every
+  horizon in the final 5 minutes (ETH and SOL); strike-cross cases aren't mispriced; no late favourite-longshot bias.
+- **Kalshi trade-size signals** (`strategies/settle-lockin/`, hypothesis 2): rejected at research. Copying or fading
+  top-1% Kalshi taker prints loses about fee + spread on ETH and SOL in every size bucket.
+- **BTC Kalshi implied vol as the ETH/SOL vol forecast** (`strategies/btc-anchor-vol/`): rejected at research. Adds
+  nothing to HAR (out-of-sample R² unchanged), overlaps eth-volfav's signal 93–97%. Spot-distance fair value also
+  loses to the market early in the window; no weekend/hour or YES/NO bias positive in both halves.
+- **Underdog seller (maker on the favourite-longshot bias)** (`strategies/dog-seller/`): rejected at full test
+  (−0.52¢/contract, CI −1.08..+0.08, 1/8 months). Underdog takers do overpay 2–4¢, but back-of-queue maker fills
+  are adversely selected (−2.1¢ in 30 s). Needs real queue position to work.

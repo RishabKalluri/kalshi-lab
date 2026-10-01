@@ -1,0 +1,20 @@
+{
+  "slug": "dog-seller",
+  "name": "Underdog Seller",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "class": "DogSeller",
+  "status": "rejected",
+  "description": "Mid-window (6 to 14.5 minutes before close) on Kalshi's 15-minute ETH and SOL markets, rest a passive offer on the underdog (the side priced 10-30c) at the best price. Retail takers overpay for these lottery-like contracts, and makers pay no fee, so selling them to takers keeps the overpayment.",
+  "hypothesis": "Favourite-longshot bias: taker purchases of 10-30c contracts lose 2-4c/contract after fees on ETH and SOL, and the passive side of those trades earned +1.3..+2.1c/contract 6-15 minutes before close in development data (7-8/8 months). A back-of-queue post-only maker selling only underdogs should keep part of that. Wrong if the engine walk-forward (back-of-queue fills on printed trades) has pooled CI below 0 or <40% of months positive, or the recorded-book lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-01",
+  "next": "Rejected at full: -0.52c/contract (CI -1.08..+0.08), 1/8 months positive. Back-of-queue fills are adversely selected (+0.8c edge at fill, -2.1c in the next 30s); protection didn't help."
+}

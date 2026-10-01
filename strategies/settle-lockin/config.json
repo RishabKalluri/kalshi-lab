@@ -1,0 +1,20 @@
+{
+  "slug": "settle-lockin",
+  "name": "Settlement Lock-in",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "class": "",
+  "status": "rejected",
+  "description": "Inside the last minute the settlement value is a 60-second average that is partly already fixed. If traders price off current spot vs strike, a model of the partly locked-in average should beat the market, especially just after spot crosses the strike.",
+  "hypothesis": "Inside the settlement window (last 60 s), (60-tau)/60 of the settlement average is fixed; spot-watchers misprice it, especially right after a strike cross. Wrong if a partial-average model loses to the next real fill in log loss, or buying its side at real fills after fees is <= 0 in both halves.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-01",
+  "next": "Rejected at research: the market beats the partial-average model at every horizon (traders track the CF index); strike-cross cases aren't mispriced; no late favourite-longshot bias; Kalshi trade size carries no tradable information."
+}

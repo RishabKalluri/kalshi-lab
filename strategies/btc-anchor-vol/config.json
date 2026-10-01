@@ -1,0 +1,20 @@
+{
+  "slug": "btc-anchor-vol",
+  "name": "BTC-Anchored Vol",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "class": "",
+  "status": "rejected",
+  "description": "Use BTC's deep, efficient Kalshi market as a real-time vol forecast for ETH and SOL: fair ETH/SOL implied vol = BTC implied vol x the coins' vol ratio. When ETH/SOL's own implied vol is far above it, buy the favourite; far below, buy the underdog.",
+  "hypothesis": "BTC's Kalshi implied vol is a forward-looking vol forecast that adapts to regime changes (what killed SOL VolFavorite in September); ETH/SOL traders price vol off recent moves. Wrong if the anchored forecast predicts ETH/SOL realized vol no better than HAR, or the deciles of iv/anchored-iv aren't positive at real fills in both halves.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-01",
+  "next": "Rejected at research: BTC implied vol adds nothing to the HAR forecast (out-of-sample R2 0.589 vs 0.587 ETH, 0.591 vs 0.588 SOL); the signal overlaps eth-volfav's 93-97%; the underdog side loses. Early-window fair-value and structural-bias screens also negative."
+}
