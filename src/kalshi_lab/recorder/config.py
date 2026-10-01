@@ -20,6 +20,11 @@ MARKETS = {
     "KXETH15M": dict(live_spot=["coinbase:ETH-USD", "kraken:ETH/USD", "bitstamp:ethusd"],
                      backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"}, settlement="avg60", record=True,
                      book_depth=43),
+    # Added Oct 1 2026: about 1/3 of ETH's volume, so likely less efficient. book_depth is provisional
+    # until a day of recorded SOL books exists to measure it.
+    "KXSOL15M": dict(live_spot=["coinbase:SOL-USD", "kraken:SOL/USD", "bitstamp:solusd"],
+                     backfill_spot={"binance": "SOLUSDT", "coinbase": "SOL-USD"}, settlement="avg60", record=True,
+                     book_depth=40),
     # Gold settles on Pyth (key-gated). OKX's XAU perp tracks it within ~$1 over 15 minutes.
     "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
                       settlement="point", record=True, book_depth=635),

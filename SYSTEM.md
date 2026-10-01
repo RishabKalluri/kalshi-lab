@@ -63,13 +63,13 @@ You can turn the laptop off at any time: recording and paper trading keep going 
 ```mermaid
 flowchart TB
     subgraph LIVE[Recorded live, from Sep 28]
-        B[Kalshi order books:<br/>every change + every trade]
-        S[Spot prices: Coinbase, Kraken,<br/>Bitstamp for BTC/ETH; OKX for gold]
+        B[Kalshi order books, BTC/ETH/SOL/gold:<br/>every change + every trade]
+        S[Spot prices: Coinbase, Kraken,<br/>Bitstamp for BTC/ETH/SOL; OKX for gold]
         M[Market info + settlements]
     end
     subgraph PAST[Downloaded history backfill]
-        T[Kalshi trades + settlements<br/>ETH: Dec 2025 to now]
-        P[Binance 1-second BTC/ETH,<br/>OKX 1-minute gold]
+        T[Kalshi trades + settlements<br/>BTC, ETH: Dec 2025 to now; SOL: Jan 2026 to now]
+        P[Binance 1-second BTC/ETH/SOL,<br/>OKX 1-minute gold]
     end
     LIVE --> R1[Realistic fills incl. queue position:<br/>needed for market makers]
     PAST --> R2[Months of history:<br/>needed for statistical confidence]
@@ -277,6 +277,10 @@ Credentials: ~/.kalshi/kalshi.pem + .env (KALSHI_KEY_ID)
 ---
 
 ## 10. Open items
+
+- **SOL 15-minute added Oct 1** (about 1/3 of ETH's volume, so likely less efficient): recording books;
+  history back to Jan 9, 2026 downloading. Next: recalibrate its book depth from a day of recordings, then
+  test VolFavorite-style ideas on it.
 
 - **Rotate the Kalshi API key** (the current one was pasted into chat) and **fund the account**
   (balance showed −$42.35) before any live trade.
