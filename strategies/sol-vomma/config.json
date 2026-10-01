@@ -1,0 +1,19 @@
+{
+  "slug": "sol-vomma",
+  "name": "SOL Vomma",
+  "series": [
+    "KXSOL15M"
+  ],
+  "class": "SolVomma",
+  "status": "rejected",
+  "description": "A few minutes before each 15-minute SOL market closes, read how much movement the price implies (implied vol) and compare it with a forecast from recent SOL price action. When the market expects much more movement than is likely, the side that's currently winning is too cheap, so buy it. (Started as a vol-of-vol / vomma pricing idea; research showed that correction is too small to trade, the vol-level error is what's left.)",
+  "hypothesis": "Thin KXSOL15M traders don't price vol uncertainty (vomma) and overprice short-horizon vol. Research: the vomma mixture correction is <1c, below fee+spread, so the tradable part is the vol level: when implied/forecast vol is in the top 30%, favourites are underpriced (~+1c/contract after fees at real next fills in both halves of dev data). Wrong if walk-forward months are mostly negative or the pooled CI is below 0.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-01",
+  "next": "Rejected: lockbox failed (-0.89c/contract, CI -2.68..+0.97; Aug 20-31 +1.07c, Sep -2.19c) after a promising full (+1.93c, CI +0.57..+3.25, 5/6 months). No retry per the rules. Vomma (vol-of-vol) pricing correction was <1c in research, too small to trade."
+}

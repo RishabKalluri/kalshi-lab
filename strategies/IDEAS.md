@@ -13,9 +13,6 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   settlement-minute ETH moves continued *away* from the strike (BTC 51%, SOL 55%). Not yet compared
   with other minutes, so it could be general momentum. If it's real, the favourite at T−60s is
   underpriced. Check it against the other minutes before building anything.
-- **VolFavorite on SOL** (port of `eth-volfav`). SOL's market has about ⅓ of ETH's volume, so it's
-  probably less efficient. Waits for the SOL Kalshi history download (server tmux `backfill-sol`) and a
-  `book_depth` recalibration from recorded SOL books.
 - **BTC leads ETH/SOL.** BTC spot (or BTC's Kalshi market) moves first; ETH/SOL Kalshi quotes reprice
   late. Trade ETH/SOL markets on fresh BTC moves. *Slow retail quotes on the thinner markets.* Data:
   spot 1s for all three, Kalshi trades.
@@ -57,3 +54,6 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   research. ETH Binance taker imbalance and signed volume (30 s to 5 min) don't predict the move to settlement
   (|r| < 0.03). Following them at the next real Kalshi fill loses about the fee plus spread (≈ −2¢) on SOL and
   on ETH's own market, and no decile comes out positive. SOL's own flow is untested because it isn't downloaded.
+- **SOL VolFavorite / vol-of-vol (vomma) pricing** (`strategies/sol-vomma/`): rejected at the lockbox. The vomma
+  (vol-uncertainty) correction to the binary's price is under 1¢, below a taker's fee plus spread. The eth-volfav method on
+  SOL was promising in the walk-forward (+1.93¢, CI +0.57..+3.25, 5/6 months) but lost in the lockbox (−0.89¢; Sep −2.2¢).
