@@ -104,7 +104,9 @@ def main(argv=None, mode: str = "paper"):
     risk = RiskLimits(max_position=a.max_position, max_order_qty=a.max_order_qty, max_loss=a.max_loss)
     source = LiveSource(a.series)
     data_root = Path(os.environ.get("KALSHI_DATA_ROOT", "~/kalshi-data/raw")).expanduser().parent
-    out = Path(a.out or f"results/{mode}-{Path(a.strategy.split(':')[0]).stem}-{datetime.now():%Y%m%d-%H%M%S}")
+    sp = Path(a.strategy.split(":")[0])
+    name = sp.parent.name if sp.name == "strategy.py" else sp.stem  # strategy folders are named by their slug
+    out = Path(a.out or f"results/{mode}-{name}-{datetime.now():%Y%m%d-%H%M%S}")
     meta = {"mode": mode, "strategy": a.strategy, "params": parse_params(a.param), "resolved_params": vars(strat.p),
             "series": a.series, "source": mode, "sizing": a.sizing, "bankroll": a.bankroll,
             "start": datetime.now().astimezone().isoformat(), "end": "(running)", "latency_ms": a.latency_ms}
