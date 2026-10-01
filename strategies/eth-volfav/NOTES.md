@@ -34,6 +34,8 @@ At 7 fixed checkpoints (T-360, 300, 240, 180, 120, 90, 60 s), if the market isn'
 | 6 | 09-30 | pipeline walk-forward, monthly refits | full | promising: +2.13¢, CI +0.6..+3.6, 5/8 months | |
 | 7 | 09-30 | realistic backfill depth (43), August refilled | full | **promising: +2.16¢, CI +0.93..+3.45, 6/8 months, +3.0¢ at 2× latency** | backtests had traded ~2.7× smaller than live |
 | 8 | 10-01 | sizing 1% → 0.5%/order | — | worst drawdown 26% → ~13% | size for drawdown, not return |
+| 9 | 10-01 | execution check: paper (Oct 1 03:16–15:31) vs a backtest on the same recorded books | paper | identical orders/fills/prices (21 vs 22 orders); paper +$6.69, 77 ct, +8.7¢/ct over 9 markets | the paper/live sim is faithful |
+| 10 | 10-01 | why 43% of paper orders missed | paper | every miss: the touch moved 1–5 ticks against us in the 150 ms latency. Whole recording (Sep 29–Oct 1, 65 orders): fill rate 78% at the touch, **95% with a 1¢ allowance** (`slip_c=1`), 98% at 2¢; ¢/ct within noise (−4.1 / −4.4 / −3.8, 36–41 markets) | backfill's synthetic books never move, so backtests assume ~93% fills; real at-the-touch IOCs fill less. Paper now runs `slip_c=1` |
 
 ## Learnings
 - **Entry timing can flip the sign.** Evaluate at fixed times; "first moment the signal crosses" is adverse selection.
@@ -42,8 +44,9 @@ At 7 fixed checkpoints (T-360, 300, 240, 180, 120, 90, 60 s), if the market isn'
 - **Paper can't prove an edge quickly** (~1/3 chance a real +2¢ edge looks negative after a week). Paper checks execution.
 - **Thinner markets are less efficient:** BTC no edge, ETH edge. Try SOL and smaller coins next.
 - The edge is concentrated outside US afternoon hours (13-16 UTC trade half as often).
+- **Real books move under you.** At-the-touch IOCs miss ~20–40% on recorded books (the quote moves within 150 ms); backfill's synthetic books don't model that. Cross the touch by 1¢ (`slip_c=1`) to fill ~95%.
 
 ## Current status
-- Stage: **paper trading** (since Sep 30, 0.5%/order, `deploy/paper/eth-volfav.json`).
+- Stage: **paper trading** (since Sep 30, 0.5%/order, `slip_c=1` from Oct 1, `deploy/paper/eth-volfav.json`).
 - Lockbox: **spent**. It was developed on data through Sep 29 before the lockbox existed; paper is its out-of-sample test.
 - Next: ~1 week of paper (~100 markets), compare per-contract results and fills to the walk-forward, then the $200 live-trial decision.

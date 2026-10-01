@@ -76,6 +76,9 @@ class VolFavorite(Strategy):
         # on the first crossing buys momentary jumps that reverse: engine walk-forward Apr/Jul/Sep went
         # from -0.2c/contract (every second) to +2.4..+8.2c (checkpoints). [] = every second.
         "checkpoints": [360, 300, 240, 180, 120, 90, 60],
+        # IOC limit this many cents through the touch. On real books ~40% of at-the-touch IOCs missed because
+        # the quote moved 1-5 ticks in the 150 ms latency (paper Oct 1); backfill's synthetic books never move.
+        "slip_c": 0,
     }
 
     def on_start(self, ctx):
@@ -162,6 +165,7 @@ class VolFavorite(Strategy):
             side, px = Side.BUY, book.best_ask
         else:
             side, px = Side.SELL, book.best_bid
+        px = min(999, px + 10 * self.p.slip_c) if side == Side.BUY else max(1, px - 10 * self.p.slip_c)
         qty = ctx.size(m.ticker, side, px, tif=TIF.IOC)
         if qty >= 1:
             (ctx.buy if side == Side.BUY else ctx.sell)(m.ticker, px, qty, tif=TIF.IOC, tag=f"r={ratio:.2f}")

@@ -10,7 +10,8 @@
   "hypothesis": "ETH's 15-minute market overprices short-horizon volatility after volatile stretches (participants anchor on recent moves), so favorites are cheap late in the window. Takers on the other side are paying for reversals that rarely happen. Wrong if: walk-forward months are mostly negative, or the same test works on BTC (would mean a method artifact, not an ETH inefficiency).",
   "params": [],
   "paper_params": [
-    "rv_scale=1.09"
+    "rv_scale=1.09",
+    "slip_c=1"
   ],
   "sizing": "pct:0.5",
   "budget": {
