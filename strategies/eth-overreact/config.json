@@ -1,0 +1,23 @@
+{
+  "slug": "eth-overreact",
+  "name": "ETH Overreaction Fade",
+  "series": [
+    "KXETH15M"
+  ],
+  "class": "ReversalOpen",
+  "status": "paper",
+  "description": "Right after a 15-minute ETH window opens, if the previous window moved a lot (more than 1.5 of its usual 15-minute standard deviations), buy the side that bets on a reversal. ETH's 15-minute moves tend to partly reverse after big moves, but the Kalshi price at the open still treats the new window as a coin flip.",
+  "hypothesis": "15-minute crypto returns have a persistent sign reversal after large moves (~56% reversal after |z|>1.5, every month, BTC/ETH/SOL; liquidation/inventory overshoots unwinding). The KXETH15M price in the first 1.5 minutes of the next window anchors near 50c and prices only spot vs strike. Losers: takers treating windows as independent coin flips or chasing continuation, makers quoting 50c at the open. Wrong if: out-of-sample (May-Aug) or walk-forward months mostly negative, or the lockbox loses (the market has finished learning it).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-01",
+  "next": "Paper ~1-2 weeks (~13 trades/day) to check fills at the open (fill rate, price vs touch with slip_c=1). Watch the decay: walk-forward May-Aug ~+0.8c, lockbox Sep +3.5c. Live trial only after a clean audit and the user's OK.",
+  "paper_params": [
+    "rv_scale=1.09",
+    "slip_c=1"
+  ]
+}

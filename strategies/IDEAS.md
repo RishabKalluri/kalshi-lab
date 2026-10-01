@@ -27,6 +27,9 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Round-number strikes.** Markets whose strike sits near a round number (ETH $2,000) may misprice
   barrier-like behaviour (support/resistance, option-pinning flow).
 
+- **SOL version of the open reversal fade.** Same rule as `eth-overreact` on KXSOL15M: research +5.6¢ (t 4.0), 7/8
+  months, May–Aug still +2.6..+3.7¢ (vs ETH ~+1.5¢). Thinner market, larger effect. New folder; ready to run.
+
 ## Needs data or infrastructure first
 
 - **Ladder relative value** (KXBTC ranges vs the KXBTCD above/below ladder): thin range markets quoted
@@ -38,6 +41,13 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Funding / open interest swings** (OKX public metrics) as a regime filter for momentum vs reversal.
 
 ## Tried
+
+- **Fade the previous window's big move at the open** (`strategies/eth-overreact/`): **paper trading**. 15-min
+  returns reverse in sign after |z| > 1.5 moves (~56%, all coins, every month); the opening price ignores it. ETH
+  walk-forward +2.23¢ (CI +0.37..+4.10, 8/9 months), lockbox pass +2.21¢ (CI −2.1..+6.5). Decaying on ETH (May–Aug ~+0.8¢).
+- **ETH overreaction to spot moves / streaks / round-number barriers** (`strategies/eth-overreact/`, H1–H3): rejected at
+  research. Kalshi lags spot slightly (< costs); streak count adds nothing beyond the last move's size; round levels
+  between spot and strike make the favourite *worse*, not better, and the underdog is still below costs.
 
 - **ETH VolFavorite** (`strategies/eth-volfav/`): buy the favourite when implied vol ≫ forecast vol.
   Walk-forward +2.16¢/contract, 6/8 months positive. Now **paper trading**.
