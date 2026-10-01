@@ -44,6 +44,10 @@ Prices are YES **mills** (0..1000). `Side.BUY` = buy YES, `Side.SELL` = sell YES
 Hooks (all optional): `on_start(ctx)`, `on_market(ctx, m)`, `on_book(ctx, ticker, book)`, `on_trade(ctx, t)`,
 `on_spot(ctx, tick)`, `on_timer(ctx)` (every second), `on_fill(ctx, f)`, `on_settle(ctx, m, pnl)`, `on_end(ctx)`.
 `fit(cls, series, until) -> dict` (classmethod): train on data before `until`, return param overrides.
+Write anything `fit()` produces under `strategies/<slug>/params/`. That folder is excluded from the code
+fingerprint, and the lockbox (and audits) set it aside and refit, so the strategy must not depend on any file in
+`params/` that its `fit()` doesn't write itself. Everything else in the folder (outside `research/`) is code: changing
+it after a promising full test means rerunning the full test before the lockbox.
 
 `ctx`: `now` (ns), `active_markets(series=None)`, `markets[ticker]` (`MarketInfo`: `open_ts`, `close_ts`,
 `strike`, `series`), `book(ticker)` (`best_bid`, `best_ask`, `mid`, `bids()`, `asks()`, `bid_qty(p)`,

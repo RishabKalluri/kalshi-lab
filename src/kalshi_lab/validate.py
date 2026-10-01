@@ -243,11 +243,35 @@ def lockbox_verdict(cards: dict) -> str:
     return "strong pass" if pooled.get("ci95_c") and pooled["ci95_c"][0] > 0 else "pass"
 
 
+def _hold_params(folder: Path, job: str, log):
+    """Lockbox/audit: move the strategy's params/ aside so every fitted file comes from fit() on this code (a file
+    hand-tuned after the full test can't reach the lockbox). Restored on exit, the held files winning."""
+    import atexit
+    import shutil
+    import signal
+    src = folder / "params"
+    if not src.exists():
+        return
+    held = folder / f".params-held-{job}"
+    src.rename(held)
+    log(f"  params/ set aside for this run ({len(list(held.iterdir()))} files); fit() regenerates what it needs")
+
+    def restore():
+        if not held.exists():
+            return
+        src.mkdir(exist_ok=True)
+        for f in held.iterdir():
+            shutil.move(str(f), str(src / f.name))
+        held.rmdir()
+    atexit.register(restore)
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # so a cancel still restores params/
+
+
 def main(argv=None):
     """`kalshi-lab validate smoke|quick|full|lockbox <strategy folder or file> [--series ...] [-p ...] [--job ID]`."""
     import argparse
 
-    from .strategy_dir import (append_result, code_hash, count_runs, folder_for, git_rev, ledger_append,
+    from .strategy_dir import (CODE_V, append_result, code_hash, count_runs, folder_for, git_rev, ledger_append,
                                ledger_ok, ledger_runs, load_config, strategy_spec)
     ap = argparse.ArgumentParser(prog="kalshi-lab validate")
     ap.add_argument("stage", choices=["smoke", "quick", "full", "lockbox"])
@@ -285,9 +309,13 @@ def main(argv=None):
             if not last_full or last_full.get("verdict") != "promising":
                 log("LOCKBOX: only after a promising full test.")
                 sys.exit(5)
-            if last_full.get("code") != code_hash(folder):
+            if last_full.get("code") != code_hash(folder, legacy=last_full.get("code_v") != CODE_V):
                 log("LOCKBOX: the code changed since the promising full test. Rerun the full test on this exact code first.")
                 sys.exit(5)
+
+    legacy_code = code_hash(folder, legacy=True) if folder else None
+    if folder and (a.stage == "lockbox" or a.audit):
+        _hold_params(folder, job, log)
 
     from .backtest import load_strategy
     cls = load_strategy(spec)
@@ -320,13 +348,13 @@ def main(argv=None):
 
     def record(verdict_, gate=None, crashed=False):
         if a.audit:
-            audit_compare(folder, a.stage, code, cards, verdict_, log)
+            audit_compare(folder, a.stage, code, legacy_code, cards, verdict_, log)
             return
         if not folder:
             return
         windows = {r["name"]: [r["start"].isoformat(), r["end"].isoformat()] for r in runs}
         rec = dict(stage=a.stage, job=job, started=started, finished=datetime.now(UTC).isoformat(), git=git_rev(),
-                   code=code, params=params, note=a.note, iteration=count_runs(folder, "full") + 1, windows=windows,
+                   code=code, code_v=CODE_V, params=params, note=a.note, iteration=count_runs(folder, "full") + 1, windows=windows,
                    cards=cards, verdict=verdict_, gate=gate, crashed=crashed, lockbox_start=LOCKBOX_START.isoformat())
         rec = ledger_append(folder.name, rec)  # authoritative
         append_result(folder, rec)              # display copy for the dashboard
@@ -373,7 +401,7 @@ def main(argv=None):
         sys.exit(4)  # the worker stops the job here
 
 
-def audit_compare(folder, stage, code, cards, verdict_, log):
+def audit_compare(folder, stage, code, legacy_code, cards, verdict_, log):
     """Compare a fresh re-run with the strategy's latest ledger entry for this stage."""
     from .strategy_dir import ledger_runs
     rec = next((r for r in reversed(ledger_runs(folder.name)) if r.get("stage") == stage and not r.get("crashed")), None)
@@ -381,6 +409,8 @@ def audit_compare(folder, stage, code, cards, verdict_, log):
         log(f"AUDIT {stage}: no ledger entry to compare against")
         sys.exit(7)
     problems = []
+    if rec.get("code_v") != 2:  # recorded with the v1 fingerprint (it included params/)
+        code = legacy_code
     if rec.get("code") != code:
         problems.append(f"code changed since the recorded run ({rec.get('code')} -> {code})")
     if rec.get("verdict") != verdict_:

@@ -103,12 +103,20 @@ def append_result(folder: Path, record: dict):
 LEDGER = ROOT / "results" / "_ledger"
 
 
-def code_hash(folder: Path) -> str:
-    """Fingerprint of a strategy's code (every .py and params file in its folder, excluding research/)."""
+CODE_V = 2  # fingerprint version recorded in the ledger as code_v
+
+
+def code_hash(folder: Path, legacy: bool = False) -> str:
+    """Fingerprint of a strategy's code: every .py/.json file in its folder except research/, results.json,
+    config.json and params/. params/ holds fit() output, which every test rewrites; the lockbox and audits set it
+    aside and refit, so fitted values always come from the code. (legacy=True: the v1 fingerprint, which
+    included params/, for comparing with ledger entries recorded before code_v existed.)"""
     h = hashlib.sha256()
     for f in sorted(folder.rglob("*")):
+        rel = f.relative_to(folder).parts
         if f.is_file() and f.suffix in (".py", ".json") and "research" not in f.parts and "__pycache__" not in f.parts \
-                and f.name not in ("results.json", "config.json"):
+                and f.name not in ("results.json", "config.json") and (legacy or rel[0] != "params") \
+                and not rel[0].startswith(".params-held"):
             h.update(str(f.relative_to(folder)).encode())
             h.update(f.read_bytes())
     return h.hexdigest()[:16]
