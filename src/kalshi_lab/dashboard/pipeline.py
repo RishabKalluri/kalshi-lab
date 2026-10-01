@@ -294,7 +294,7 @@ def stage_tab(stage, c, r, T, layout):
     if stage_runs:
         for rec in stage_runs:
             if rec.get("pre_lockbox_rules") and stage == "lockbox":
-                st.info(md(rec.get("note", "")))
+                st.warning("**Spent, not an independent test.** " + md(rec.get("note", "")))
         if any(_pooled(x) for x in stage_runs):
             runs_history(stage_runs)
         shown = True
@@ -331,10 +331,14 @@ def card(c, r, backfills, T, layout):
         cur = STAGES.index(r["stage"]) if r["stage"] in STAGES else 0
         done_stages = {x["stage"] for x in r["runs"]}
 
+        spent = {x["stage"] for x in r["runs"] if "spent" in str(x.get("verdict", ""))}
+
         def mark(i, s):
             if i == cur:
                 return "◉"
             if i < cur:
+                if s in spent:
+                    return "◐"
                 return "✓" if (s in done_stages or s in ("idea", "research")) else "◐"
             return "○"
 

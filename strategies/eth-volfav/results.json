@@ -554,10 +554,53 @@
    "finished": "2026-10-01T00:00:00Z",
    "git": "pre-folder",
    "params": [],
-   "note": "Not available: this strategy was developed on data through Sep 29 before the lockbox existed, so Aug 20+ is not unseen. Its out-of-sample test is paper trading from Sep 30.",
+   "note": "Not a real lockbox: this strategy was developed on data through Sep 29, so Aug 20+ was already seen. Numbers shown are its Aug-Sep walk-forward months (from the realistic-depth full test), for reference only. Its true out-of-sample test is paper trading from Sep 30.",
    "iteration": null,
-   "cards": {},
-   "verdict": "spent (developed before lockbox)",
+   "cards": {
+    "seen-2026-08": {
+     "pnl": 453.83,
+     "contracts": 17073.0,
+     "markets": 803,
+     "fees": 173.57,
+     "pnl_per_contract_c": 2.658,
+     "t_stat": 1.95,
+     "max_drawdown": 133.91,
+     "rejects": 0,
+     "ci95_c": [
+      0.011,
+      5.249
+     ],
+     "days_positive": "22/31"
+    },
+    "seen-2026-09": {
+     "pnl": 840.1,
+     "contracts": 28451.0,
+     "markets": 1094,
+     "fees": 285.91,
+     "pnl_per_contract_c": 2.953,
+     "t_stat": 2.64,
+     "max_drawdown": 169.65,
+     "rejects": 0,
+     "ci95_c": [
+      0.771,
+      5.046
+     ],
+     "days_positive": "21/29"
+    },
+    "POOLED": {
+     "pnl": 1293.92,
+     "contracts": 45524.0,
+     "markets": 1897,
+     "pnl_per_contract_c": 2.842,
+     "ci95_c": [
+      1.206,
+      4.496
+     ],
+     "days_positive": "43/60",
+     "max_drawdown": 169.65
+    }
+   },
+   "verdict": "spent (not independent)",
    "gate": null,
    "crashed": false,
    "pre_lockbox_rules": true
