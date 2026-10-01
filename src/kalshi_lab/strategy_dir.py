@@ -51,9 +51,20 @@ def all_folders() -> list[Path]:
                   and (p / "config.json").exists())
 
 
+GRANTS = STRATEGIES / "_budgets.json"  # user-granted extra budget: {"<slug>": {"full_tests": 5}}; agents can't edit it
+
+
+def budget(folder: Path, c: dict) -> dict:
+    """Effective budget. A strategy's own config.json can only LOWER the defaults (its agent can edit it);
+    raising them needs an entry in strategies/_budgets.json, which only the user grants."""
+    grant = json.loads(GRANTS.read_text()).get(folder.name, {}) if GRANTS.exists() else {}
+    own = c.get("budget") or {}
+    return {k: grant.get(k, min(int(own.get(k, v)), v)) for k, v in DEFAULT_BUDGET.items()}
+
+
 def load_config(folder: Path) -> dict:
     c = json.loads((folder / "config.json").read_text())
-    c.setdefault("budget", dict(DEFAULT_BUDGET))
+    c["budget"] = budget(folder, c)
     return c
 
 

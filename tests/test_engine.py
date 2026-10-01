@@ -197,3 +197,18 @@ def test_strategy_folder_ledger_budget_and_tamper_detection(tmp_path, monkeypatc
     h1 = sd.code_hash(f)
     (f / "strategy.py").write_text("x = 2\n")
     assert sd.code_hash(f) != h1
+
+
+def test_budget_can_only_be_raised_by_user_grant(tmp_path, monkeypatch):
+    import json
+    import kalshi_lab.strategy_dir as sd
+    monkeypatch.setattr(sd, "STRATEGIES", tmp_path)
+    monkeypatch.setattr(sd, "GRANTS", tmp_path / "_budgets.json")
+    f = tmp_path / "demo"
+    f.mkdir()
+    (f / "config.json").write_text(json.dumps({"slug": "demo", "series": ["X"], "budget": {"full_tests": 100}}))
+    assert sd.load_config(f)["budget"]["full_tests"] == 3          # agent's own increase is ignored
+    (f / "config.json").write_text(json.dumps({"slug": "demo", "series": ["X"], "budget": {"full_tests": 1}}))
+    assert sd.load_config(f)["budget"]["full_tests"] == 1          # lowering is allowed
+    (tmp_path / "_budgets.json").write_text(json.dumps({"demo": {"full_tests": 6}}))
+    assert sd.load_config(f)["budget"]["full_tests"] == 6          # user grant wins

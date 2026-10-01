@@ -18,7 +18,7 @@ PROTECTED_FILES = re.compile(
     r"(strategies/[^/]+/results\.json|results/_ledger/|results/_jobs/|"
     r"src/kalshi_lab/(validate|strategy_dir|backtest|jobs|remote|paper_ctl|engine|strategy|sizing|report)\.py|"
     r"src/kalshi_lab/(recorder|live|sim|core|data)/|deploy/|\.claude/|CLAUDE\.md|"
-    r"strategies/(_archive|_template|eth-volfav)/|tests/)"
+    r"strategies/(_archive|_template|eth-volfav)/|strategies/_budgets\.json|tests/)"
 )
 SECRETS = re.compile(r"(lockbox\.token|kalshi\.pem|\.kalshi/|(^|/)\.env\b)")
 BASH_FORBIDDEN = [
@@ -26,6 +26,8 @@ BASH_FORBIDDEN = [
     (r"KALSHI_LOCKBOX", "lockbox settings are fixed (user only)"),
     (r"lockbox\.token|_ledger", "the lockbox token and the ledger are off limits"),
     (r"kalshi-lab\s+live\b", "agents never trade real money"),
+    (r"kalshi-lab\s+(validate|enqueue|worker)\b|kalshi_lab\s+validate", "run pipeline stages through `kalshi-lab test` (it queues them one at a time)"),
+    (r"KALSHI_TEST_WORKERS", "test parallelism is fixed by the machine's capacity"),
     (r"kalshi-lab\s+(paper-stop|backfill|record)\b", "stopping paper traders / downloading / recording is infrastructure: ask the user"),
     (r"\b(systemctl|ssh|scp|rsync)\b", "the server and its services are off limits; use kalshi-lab commands"),
     (r"git\s+(push\s+(-f|--force)|reset\s+--hard|rebase|filter-branch)", "history-rewriting git commands are off limits"),
