@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "strategies"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "strategies" / "eth-volfav"))
 from vol_fit import PARAMS, fit_model  # noqa: E402
 
 ap = argparse.ArgumentParser()

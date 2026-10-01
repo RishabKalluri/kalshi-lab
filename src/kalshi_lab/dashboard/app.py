@@ -69,17 +69,17 @@ def find_strategies() -> dict[str, dict]:
 
     from kalshi_lab.strategy import Strategy
     out = {}
-    for f in sorted(STRATEGIES.glob("*.py")):
+    for f in sorted([*STRATEGIES.glob("*/strategy.py"), *(STRATEGIES / "_archive").glob("*.py")]):
         try:
-            spec = importlib.util.spec_from_file_location(f"dash_{f.stem}", f)
+            spec = importlib.util.spec_from_file_location(f"dash_{f.parent.name}_{f.stem}".replace("-", "_"), f)
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
         except Exception as e:
-            out[f"strategies/{f.name}"] = {"__error__": repr(e)}
+            out[str(f.relative_to(ROOT))] = {"__error__": repr(e)}
             continue
         for v in vars(mod).values():
             if isinstance(v, type) and issubclass(v, Strategy) and v is not Strategy and v.__module__ == mod.__name__:
-                out[f"strategies/{f.name}:{v.__name__}"] = {**v.params, "__doc__": (mod.__doc__ or "").strip()}
+                out[f"{f.relative_to(ROOT)}:{v.__name__}"] = {**v.params, "__doc__": (mod.__doc__ or "").strip()}
     return out
 
 
@@ -204,7 +204,9 @@ def run_panel():
                 cmd += ["--sweep", part.replace(" ", "")]
             with st.status(f"Running {name}…", expanded=True) as status:
                 st.code(" ".join(shlex.quote(c) for c in cmd), language="bash")
-                proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+                from kalshi_lab.validate import _unseal_token  # the user's own tool may use any dates
+                proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                                      env={**os.environ, "KALSHI_LOCKBOX_UNSEAL": _unseal_token()})
                 st.code((proc.stdout + proc.stderr)[-4000:] or "(no output)")
                 if proc.returncode == 0:
                     status.update(label=f"Done: {name}", state="complete")

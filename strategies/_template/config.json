@@ -1,0 +1,14 @@
+{
+  "slug": "",
+  "name": "",
+  "series": [],
+  "class": "",
+  "status": "developing",
+  "description": "Plain English, 2-3 sentences: what the strategy does and why it should make money.",
+  "hypothesis": "Before testing: why is this market mispriced, who is on the other side, and what result would prove it wrong?",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {"full_tests": 3, "lockbox_runs": 1},
+  "created": "",
+  "next": ""
+}

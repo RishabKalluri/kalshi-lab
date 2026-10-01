@@ -31,15 +31,20 @@ def _dirs():
 def enqueue(argv=None):
     ap = argparse.ArgumentParser(prog="kalshi-lab enqueue")
     ap.add_argument("strategy")
-    ap.add_argument("--series", nargs="+", required=True)
+    ap.add_argument("--series", nargs="+", help="default: the strategy folder's config.json")
     ap.add_argument("-p", "--param", action="append", default=[])
     ap.add_argument("--stages", default="quick,full")
     ap.add_argument("--job")
+    ap.add_argument("--note", default="")
     a = ap.parse_args(argv)
     _dirs()
-    job = a.job or f"{Path(a.strategy.split(':')[0]).stem}-{datetime.now():%m%d-%H%M%S}"
-    spec = dict(id=job, strategy=a.strategy, series=a.series, params=a.param, stages=a.stages.split(","),
-                created=datetime.now(timezone.utc).isoformat(), status="queued")
+    from .strategy_dir import folder_for, load_config
+    folder = folder_for(a.strategy)
+    series = a.series or (load_config(folder)["series"] if folder else ["KXBTC15M"])
+    slug = folder.name if folder else Path(a.strategy.split(":")[0]).stem
+    job = a.job or f"{slug}-{datetime.now():%m%d-%H%M%S}"
+    spec = dict(id=job, strategy=a.strategy, series=series, params=a.param, stages=a.stages.split(","),
+                note=a.note, created=datetime.now(timezone.utc).isoformat(), status="queued")
     (Q / "queue" / f"{job}.json").write_text(json.dumps(spec, indent=1))
     print(f"queued {job}: {a.stages} for {a.strategy} on {a.series}")
 
@@ -67,6 +72,10 @@ def _push(host: str | None, job_id: str | None = None):
         return
     subprocess.call(["rsync", "-az", f"{Q}/", f"{host}:kalshi/results/_jobs/"], stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL)
+    ledger = ROOT / "results" / "_ledger"
+    if ledger.exists():  # the authoritative records: the server's dashboard verifies results.json against them
+        subprocess.call(["rsync", "-az", f"{ledger}/", f"{host}:kalshi/results/_ledger/"], stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL)
     if job_id:
         dirs = [str(p) for p in (ROOT / "results").glob(f"{job_id}-*") if p.is_dir()]
         if dirs:
@@ -97,7 +106,7 @@ def worker(argv=None):
                 j["stage"] = stage
                 f.write_text(json.dumps(j, indent=1))
                 cmd = [sys.executable, "-m", "kalshi_lab", "validate", stage, j["strategy"], "--series", *j["series"],
-                       "--job", j["id"]] + [x for p in j["params"] for x in ("-p", p)]
+                       "--job", j["id"], "--note", j.get("note", "")] + [x for p in j["params"] for x in ("-p", p)]
                 log.write(f"\n=== {stage} {datetime.now(timezone.utc):%H:%M:%S} ===\n")
                 log.flush()
                 proc = subprocess.Popen(cmd, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)

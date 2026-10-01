@@ -175,6 +175,42 @@ sequenceDiagram
 
 ---
 
+## 4b. Agent-driven strategy development
+
+Each strategy is developed by its own agent (`/develop-strategy [market] [idea]`, a forked skill) in its own
+folder, and the agent drives the pipeline itself:
+
+```mermaid
+flowchart LR
+    A[/develop-strategy KXSOL15M/] --> B[read SYSTEM.md, other NOTES.md,<br/>rejected ideas, research tools]
+    B --> C[kalshi-lab new slug<br/>hypothesis written first]
+    C --> D[research + implement]
+    D --> E{smoke}
+    E --> F{quick}
+    F -->|clearly negative| D
+    F --> G{full<br/>budget 3}
+    G -->|not promising: log learning,<br/>change one thing| D
+    G -->|promising| H{lockbox<br/>one shot}
+    H -->|fail| R[rejected]
+    H -->|pass| P[paper-start]
+```
+
+```
+strategies/<slug>/  strategy.py · config.json · NOTES.md (learnings, kept current) · results.json · research/
+strategies/_template/  copied by `kalshi-lab new`     strategies/_archive/  older experiments + legacy registry
+```
+
+**The lockbox:** data from 2026-08-20 on is held out. Smoke/quick/full only use earlier "development" data;
+after a promising full test a strategy gets **one** run on the lockbox (pass = profitable, strong pass = CI above
+0, fail = rejected, not tweaked). This is the defense against overfitting by iteration.
+
+**Anti-cheating layers:** (1) every pipeline run is appended to a hash-chained ledger outside the strategy's
+folder (`results/_ledger/<slug>.jsonl`); budgets and gates read only the ledger, and the dashboard flags a
+results.json that disagrees; (2) the lockbox only opens for the exact code (fingerprint) that earned the
+promising verdict; (3) a hook blocks subagents from editing records, grading code, infrastructure, other
+strategies, credentials or the server, and backtests into the lockbox are refused; (4) before anything goes
+live, `kalshi-lab audit <slug>` independently re-runs the full test and lockbox and compares to the ledger.
+
 ## 5. Paper trading
 
 - One systemd **template** service on the server: `kalshi-paper@<id>`, configured by
@@ -210,7 +246,7 @@ Open **http://localhost:8501** (a tunnel to the server; `deploy/dashboard.sh` re
 ```
 
 Stage marks: ✓ done · ◐ partly done · ◉ current · ○ not yet. Stage text, descriptions and recorded
-numbers come from `strategies/registry.json`, which Claude keeps current; live status (tests, paper,
+numbers come from each strategy folder (config.json, results.json, NOTES.md); live status (tests, paper,
 downloads) is read automatically.
 
 ---
@@ -236,7 +272,11 @@ Lessons that shaped the system:
 ## 8. Commands (Claude runs these for you)
 
 ```
-uv run kalshi-lab test <strategy.py> --series KXETH15M     # smoke here, quick + full in the background
+/develop-strategy KXSOL15M                                 # (in Claude Code) an agent develops a new strategy
+uv run kalshi-lab new <slug> --series KXSOL15M             # new strategy folder from the template
+uv run kalshi-lab test <slug> --skip-smoke --stages full --wait   # one pipeline stage (smoke/quick/full/lockbox)
+uv run kalshi-lab data KXSOL15M                            # history available; development vs lockbox split
+uv run kalshi-lab audit <slug>                             # independent re-run vs the ledger (before live)
 uv run kalshi-lab jobs                                     # job status
 uv run kalshi-lab backtest <strategy.py> --source backfill --start ... --end ...
 uv run kalshi-lab paper-start <id> | paper-stop <id> | paper-list
@@ -261,12 +301,13 @@ kalshi/
 │   ├── sim/          exchange.py (simulated matching)
 │   ├── live/         run.py (paper/live runner) · exchange.py (real orders) · source.py · history.py
 │   ├── engine.py · strategy.py (Strategy + ctx) · sizing.py · report.py · backtest.py
-│   ├── validate.py (smoke/quick/full) · jobs.py (queue + worker) · remote.py (laptop↔server)
+│   ├── validate.py (smoke/quick/full/lockbox, audit) · strategy_dir.py (folders, ledger) · jobs.py · remote.py
 │   ├── paper_ctl.py (paper-start/stop) · auth.py · rest.py
 │   └── dashboard/    app.py · pipeline.py (Strategies page) · background.py
-├── strategies/       vol_favorite.py · vol_fit.py · registry.json · template.py · params/ · (older ones)
+├── strategies/       <slug>/ (strategy.py, config.json, NOTES.md, results.json) · _template/ · _archive/
 ├── research/         screening scripts (walk_forward.py, build_dataset.py, ...) · data/
 ├── scripts/          one-off checks (check_books, markouts, decompose, ...)
+├── .claude/          skills/develop-strategy/ (SKILL.md, reference.md) · hooks/strategy_agent_guard.py · settings.json
 ├── deploy/           server_setup.sh · push.sh · pull_data.sh · dashboard.sh · paper/<id>.json
 ├── tests/            unit tests (sim, engine, sizing, pipeline gates)
 └── results/          every run's summary.json, markets.csv, fills.csv, orders.csv, timeline; _jobs/

@@ -50,8 +50,10 @@ def ensure_local_worker():
 
 def test(argv=None):
     ap = argparse.ArgumentParser(prog="kalshi-lab test", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("strategy")
-    ap.add_argument("--series", nargs="+", default=["KXBTC15M"])
+    ap.add_argument("strategy", help="strategy folder/slug (e.g. eth-volfav) or a .py file")
+    ap.add_argument("--series", nargs="+", help="default: the strategy folder's config.json")
+    ap.add_argument("--note", default="", help="what changed in this iteration (logged to results.json)")
+    ap.add_argument("--wait", action="store_true", help="block until the queued stages finish, then print the verdicts")
     ap.add_argument("-p", "--param", action="append", default=[])
     ap.add_argument("--stages", default="quick,full", help="background stages to queue after smoke")
     ap.add_argument("--skip-smoke", action="store_true")
@@ -82,7 +84,12 @@ def jobs(argv=None):
 
 
 def _test_local(a):
-    job = f"{Path(a.strategy.split(':')[0]).stem}-{datetime.now():%m%d-%H%M%S}"
+    from .strategy_dir import folder_for, load_config
+    folder = folder_for(a.strategy)
+    if not a.series:
+        a.series = load_config(folder)["series"] if folder else ["KXBTC15M"]
+    slug = folder.name if folder else Path(a.strategy.split(":")[0]).stem
+    job = f"{slug}-{datetime.now():%m%d-%H%M%S}"
     print(f"pulling data for {a.series} from {HOST}...", flush=True)
     pull_data(a.series)
     sync()  # the server's dashboard reads strategy files/registry
@@ -90,13 +97,48 @@ def _test_local(a):
     params = [x for p in a.param for x in ("-p", p)]
     if not a.skip_smoke:
         print("smoke test (local):", flush=True)
-        rc = subprocess.call(base + ["validate", "smoke", a.strategy, "--series", *a.series, *params, "--job", job], cwd=ROOT)
+        rc = subprocess.call(base + ["validate", "smoke", a.strategy, "--series", *a.series, *params, "--job", job,
+                                     "--note", a.note], cwd=ROOT)
         if rc != 0:
             print("smoke failed: fix it and re-run. Nothing was queued.")
             sys.exit(rc)
         subprocess.call(["rsync", "-az", *[str(p) for p in (ROOT / "results").glob(f"{job}-smoke")],
                          f"{HOST}:kalshi/results/"], stdout=subprocess.DEVNULL)
+        subprocess.call(["rsync", "-az", f"{ROOT}/results/_ledger/", f"{HOST}:kalshi/results/_ledger/"],
+                        stdout=subprocess.DEVNULL)
+    if not a.stages:
+        return
     subprocess.check_call(base + ["enqueue", a.strategy, "--series", *a.series, *params, "--stages", a.stages,
-                                  "--job", job], cwd=ROOT)
+                                  "--job", job, "--note", a.note], cwd=ROOT)
     ensure_local_worker()
-    print("queued on this laptop's background worker; results appear in the dashboard as they finish.")
+    print(f"queued {job} ({a.stages}) on this laptop's background worker; results appear in the dashboard as they finish.")
+    if a.wait:
+        wait(job)
+
+
+def wait(job: str):
+    """Block until a job finishes; print each stage's verdict and the job status (for agents)."""
+    import json
+    import time
+    done = ROOT / "results" / "_jobs" / "done" / f"{job}.json"
+    while not done.exists():
+        time.sleep(15)
+    j = json.loads(done.read_text())
+    for stage in j["stages"]:
+        rep = ROOT / "results" / "_jobs" / f"{job}.{stage}.json"
+        if rep.exists():
+            r = json.loads(rep.read_text())
+            pooled = r["cards"].get("POOLED") or next(iter(r["cards"].values()), {})
+            print(f"{stage}: verdict={r['verdict']} pooled={pooled}")
+    print(f"job {job}: {j['status']}")
+
+
+def pull(argv=None):
+    """`kalshi-lab pull SERIES ...`: copy the server's history + recent recordings for these series here."""
+    import argparse
+    ap = argparse.ArgumentParser(prog="kalshi-lab pull")
+    ap.add_argument("series", nargs="+")
+    ap.add_argument("--recorded-days", type=int, default=3)
+    a = ap.parse_args(argv)
+    pull_data(a.series, a.recorded_days)
+    print(f"pulled {a.series}")

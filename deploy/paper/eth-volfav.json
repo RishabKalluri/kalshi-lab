@@ -1,1 +1,1 @@
-{"strategy": "strategies/vol_favorite.py", "series": ["KXETH15M"], "params": ["rv_scale=1.09"], "sizing": "pct:0.5"}
+{"strategy": "strategies/eth-volfav/strategy.py", "series": ["KXETH15M"], "params": ["rv_scale=1.09"], "sizing": "pct:0.5"}

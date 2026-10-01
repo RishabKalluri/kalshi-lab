@@ -1,11 +1,8 @@
-"""Strategy pipeline page.
+"""Strategy pipeline page: one card per strategy folder (strategies/<slug>/).
 
-One card per strategy, always in the same layout:
-  header + current status · what it does · what's running for it right now (tests, paper runs, data it
-  waits on, with elapsed time and estimates) · stage tabs, each with what the stage checks, the result,
-  and its numbers · next step.
-Stage, descriptions and recorded numbers come from strategies/registry.json (kept current through chat);
-live status comes from validation jobs, paper runs and backfill logs.
+Each card reads the folder's config.json (name, description, hypothesis, status), results.json (every pipeline
+run, appended automatically) and NOTES.md, plus live state: running test jobs, paper runs, data downloads.
+Ideas without a folder and older rejected experiments come from strategies/_archive/registry.json.
 """
 
 import json
@@ -26,26 +23,38 @@ RESULTS = ROOT / "results"
 JOBS = RESULTS / "_jobs"
 DATA = Path(os.environ.get("KALSHI_DATA_ROOT", "~/kalshi-data/raw")).expanduser()
 LOGS = DATA.parent / "logs"
-STAGES = ["idea", "research", "smoke", "quick", "full", "paper", "live"]
+STAGES = ["idea", "research", "smoke", "quick", "full", "lockbox", "paper", "live"]
 LABEL = {"idea": "Idea", "research": "Research", "smoke": "Smoke", "quick": "Quick", "full": "Full test",
-         "paper": "Paper", "live": "Live", "rejected": "Rejected"}
+         "lockbox": "Lockbox", "paper": "Paper", "live": "Live", "rejected": "Rejected", "parked": "Parked"}
 STAGE_INFO = {
-    "idea": "A hypothesis about why the market might be mispriced, and who's on the other side.",
-    "research": "Quick analysis on historical data to see whether the effect exists at all. Screening only: research scripts simplify execution, so no decision is made on them (a +2.2c research result was -0.2c through the engine until entry timing was fixed).",
-    "smoke": "Runs the strategy code on ~2 hours of data (~1 min): does it work, trade, and size orders sensibly? Must pass before anything else runs.",
-    "quick": "A few days of history plus recent recorded order books (~5-10 min). A gate: clearly negative results stop here and the full test never runs.",
-    "full": "Walk-forward through the real trading engine: one backtest per month, the strategy refit before each month on earlier data only, plus the last 3 months at double latency and all recorded order books (~30-60 min; only after Quick). Verdict from the pooled result: promising (CI above 0, >=60% of months up, survives 2x latency), reject, or inconclusive.",
-    "paper": "Live market data, simulated money, 24/7 on the server. Checks that live fills and signals match the backtest. Can start once Quick passes and run alongside the Full test, since it risks no money.",
-    "live": "Real money at small size with stop rules set in advance. Requires a finished Full test AND enough paper results, and your go-ahead.",
+    "idea": "The hypothesis, written before any test: why the market should be mispriced and who's on the other side.",
+    "research": "Screening analyses on history. They simplify execution, so no decision is made on them.",
+    "smoke": "Runs the strategy on 6 hours of development data (~1 min): does it work, trade, and size orders sensibly?",
+    "quick": "The last 3 days of development data (~1-10 min). Gate: clearly negative stops here; the full test never runs.",
+    "full": "Walk-forward through the engine over all development months (before the lockbox), refit monthly on earlier data, plus the last 3 months at 2x latency. Promising = pooled 95% CI above 0, >=60% of months up, survives 2x latency. Budget: 3 per strategy.",
+    "lockbox": "One shot at the ~6 weeks the strategy has never seen (from the lockbox date on), only after a promising full test. Pass = profitable; strong pass = CI above 0; fail = the idea is rejected, not tweaked.",
+    "paper": "Live data, simulated money, 24/7 on the server, after the lockbox passes. Checks live fills and signals match the backtest.",
+    "live": "Real money at small size with stop rules set in advance. Needs the user's go-ahead.",
 }
 CARD_COLS = {"pnl": "PnL ($)", "markets": "markets", "contracts": "contracts", "pnl_per_contract_c": "¢/contract",
              "ci95_c": "95% CI (¢)", "days_positive": "days +", "max_drawdown": "max DD ($)"}
 
 
 # ------------------------------------------------------------------ data (cached: the server is small)
-def load_registry() -> list[dict]:
-    p = ROOT / "strategies" / "registry.json"
-    return json.loads(p.read_text()) if p.exists() else []
+def load_entries() -> tuple[list[dict], list[dict]]:
+    """(strategy folders, archived/legacy entries)."""
+    from kalshi_lab.strategy_dir import all_folders, load_config, load_results
+    out = []
+    for f in all_folders():
+        c = load_config(f)
+        c["_folder"] = f
+        c["_runs"] = load_results(f)["runs"]
+        notes = f / "NOTES.md"
+        c["_notes"] = notes.read_text() if notes.exists() else ""
+        out.append(c)
+    arch = ROOT / "strategies" / "_archive" / "registry.json"
+    legacy = json.loads(arch.read_text()) if arch.exists() else []
+    return out, [e for e in legacy if not any(e.get("id") == c["slug"] for c in out)]
 
 
 @st.cache_data(ttl=20, show_spinner=False)
@@ -126,27 +135,40 @@ def _backfills() -> dict[str, dict]:
     return out
 
 
-def _matches(entry, strategy: str, series) -> bool:
-    return bool(entry["file"]) and strategy.split(":")[0].endswith(entry["file"]) and set(series) == set(entry["series"])
+def _folder_of(spec: str):
+    from kalshi_lab.strategy_dir import folder_for
+    try:
+        return folder_for(spec or "")
+    except Exception:
+        return None
 
 
-def resolve(entry, jobs, papers) -> dict:
-    stage, status = entry["stage"], ""
-    ejobs = [j for j in jobs if _matches(entry, j["strategy"], j["series"])]
+def resolve(c, jobs, papers) -> dict:
+    """Current stage + status for a strategy folder, from its results, config and live jobs/paper runs."""
+    f = c["_folder"].resolve()
+    runs = [r for r in c["_runs"] if not r.get("crashed")]
+    reached = [STAGES.index(r["stage"]) for r in runs if r.get("stage") in STAGES]
+    stage = STAGES[max(reached)] if reached else ("research" if "## Iteration log" in c["_notes"] and runs else "idea")
+    status = c.get("status", "developing")
+    ejobs = [j for j in jobs if _folder_of(j["strategy"]) == f]
     active = next((j for j in ejobs if j["_state"] in ("running", "queued")), None)
-    paper = [p for p in papers if _matches(entry, p.get("strategy", ""), p.get("series", []))]
+    paper = [p for p in papers if _folder_of(p.get("strategy", "")) == f]
     live_paper = next((p for p in paper if p["_running"]), None)
+    label = status
+    if status in ("paper", "live"):
+        stage = status
     if active:
-        stage = (active.get("stage") or active["stages"][0]) if active["_state"] == "running" else stage
-        status = f"testing: {active.get('stage', '')}" if active["_state"] == "running" else "test queued"
-    if live_paper:
-        stage, status = "paper", "paper trading"
-    if entry["stage"] == "rejected":
-        status = "rejected"
-    return dict(stage=stage, status=status, jobs=ejobs, active_job=active, paper=paper, live_paper=live_paper)
+        label = f"testing: {active.get('stage', '')}" if active["_state"] == "running" else "test queued"
+        if active["_state"] == "running" and active.get("stage") in STAGES:
+            stage = max(stage, active["stage"], key=STAGES.index)
+    elif live_paper:
+        label = "paper trading"
+    elif runs:
+        last = runs[-1]
+        label = f"{status} · last: {last['stage']} {last.get('verdict', '')}"
+    return dict(stage=stage, status=label, jobs=ejobs, active_job=active, paper=paper, live_paper=live_paper, runs=runs)
 
 
-# ------------------------------------------------------------------ pieces
 def md(text: str) -> str:
     """Escape $ so Streamlit markdown doesn't render dollar amounts as LaTeX."""
     return str(text).replace("$", "\\$")
@@ -170,9 +192,9 @@ def runs_table(cards: dict):
         st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
 
-def activity_rows(entry, r, backfills) -> list[dict]:
+def activity_rows(c, r, backfills) -> list[dict]:
     rows = job_rows(r["jobs"]) + paper_rows([p for p in r["paper"] if p["_running"]])
-    for dep in entry.get("depends_on", []):
+    for dep in c.get("depends_on", []):
         b = backfills.get(dep["log"])
         if b and b["running"]:
             rows.append({**b, "kind": "Waiting on data", "name": dep["label"]})
@@ -232,29 +254,52 @@ def paper_stats(p: dict, T: dict, layout):
     st.caption(f"results: `{Path(p['_dir']).name}` · saved {p['_age_min']:.0f} min ago")
 
 
-def stage_tab(stage, entry, r, T, layout):
-    h = entry.get("history", {}).get(stage)
+def _pooled(rec: dict) -> dict:
+    cards = rec.get("cards") or {}
+    return cards.get("POOLED") or next((v for v in cards.values() if v), {}) or {}
+
+
+def runs_history(stage_runs: list[dict]):
+    """Every attempt at a stage, newest first, with its headline numbers."""
+    rows = []
+    for i, rec in enumerate(reversed(stage_runs)):
+        pc = _pooled(rec)
+        wf = [k for k, v in (rec.get("cards") or {}).items() if k.startswith(("wf-", "lockbox-2")) and v]
+        up = sum((rec["cards"][k] or {}).get("pnl", 0) > 0 for k in wf)
+        rows.append({"when": str(rec.get("finished", ""))[:16].replace("T", " "), "verdict": rec.get("verdict", ""),
+                     "¢/contract": pc.get("pnl_per_contract_c"), "95% CI (¢)": pc.get("ci95_c"),
+                     "PnL ($)": pc.get("pnl"), "markets": pc.get("markets"),
+                     "months +": f"{up}/{len(wf)}" if wf else "", "note": rec.get("note", ""), "job": rec.get("job", "")})
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    latest = stage_runs[-1]
+    detail = {k: v for k, v in (latest.get("cards") or {}).items() if v}
+    if len(detail) > 1:
+        with st.expander("Latest attempt: every run"):
+            runs_table(detail)
+
+
+def stage_tab(stage, c, r, T, layout):
     cur = STAGES.index(r["stage"]) if r["stage"] in STAGES else 0
-    st.markdown(f"**What this stage checks:** {STAGE_INFO[stage]}")
-    if h:
-        st.markdown(f"**Result: {md(h['result'])}** · {h['date']}")
-        st.markdown(md(h["detail"]))
+    st.markdown(f"**What this stage checks:** {md(STAGE_INFO[stage])}")
+    stage_runs = [x for x in r["runs"] if x.get("stage") == stage]
     shown = False
-    if h and h.get("metrics"):
-        metric_grid(h["metrics"])
+    if stage == "idea":
+        st.markdown(f"**Hypothesis:** {md(c.get('hypothesis', ''))}")
         shown = True
-    cards = {name: run_card(name) for name in (h or {}).get("runs", [])}
-    for j in r["jobs"]:  # automated pipeline reports for this stage
-        rep = j.get("_reports", {}).get(stage)
-        if rep:
-            for run, c in rep["cards"].items():
-                cards[f"{j['id']} · {run}"] = c
-            if stage == "full":
-                st.markdown(f"**Pipeline verdict:** {rep['verdict']}")
-    if any(cards.values()):
-        st.markdown("**Runs**")
-        runs_table(cards)
+    elif stage == "research":
+        sec = c["_notes"].split("## Ideas and prior work used")
+        if len(sec) > 1:
+            st.markdown(md(sec[1].split("\n## ")[0]))
+            shown = True
+    if stage_runs:
+        for rec in stage_runs:
+            if rec.get("pre_lockbox_rules") and stage == "lockbox":
+                st.info(md(rec.get("note", "")))
+        if any(_pooled(x) for x in stage_runs):
+            runs_history(stage_runs)
         shown = True
+    if stage == "full":
+        st.caption(f"Full tests used: {len(stage_runs)} of {c['budget'].get('full_tests', 3)}")
     if stage == "paper" and r["paper"]:
         paper_stats(r["live_paper"] or r["paper"][0], T, layout)
         shown = True
@@ -262,46 +307,49 @@ def stage_tab(stage, entry, r, T, layout):
     if aj and aj["_state"] == "running" and aj.get("stage") == stage:
         st.info("This stage is running now: progress is shown under Running now.")
     if not shown:
-        st.caption("Not reached yet." if STAGES.index(stage) > cur else "No numbers recorded for this stage.")
+        st.caption("Not reached yet." if STAGES.index(stage) > cur else "No runs recorded for this stage.")
 
 
-def card(entry, r, backfills, T, layout):
+def card(c, r, backfills, T, layout):
     with st.container(border=True):
-        h1, h2 = st.columns([3, 1.3])
-        h1.markdown(f"### {entry['name']}")
-        h1.caption(f"{', '.join(entry['series'])} · `{entry['file'] or 'research only'}` · "
-                   f"stage: **{LABEL.get(r['stage'], r['stage'])}**")
-        if r["status"]:
-            h2.markdown(f'<div style="text-align:right;padding-top:0.9rem;color:{T["ink2"]}">{r["status"]}</div>',
-                        unsafe_allow_html=True)
-        st.markdown(f"**What it does:** {md(entry.get('description') or entry['summary'])}")
-        rows = activity_rows(entry, r, backfills)
+        h1, h2 = st.columns([3, 1.4])
+        h1.markdown(f"### {c['name']}")
+        h1.caption(f"{', '.join(c['series'])} · `strategies/{c['slug']}/` · stage: **{LABEL.get(r['stage'], r['stage'])}**")
+        h2.markdown(f'<div style="text-align:right;padding-top:0.9rem;color:{T["ink2"]}">{r["status"]}</div>',
+                    unsafe_allow_html=True)
+        from kalshi_lab.strategy_dir import ledger_ok, results_match_ledger
+        if not ledger_ok(c["slug"]):
+            st.error("⚠ Ledger hash chain broken: pipeline records were edited. Treat every result for this strategy as untrusted.")
+        elif not results_match_ledger(c["_folder"]):
+            st.warning("⚠ results.json disagrees with the pipeline ledger (edited?). Numbers below may be wrong; "
+                       "the ledger is authoritative.")
+        st.markdown(f"**What it does:** {md(c.get('description', ''))}")
+        rows = activity_rows(c, r, backfills)
         if rows:
             st.markdown("**Running now**")
             activity_block(rows)
         cur = STAGES.index(r["stage"]) if r["stage"] in STAGES else 0
-        hist = entry.get("history", {})
+        done_stages = {x["stage"] for x in r["runs"]}
 
         def mark(i, s):
             if i == cur:
                 return "◉"
-            if hist.get(s, {}).get("status") == "partial":
-                return "◐"
-            return "✓" if i < cur else "○"
+            if i < cur:
+                return "✓" if (s in done_stages or s in ("idea", "research")) else "◐"
+            return "○"
 
         labels = [f"{mark(i, s)} {LABEL[s]}" for i, s in enumerate(STAGES)]
-        if entry.get("parallel_note"):
-            st.caption(f"⇉ {entry['parallel_note']}")
-        st.caption("Click a stage for its details and numbers · ✓ done · ◐ partly done · ◉ current · ○ not yet")
-        tabs = st.tabs(labels, default=labels[cur], key=f"stages-{entry['id']}", on_change="ignore")
+        st.caption("Click a stage for its details and numbers · ✓ done · ◐ skipped/partial · ◉ current · ○ not yet")
+        tabs = st.tabs(labels, default=labels[cur], key=f"stages-{c['slug']}", on_change="ignore")
         for s, tab in zip(STAGES, tabs):
             with tab:
-                stage_tab(s, entry, r, T, layout)
-        if entry.get("next"):
-            st.markdown(f"**Next:** {md(entry['next'])}")
+                stage_tab(s, c, r, T, layout)
+        if c.get("next"):
+            st.markdown(f"**Next:** {md(c['next'])}")
+        with st.expander("Notes & learnings (NOTES.md)"):
+            st.markdown(md(c["_notes"]) or "_empty_")
 
 
-# ------------------------------------------------------------------ page
 def page(T: dict, layout):
     st.title("Strategies")
     items = health()
@@ -312,30 +360,36 @@ def page(T: dict, layout):
             col.markdown(f'<div style="font-size:0.8rem;color:{T["muted"]}">{label}</div>'
                          f'<div style="font-size:0.85rem"><span style="color:{color}">{icon}</span> {detail}</div>',
                          unsafe_allow_html=True)
-    reg = load_registry()
+    entries, legacy = load_entries()
     jobs, papers, backfills = _jobs(), _paper_runs(), _backfills()
-    users = {}
-    for e in reg:
-        for d in e.get("depends_on", []):
-            users.setdefault(d["log"], []).append(e["name"])
     running_bf = {k: v for k, v in backfills.items() if v["running"]}
     if running_bf:
         with st.expander(f"Data downloads ({len(running_bf)} running)"):
             for k, b in running_bf.items():
                 c1, c2, c3 = st.columns([2.5, 4, 2])
-                c1.markdown(f"**{b['name']}**  \n<span style='font-size:0.8rem'>for "
-                            f"{', '.join(users.get(k, ['general history']))}</span>", unsafe_allow_html=True)
+                c1.markdown(f"**{b['name']}**")
                 c2.progress(max(0.0, min(1.0, b["frac"])), text=f"{b['phase']}: {b['detail']}")
                 c3.markdown(f"running {_dur(b['elapsed'])}  \n**{'~' + _dur(b['eta']) + ' left' if b.get('eta') else '—'}**")
     st.divider()
+    active = [c for c in entries if c.get("status") not in ("rejected", "parked")]
+    resolved = [(c, resolve(c, jobs, papers)) for c in active]
     order = {s: i for i, s in enumerate(reversed(STAGES))}
-    resolved = [(e, resolve(e, jobs, papers)) for e in reg if e["stage"] != "rejected"]
     resolved.sort(key=lambda x: order.get(x[1]["stage"], 99))
-    for e, r in resolved:
-        card(e, r, backfills, T, layout)
-    rej = [e for e in reg if e["stage"] == "rejected"]
-    if rej:
-        with st.expander(f"Rejected ideas ({len(rej)})"):
-            st.dataframe(pd.DataFrame([{"strategy": e["name"], "series": ", ".join(e["series"]),
-                                        "what it was": e.get("description", e["summary"]), "why rejected": e["evidence"]}
-                                       for e in rej]), hide_index=True, width="stretch")
+    if not resolved:
+        st.info("No active strategies. Start one with the develop-strategy skill.")
+    for c, r in resolved:
+        card(c, r, backfills, T, layout)
+    ideas = [e for e in legacy if e.get("stage") not in ("rejected",)]
+    if ideas:
+        with st.expander(f"Ideas without code yet ({len(ideas)})"):
+            st.dataframe(pd.DataFrame([{"idea": e["name"], "markets": ", ".join(e["series"]),
+                                        "what": e.get("description", e.get("summary", "")), "evidence": e.get("evidence", "")}
+                                       for e in ideas]), hide_index=True, width="stretch")
+    rej = [c for c in entries if c.get("status") in ("rejected", "parked")]
+    rej_rows = [{"strategy": c["name"], "markets": ", ".join(c["series"]), "what it was": c.get("description", ""),
+                 "why": c.get("next", ""), "folder": f"strategies/{c['slug']}/"} for c in rej]
+    rej_rows += [{"strategy": e["name"], "markets": ", ".join(e["series"]), "what it was": e.get("description", e.get("summary", "")),
+                  "why": e.get("evidence", ""), "folder": "strategies/_archive/"} for e in legacy if e.get("stage") == "rejected"]
+    if rej_rows:
+        with st.expander(f"Rejected or parked ({len(rej_rows)})"):
+            st.dataframe(pd.DataFrame(rej_rows), hide_index=True, width="stretch")

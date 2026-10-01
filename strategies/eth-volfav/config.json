@@ -1,0 +1,22 @@
+{
+  "slug": "eth-volfav",
+  "name": "ETH VolFavorite",
+  "series": [
+    "KXETH15M"
+  ],
+  "class": "VolFavorite",
+  "status": "paper",
+  "description": "On Kalshi's 15-minute ETH up/down markets, a few minutes before close, compare how much the market 'expects' ETH to move (implied volatility, read off the contract price) with how much it will probably move (a forecast from recent price action). When the market expects far more movement than is likely, the side that's currently winning is underpriced, so buy it.",
+  "hypothesis": "ETH's 15-minute market overprices short-horizon volatility after volatile stretches (participants anchor on recent moves), so favorites are cheap late in the window. Takers on the other side are paying for reversals that rarely happen. Wrong if: walk-forward months are mostly negative, or the same test works on BTC (would mean a method artifact, not an ETH inefficiency).",
+  "params": [],
+  "paper_params": [
+    "rv_scale=1.09"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-09-30",
+  "next": "Paper ~1 week to check execution (fill rate, fill prices, signal rate) per contract vs the walk-forward's +2.2c; then the $200 live-trial decision at 0.5%/order."
+}

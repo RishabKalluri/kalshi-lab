@@ -27,13 +27,17 @@ from kalshi_lab.data.normalize import iso_ns
 from kalshi_lab.recorder.sink import EXT, read_lines
 
 series = sys.argv[1] if len(sys.argv) > 1 else "KXBTC15M"
+# By default the dataset stops at the lockbox start, so research can't see lockbox data. --include-lockbox
+# (for refitting models used in paper/live trading, by the user/maintainer) writes <SERIES>_all.parquet.
+INCLUDE_LOCKBOX = "--include-lockbox" in sys.argv
+from kalshi_lab.validate import LOCKBOX_START  # noqa: E402
 BF = Path(os.environ.get("KALSHI_DATA_ROOT", "~/kalshi-data/raw")).expanduser().parent / "backfill"
 from kalshi_lab.recorder.config import settlement, spot_map  # noqa: E402
 SPOT = spot_map([series], backfill=True)[series][0]
 # Crypto settles on a 60s average (strike = 60s average before open); gold on a single 1-minute close.
 POINT = settlement(series) == "point"
 HORIZONS = [int(x) for x in os.environ.get("HORIZONS", "840,720,600,480,360,300,240,180,120,90,60").split(",")]
-TAG = os.environ.get("TAG", "")
+TAG = os.environ.get("TAG", "") + ("_all" if INCLUDE_LOCKBOX else "")
 OUT = Path(__file__).parent / "data"
 OUT.mkdir(exist_ok=True)
 
@@ -83,6 +87,8 @@ for day in sorted(p for p in (BF / "kalshi" / series).iterdir() if p.is_dir()):
         if K is None or not m.get("result"):
             continue
         open_s, close_s = iso_ns(m["open_time"]) // 10**9, iso_ns(m["close_time"]) // 10**9
+        if not INCLUDE_LOCKBOX and close_s >= LOCKBOX_START.timestamp():
+            continue
         if math.isnan(S(open_s - 4 * 3600)) or math.isnan(S(close_s)):
             continue
         basis = K - (S(open_s) if POINT else float(np.mean(spot[open_s - 60 - T0: open_s - T0])))

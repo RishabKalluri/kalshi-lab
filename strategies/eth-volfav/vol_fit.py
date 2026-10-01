@@ -13,18 +13,23 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]  # repo root (this file is strategies/<slug>/vol_fit.py)
 PARAMS = Path(__file__).parent / "params"
 H = [360, 300, 240, 180, 120, 90, 60]
 
 
 def _dataset(series: str, need_until: pd.Timestamp) -> pd.DataFrame:
-    path = ROOT / "research" / "data" / f"{series}.parquet"
+    """Development data (before the lockbox) unless the fit needs later data (paper/live refits)."""
+    from kalshi_lab.validate import LOCKBOX_START
+    full = need_until > pd.Timestamp(LOCKBOX_START)
+    path = ROOT / "research" / "data" / f"{series}{'_all' if full else ''}.parquet"
+    target = need_until if full else pd.Timestamp(LOCKBOX_START)
     if path.exists():
         df = pd.read_parquet(path)
-        if df.close.max() >= need_until - pd.Timedelta(days=2):
+        if df.close.max() >= target - pd.Timedelta(days=2):
             return df
-    subprocess.check_call([sys.executable, str(ROOT / "research" / "build_dataset.py"), series], cwd=ROOT)
+    cmd = [sys.executable, str(ROOT / "research" / "build_dataset.py"), series] + (["--include-lockbox"] if full else [])
+    subprocess.check_call(cmd, cwd=ROOT)
     return pd.read_parquet(path)
 
 

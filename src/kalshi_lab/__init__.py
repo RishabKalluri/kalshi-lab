@@ -15,6 +15,10 @@ COMMANDS = {
     "jobs-local": ("kalshi_lab.jobs", "list_jobs"),
     "worker": ("kalshi_lab.jobs", "worker"),        # server: background job loop (systemd)
     "cancel": ("kalshi_lab.jobs", "cancel"),        # server: cancel a queued/running job
+    "new": ("kalshi_lab.strategy_dir", "new"),          # create strategies/<slug>/ from the template
+    "data": ("kalshi_lab.validate", "data_status"),
+    "audit": ("kalshi_lab.validate", "audit"),          # independent re-run vs the ledger (before live)     # what history exists; dev vs lockbox split
+    "pull": ("kalshi_lab.remote", "pull"),              # copy the server's data for a series to this laptop
     "paper-start": ("kalshi_lab.paper_ctl", "start"),  # laptop: paper trade a registry strategy on the server
     "paper-stop": ("kalshi_lab.paper_ctl", "stop"),
     "paper-list": ("kalshi_lab.paper_ctl", "list_"),

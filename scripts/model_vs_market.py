@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "strategies"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "strategies" / "_archive"))
 from models import prob_up  # noqa: E402
 
 from kalshi_lab.data.normalize import iso_ns  # noqa: E402

@@ -151,3 +151,49 @@ def test_backfill_synthetic_depth_uses_configured_depth():
     eng = Engine(Strategy(), ev, SimExchange(), has_book=False, synthetic_depth={"X": 40}).run()
     b = eng.ctx.books["M"]
     assert b.ask_qty(600) == 40 and b.bid_qty(580) == 40
+
+
+def test_lockbox_windows_and_verdict(monkeypatch):
+    from datetime import datetime, timezone
+    import kalshi_lab.validate as v
+    monkeypatch.setattr(v, "backfill_days", lambda s: ["2026-01-01", "2026-09-30"])
+    monkeypatch.setattr(v, "recorded_range", lambda s: None)
+    lb = v.LOCKBOX_START
+    for stage in ("smoke", "quick", "full"):
+        assert all(r["end"] <= lb for r in v.plan(stage, ["X"], fits=True)), stage
+    lock = v.plan("lockbox", ["X"], fits=True)
+    assert lock and all(r["start"] >= lb and r["fit_until"] == lb for r in lock)
+    assert v.lockbox_verdict({"POOLED": {"pnl": 5, "contracts": 10, "ci95_c": [0.2, 3]}}) == "strong pass"
+    assert v.lockbox_verdict({"POOLED": {"pnl": 5, "contracts": 10, "ci95_c": [-1, 3]}}) == "pass"
+    assert v.lockbox_verdict({"POOLED": {"pnl": -1, "contracts": 10, "ci95_c": [-3, 1]}}) == "fail"
+
+
+def test_strategy_folder_ledger_budget_and_tamper_detection(tmp_path, monkeypatch):
+    import json
+    import kalshi_lab.strategy_dir as sd
+    monkeypatch.setattr(sd, "STRATEGIES", tmp_path)
+    monkeypatch.setattr(sd, "LEDGER", tmp_path / "_ledger")
+    f = tmp_path / "demo"
+    f.mkdir()
+    (f / "config.json").write_text(json.dumps({"slug": "demo", "series": ["X"]}))
+    (f / "strategy.py").write_text("x = 1\n")
+    assert sd.folder_for(str(f)) == f.resolve()
+    assert sd.load_config(f)["budget"]["full_tests"] == 3
+    for rec in ({"stage": "full", "job": "j1", "verdict": "inconclusive"}, {"stage": "full", "job": "j2", "crashed": True}):
+        r = sd.ledger_append("demo", rec)
+        sd.append_result(f, r)
+    assert sd.count_runs(f, "full") == 1          # crashed runs don't use budget
+    assert sd.ledger_ok("demo") and sd.results_match_ledger(f)
+    # an agent editing its own results.json is detected, and doesn't change budgets
+    res = json.loads((f / "results.json").read_text())
+    res["runs"][0]["verdict"] = "promising"
+    (f / "results.json").write_text(json.dumps(res))
+    assert not sd.results_match_ledger(f)
+    # editing the ledger itself breaks the hash chain
+    led = tmp_path / "_ledger" / "demo.jsonl"
+    led.write_text(led.read_text().replace('"inconclusive"', '"promising"'))
+    assert not sd.ledger_ok("demo")
+    # code fingerprint changes when strategy code changes
+    h1 = sd.code_hash(f)
+    (f / "strategy.py").write_text("x = 2\n")
+    assert sd.code_hash(f) != h1

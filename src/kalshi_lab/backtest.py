@@ -33,12 +33,15 @@ from .sizing import parse as parse_sizing
 
 
 def load_strategy(spec: str):
+    from .strategy_dir import strategy_spec
+    spec = strategy_spec(spec)  # a strategy folder/slug -> its strategy.py (+ class from config.json)
     target, _, cls = spec.partition(":")
     if target.endswith(".py"):
         path = Path(target).resolve()
-        mod_spec = importlib.util.spec_from_file_location(path.stem, path)
+        name = f"strategy_{path.parent.name}_{path.stem}".replace("-", "_")  # unique per folder
+        mod_spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(mod_spec)
-        sys.modules[path.stem] = mod
+        sys.modules[name] = mod
         mod_spec.loader.exec_module(mod)
     else:
         mod = importlib.import_module(target)
@@ -74,6 +77,8 @@ def run_one(args: dict) -> dict:
     cls = load_strategy(args["strategy"])
     strat = cls(**args["params"])
     start, end = _dt(args["start"]), _dt(args["end"])
+    from .validate import lockbox_guard
+    lockbox_guard(start, end)  # lockbox dates only via the pipeline's lockbox stage (or the user's own tools)
     recorded = args["source"] == "recorded"
     smap = spot_map(args["series"], backfill=not recorded)
     if args["spot"]:  # explicit override: these streams for every series

@@ -10,7 +10,7 @@ Mechanics, identical to the research:
   implied vol   iv = D / (Phi^-1(mid) * sqrt(tau - 40)),  D = spot + basis - strike, basis = strike -
                 our 60s average before open (the strike is BRTI's 60s average before open)
   forecast      log rv = beta . [1, log rv15m, log rv60m, log rv4h, hour dummies, log tau]  (fit offline,
-                strategies/params/vol_model_<SERIES>.json via research/fit_vol_model.py)
+                strategies/eth-volfav/params/vol_model_<SERIES>.json via research/fit_vol_model.py)
   entry         ratio = iv / forecast > threshold  ->  buy the favorite at the ask (IOC)
 """
 
