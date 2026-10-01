@@ -77,10 +77,24 @@ def _push(host: str | None, job_id: str | None = None):
         subprocess.call(["rsync", "-az", f"{ledger}/", f"{host}:kalshi/results/_ledger/"], stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL)
     if job_id:
+        from .strategy_dir import folder_for
+        # the job's results.json too, so the server's copy and its ledger always agree (the dashboard checks)
+        job = next((json.loads(f.read_text()) for d in ("running", "done") for f in [Q / d / f"{job_id}.json"]
+                    if f.exists()), None)
+        folder = folder_for(job["strategy"]) if job else None
+        if folder and (folder / "results.json").exists():
+            subprocess.call(["rsync", "-az", str(folder / "results.json"),
+                             f"{host}:kalshi/{folder.relative_to(ROOT)}/results.json"],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         dirs = [str(p) for p in (ROOT / "results").glob(f"{job_id}-*") if p.is_dir()]
         if dirs:
             subprocess.call(["rsync", "-az", *dirs, f"{host}:kalshi/results/"], stdout=subprocess.DEVNULL,
                             stderr=subprocess.DEVNULL)
+
+
+def _code_stamp() -> float:
+    """Latest modification time of the package's code (the worker restarts itself when it changes)."""
+    return max(p.stat().st_mtime for p in (ROOT / "src" / "kalshi_lab").rglob("*.py"))
 
 
 def worker(argv=None):
@@ -91,9 +105,14 @@ def worker(argv=None):
     print("worker started", flush=True)
     for f in (Q / "running").glob("*.json"):  # jobs interrupted by a restart go back in the queue
         f.rename(Q / "queue" / f.name)
+    started_code = _code_stamp()
     while True:
         queued = sorted((Q / "queue").glob("*.json"), key=lambda p: p.stat().st_mtime)
         if not queued:
+            if _code_stamp() != started_code:  # code changed while idle: restart so jobs never run stale code
+                print("code changed: restarting worker", flush=True)
+                os.execv(sys.executable, [sys.executable, "-m", "kalshi_lab", "worker"] +
+                         (["--push", a.push] if a.push else []))
             time.sleep(5)
             continue
         f = queued[0].rename(Q / "running" / queued[0].name)
