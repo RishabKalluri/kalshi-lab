@@ -109,6 +109,8 @@ flowchart LR
 - **Strategies only decide *what* to trade.** How much comes from the sizing layer, the same for every
   strategy: risk 1% of equity per order, never more than 5% in one market. Kelly sizing exists but isn't
   used on unproven edges.
+- **Backfill books** show a configured depth per market (`MARKETS[...].book_depth`, the 25th percentile of real
+  recorded best-price depth), because history has trades but no books and a trade's size understates depth.
 - **The simulated exchange** is deliberately conservative: orders arrive after a latency delay and see the
   book at arrival; resting orders join the back of the queue; Kalshi's real fees
   (`ceil(0.07·C·P·(1−P))` for takers, zero for makers on these series) and tick sizes apply; orders that
@@ -217,7 +219,7 @@ downloads) is read automatically.
 
 | Strategy | Status | One line |
 |---|---|---|
-| **ETH VolFavorite** | **Paper trading** | Buy the side that's winning when ETH's implied vol is high vs a vol forecast, at 7 fixed checkpoints (T-6m to T-1m). Walk-forward over 8 months: **+2.13¢/contract, 95% CI +0.62 to +3.64**, 5/8 months positive, holds at 2× latency. |
+| **ETH VolFavorite** | **Paper trading (0.5%/order)** | Buy the side that's winning when ETH's implied vol is high vs a vol forecast, at 7 fixed checkpoints (T-6m to T-1m). Walk-forward over 8 months at realistic depth: **+2.16¢/contract, 95% CI +0.93 to +3.45**, 6/8 months positive, +3.0¢ at 2× latency; worst drawdown 26% at 1%/order, hence 0.5%. |
 | BTC Ladder Relative Value | Research | Quote thin hourly BTC range markets around the fair value implied by the liquid above/below ladder. Promising signal (+1.3¢ when takers overpay); needs recorded books. |
 | Gold Maker | Rejected (parked) | Zero-fee market making on gold; break-even in backtest, loses live to faster traders. |
 | BTC Spread Maker | Rejected (parked) | Back-of-queue fills get picked off. |

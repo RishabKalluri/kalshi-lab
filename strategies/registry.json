@@ -9,7 +9,7 @@
     "stage": "paper",
     "summary": "Buy the favorite when the market's implied vol is high relative to our vol forecast (T-6m to T-1m).",
     "evidence": "30-day out-of-sample: +4.2c/contract (95% CI +1.7 to +6.5), 13/15 days up. Engine backtest on the test half: +$384 (+38%) in 15 days, t=1.29. Same test on BTC loses (good control). 8 of 9 parameter variants profitable. Latest 3 days (quick stage): -4.5c/contract, 0/3 days positive.",
-    "next": "Accumulate paper markets (~3 weeks for a few hundred); compare live \u00a2/contract to the walk-forward's +2.1c; BTC 12-month control.",
+    "next": "Paper ~1 week to check execution (fill rate, fill prices, signal rate) per contract vs the walk-forward's +2.2c; BTC 12-month control; then the $200 live-trial decision at 0.5%/order.",
     "updated": "2026-09-30",
     "description": "On Kalshi's 15-minute ETH up/down markets, a few minutes before close, compare how much the market 'expects' ETH to move (implied volatility, read off the contract price) with how much it will probably move (our forecast from recent price action). When the market expects far more movement than is likely, the side that's currently winning is underpriced, so we buy it.",
     "history": {
@@ -47,25 +47,25 @@
         "detail": "Automated pipeline. Last 3 days of backfill: -$94.80 over 119 markets (-4.5c/contract, 95% CI -13.6 to +4.5), 0 of 3 days positive; last 6h of recorded books: -$20.57 over 6 markets. The model was fit on data including these days, so this is a warning sign: the September edge may not persist. The 12-month walk-forward test decides."
       },
       "full": {
-        "date": "2026-09-30",
+        "date": "2026-10-01",
         "status": "done",
-        "result": "Promising (automated walk-forward through the engine)",
-        "detail": "Pipeline job vol_favorite-0930-124526: 8 out-of-sample months (Feb-Sep 2026), model refit before each month on earlier data only, fixed checkpoints, next-trade-style fills from backfill, after fees. Pooled +2.13c/contract (95% CI +0.62 to +3.64), 5 of 8 months positive (Apr/May/Jun slightly negative), 148/240 days positive. Still positive at 2x latency (+3.85c, CI +1.67 to +6.03). August is partial (history gap since fixed; rerun pending). Earlier finding kept for the record: entering on the first second the signal crossed lost money (-0.16c).",
+        "result": "Promising (walk-forward, realistic depth)",
+        "detail": "Pipeline job vol_favorite-0930-185530: 8 out-of-sample months, refit monthly on earlier data, fixed checkpoints, backfill books at realistic depth (43 contracts = 25th pct of recorded ETH best-price depth; previously the last trade's size, which made backtests ~2.7x smaller than live). Pooled +2.16c/contract (95% CI +0.93 to +3.45), 6/8 months positive, +3.02c at 2x latency. Worst drawdown $260 on $1k at 1%/order -> paper and live use 0.5%/order (~13%). Recorded-books run (last ~1.5 days) -$56 over 35 markets: small sample, watching.",
         "metrics": {
-          "pooled \u00a2/contract": "+2.13",
-          "95% CI (\u00a2)": "+0.62 to +3.64",
-          "months positive": "5 / 8",
-          "days positive": "148 / 240",
-          "2x latency \u00a2/contract": "+3.85",
-          "pooled PnL ($1k/month)": "+$709",
-          "worst chained drawdown": "$190",
-          "markets": "3,568"
+          "pooled \u00a2/contract": "+2.16",
+          "95% CI (\u00a2)": "+0.93 to +3.45",
+          "months positive": "6 / 8",
+          "2x latency \u00a2/contract": "+3.02",
+          "PnL 8 months ($1k, 1%)": "+$1,661",
+          "worst drawdown (1%)": "$260 (26%)",
+          "chosen sizing": "0.5% / order",
+          "contracts / market": "20"
         }
       },
       "paper": {
         "date": "2026-09-30",
         "result": "Running",
-        "detail": "Live on the server with simulated money. Since Sep 30 17:40 UTC it preloads 4h of recorded spot on start (no warm-up after restarts) and trades at fixed checkpoints with a model fit on all 9.5 months. Expect ~15 markets/day, so a few hundred markets takes ~3 weeks.",
+        "detail": "Live on the server with simulated money. Since Sep 30 17:40 UTC it preloads 4h of recorded spot on start (no warm-up after restarts) and trades at fixed checkpoints with a model fit on all 9.5 months. Expect ~15 markets/day, so a few hundred markets takes ~3 weeks. Oct 1 00:28 UTC: sizing cut to 0.5%/order (halves drawdown); first 4 markets at 1% were -$41 (-40c/contract, ~5% likely by chance).",
         "metrics": {
           "backtest expects \u00a2/contract": "\u2248 +1.6",
           "goal": "~350 markets"

@@ -18,7 +18,8 @@ class Engine:
     def __init__(self, strategy: Strategy, source, exchange, risk: RiskLimits | None = None,
                  timer_ms: int = 1000, has_book: bool = True, cash: float = 0.0,
                  spot_stale_s: float = 5, start_ts: int | None = None, timeline_s: float | None = None,
-                 spot_map: dict[str, list[str]] | None = None, sizer=None):
+                 spot_map: dict[str, list[str]] | None = None, sizer=None,
+                 synthetic_depth: dict[str, float] | None = None):
         """`start_ts`: events before it only rebuild state (books, markets, spot); the strategy
         starts at the first event at/after it."""
         self.real_strategy = strategy
@@ -28,6 +29,9 @@ class Engine:
         self.exchange = exchange
         self.timer_ns = timer_ms * 1_000_000
         self.has_book = has_book  # False: synthesize top of book from trades (backfill data)
+        # Backfill only: contracts shown at the synthetic best price, per series. History has no order books,
+        # and the last trade's size badly understates real depth (it made backtests ~2.7x smaller than live).
+        self.synthetic_depth = synthetic_depth or {}
         self.portfolio = Portfolio(cash)
         self.ctx = Context(exchange, risk or RiskLimits(), self.portfolio, spot_stale_s, spot_map, sizer)
         self.fills: list[Fill] = []
@@ -182,12 +186,14 @@ class Engine:
         book = self.ctx.books.get(tr.ticker)
         if book is None:
             return
+        m = self.ctx.markets.get(tr.ticker)
+        qty = max(tr.qty, self.synthetic_depth.get(m.series, 0) if m else 0)
         if tr.taker == Side.BUY:
-            book.no_bids = {1000 - tr.price: tr.qty}
+            book.no_bids = {1000 - tr.price: qty}
             if book.best_bid is not None and book.best_bid >= tr.price:
                 book.yes_bids = {}
         else:
-            book.yes_bids = {tr.price: tr.qty}
+            book.yes_bids = {tr.price: qty}
             if book.best_ask is not None and book.best_ask <= tr.price:
                 book.no_bids = {}
         book.valid = True

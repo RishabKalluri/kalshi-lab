@@ -25,7 +25,7 @@ from .core.fees import Fees
 from .core.risk import RiskLimits
 from .data.source import BackfillSource, RecordedSource
 from .engine import Engine
-from .recorder.config import spot_map
+from .recorder.config import book_depth, spot_map
 from .report import print_summary, save, summarize
 from .sim.exchange import SimExchange
 from .sizing import DEFAULT_MAX_FRAC, DEFAULT_SIZING
@@ -88,7 +88,8 @@ def run_one(args: dict) -> dict:
     eng = Engine(strat, source, exch, risk=risk, timer_ms=args["timer_ms"], has_book=recorded,
                  spot_stale_s=stale, start_ts=int(start.timestamp() * 1e9),
                  timeline_s=args.get("timeline_s") or None, spot_map=smap,
-                 sizer=parse_sizing(args.get("sizing"), args.get("max_frac", DEFAULT_MAX_FRAC)), cash=args.get("bankroll", 1000.0))
+                 sizer=parse_sizing(args.get("sizing"), args.get("max_frac", DEFAULT_MAX_FRAC)), cash=args.get("bankroll", 1000.0),
+                 synthetic_depth={s: d for s in args["series"] if (d := book_depth(s))} if not recorded else None)
     eng.run()
     summary = summarize(eng)
     summary["wall_s"] = round(time.time() - t0, 1)

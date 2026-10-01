@@ -144,3 +144,10 @@ def test_walk_forward_verdict():
     assert verdict(bad) == "reject"
     meh = dict(good, POOLED={"pnl": 5, "ci95_c": [-1.0, 3.0]})
     assert verdict(meh) == "inconclusive"
+
+
+def test_backfill_synthetic_depth_uses_configured_depth():
+    ev = [market(ts=1), Trade(2, "M", 600, 2, Side.BUY), Trade(3, "M", 580, 1, Side.SELL)]
+    eng = Engine(Strategy(), ev, SimExchange(), has_book=False, synthetic_depth={"X": 40}).run()
+    b = eng.ctx.books["M"]
+    assert b.ask_qty(600) == 40 and b.bid_qty(580) == 40

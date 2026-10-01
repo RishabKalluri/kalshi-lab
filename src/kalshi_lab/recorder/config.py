@@ -7,18 +7,22 @@
   settlement     "avg60": 60s average vs 60s average before open (CF Benchmarks crypto)
                  "point": one 1-minute close vs the close at open (Pyth gold)
   record         whether the recorder captures it by default
+  book_depth     contracts at the best price in backfill tests (history has trades but no order books);
+                 the 25th percentile of real best-price depth measured from recorded books (Sep 30 2026)
 
 Backfill of Kalshi trades works for any series without an entry (no spot), e.g. KXBTC / KXBTCD ladders.
 """
 
 MARKETS = {
     "KXBTC15M": dict(live_spot=["coinbase:BTC-USD", "kraken:BTC/USD", "bitstamp:btcusd"],  # BRTI constituents
-                     backfill_spot={"binance": "BTCUSDT", "coinbase": "BTC-USD"}, settlement="avg60", record=True),
+                     backfill_spot={"binance": "BTCUSDT", "coinbase": "BTC-USD"}, settlement="avg60", record=True,
+                     book_depth=2088),
     "KXETH15M": dict(live_spot=["coinbase:ETH-USD", "kraken:ETH/USD", "bitstamp:ethusd"],
-                     backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"}, settlement="avg60", record=True),
+                     backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"}, settlement="avg60", record=True,
+                     book_depth=43),
     # Gold settles on Pyth (key-gated). OKX's XAU perp tracks it within ~$1 over 15 minutes.
     "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
-                      settlement="point", record=True),
+                      settlement="point", record=True, book_depth=635),
 }
 
 # Backward-compatible views.
@@ -36,6 +40,10 @@ def backfill_stream(exchange: str, symbol: str) -> str:
     """Name of the backfilled spot stream for (exchange, symbol), matching data/backfill.py."""
     base = f"{exchange}_{symbol.replace('-', '').replace('/', '').lower()}"
     return base + ("_1m" if exchange == "okx" else "")
+
+
+def book_depth(series: str) -> float | None:
+    return MARKETS.get(series, {}).get("book_depth")
 
 
 def settlement(series: str) -> str:

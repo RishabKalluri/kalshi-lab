@@ -32,19 +32,24 @@ def conf(argv=None):
     entry_id = (argv or sys.argv[2:])[0]
     c = json.loads((CONF / f"{entry_id}.json").read_text())
     from .live.run import paper
-    paper([c["strategy"], "--series", *c["series"], *[x for p in c.get("params", []) for x in ("-p", p)]])
+    extra = ["--sizing", c["sizing"]] if c.get("sizing") else []
+    paper([c["strategy"], "--series", *c["series"], *extra, *[x for p in c.get("params", []) for x in ("-p", p)]])
 
 
 def start(argv=None):
     ap = argparse.ArgumentParser(prog="kalshi-lab paper-start")
     ap.add_argument("id")
     ap.add_argument("-p", "--param", action="append", default=[])
+    ap.add_argument("--sizing", help="e.g. pct:0.5 (default: the global default, pct:1)")
     a = ap.parse_args(argv)
     e = _registry(a.id)
     if not e.get("file"):
         raise SystemExit(f"{a.id} has no strategy file yet")
     CONF.mkdir(parents=True, exist_ok=True)
-    (CONF / f"{a.id}.json").write_text(json.dumps({"strategy": e["file"], "series": e["series"], "params": a.param}))
+    conf_ = {"strategy": e["file"], "series": e["series"], "params": a.param}
+    if a.sizing:
+        conf_["sizing"] = a.sizing
+    (CONF / f"{a.id}.json").write_text(json.dumps(conf_))
     from .remote import sync
     sync()
     subprocess.check_call(["ssh", HOST, f"sudo systemctl enable --now kalshi-paper@{a.id} && sudo systemctl restart kalshi-paper@{a.id}"
