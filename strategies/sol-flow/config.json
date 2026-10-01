@@ -1,0 +1,19 @@
+{
+  "slug": "sol-flow",
+  "name": "SOL Order Flow",
+  "series": [
+    "KXSOL15M"
+  ],
+  "class": "",
+  "status": "parked",
+  "description": "At fixed checkpoints in the last minutes of each 15-minute SOL market, measure one-sided aggressive (taker) buying or selling on OKX perpetuals and Binance spot. If the flow points one way and Kalshi's price hasn't caught up, buy that side.",
+  "hypothesis": "Taker order-flow imbalance on the venues where SOL is priced (OKX perp, Binance spot) predicts the next few minutes of spot drift beyond the trailing price move; thin Kalshi SOL books price off spot distance, not flow. Wrong if flow adds nothing beyond the trailing return, if Kalshi prices already move with it (no edge at the next taker fill after fees), or if walk-forward months are mostly negative.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-01",
+  "next": "Parked at research: ETH order flow (proxy) and ETH's own market show no edge at real fills (every signal about -2c/contract after fees, no profitable decile). SOL's own flow isn't downloaded; low priority."
+}

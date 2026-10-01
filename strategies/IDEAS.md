@@ -9,12 +9,6 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 
 ## Ready to try (data exists)
 
-- **Order-flow pressure before checkpoints** (BTC/ETH/SOL). Taker buy/sell imbalance on Binance spot and
-  OKX perpetuals in the 1–5 minutes before a decision time predicts the settlement-window move, beyond
-  what the Kalshi price already shows. *Kalshi traders watch price, not flow; informed flow shows up in
-  aggressive trades before the price fully moves.* Data: `backfill/flow/` (from 2025-12-01, per second;
-  `kalshi_lab.data.flow.load_flow`). Note: these feeds aren't recorded live yet, so a winning strategy
-  needs a recorder addition before paper trading (ask the user).
 - **Last-minute momentum in ETH.** In `research/settlement_manipulation.py`, 59% of large (2σ)
   settlement-minute ETH moves continued *away* from the strike (BTC 51%, SOL 55%). Not yet compared
   with other minutes, so it could be general momentum. If it's real, the favourite at T−60s is
@@ -59,3 +53,7 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Settlement manipulation** (`research/settlement_manipulation.py`): no fingerprint of spot pushes
   during the settlement window in BTC/ETH/SOL (the window is the *calmest* minute; no reversal; the
   official index matches Binance within ~0.5 bp). Not a risk worth modelling for now.
+- **Order-flow pressure before checkpoints** (`strategies/sol-flow/`, taker on SOL and ETH): parked at
+  research. ETH Binance taker imbalance and signed volume (30 s to 5 min) don't predict the move to settlement
+  (|r| < 0.03). Following them at the next real Kalshi fill loses about the fee plus spread (≈ −2¢) on SOL and
+  on ETH's own market, and no decile comes out positive. SOL's own flow is untested because it isn't downloaded.
