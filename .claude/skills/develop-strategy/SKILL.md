@@ -44,7 +44,8 @@ Before inventing, spend a few minutes reading (and reuse code freely; don't rewr
    repeat a dead end without a new reason. If you take an idea from IDEAS.md, mark it `→ taken: <slug>`.
 3. `research/` and `scripts/`: analysis tools (walk-forward, markouts, PnL decomposition, model-vs-market,
    dataset builder). `strategies/eth-volfav/` is the reference example of a complete strategy folder.
-4. `kalshi-lab data <market>`: what history exists, and the development/lockbox split.
+4. `kalshi-lab pull <market>` (copies the server's latest history, order flow and recent recordings to this
+   laptop), then `kalshi-lab data <market>`: what history exists, and the development/lockbox split.
 Key lessons already learned (details in the notes): BTC's 15-minute market is efficient, ETH's isn't
 (thinner markets are less efficient); entering on the *first* second a signal crosses buys spikes that
 reverse, so evaluate at fixed times; research scripts flatter results, only engine results count; backfill

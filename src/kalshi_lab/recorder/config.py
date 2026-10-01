@@ -26,12 +26,13 @@ MARKETS = {
                      backfill_spot={"binance": "ETHUSDT", "coinbase": "ETH-USD"},
                      flow={"binance": "ETHUSDT", "okx": "ETH-USDT-SWAP"}, settlement="avg60", record=True,
                      book_depth=43),
-    # Added Oct 1 2026: about 1/3 of ETH's volume, so likely less efficient. book_depth is provisional
-    # until a day of recorded SOL books exists to measure it.
+    # Added Oct 1 2026: about 1/3 of ETH's volume, so likely less efficient. book_depth is provisional:
+    # 3 hours of recorded books (8 markets, overnight US) gave p25 = 10 contracts vs 34 for ETH measured the
+    # same way (ETH's configured 43 came from a longer sample), so 13. Re-measure after a full day.
     "KXSOL15M": dict(live_spot=["coinbase:SOL-USD", "kraken:SOL/USD", "bitstamp:solusd"],
                      backfill_spot={"binance": "SOLUSDT", "coinbase": "SOL-USD"},
                      flow={"binance": "SOLUSDT", "okx": "SOL-USDT-SWAP"}, settlement="avg60", record=True,
-                     book_depth=40),
+                     book_depth=13),
     # Gold settles on Pyth (key-gated). OKX's XAU perp tracks it within ~$1 over 15 minutes.
     "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
                       settlement="point", record=True, book_depth=635),
