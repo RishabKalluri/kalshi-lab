@@ -1,0 +1,23 @@
+{
+  "slug": "us-hours-vol",
+  "name": "US-Hours Vol Seasonality",
+  "series": [
+    "KXETH15M",
+    "KXBTC15M"
+  ],
+  "class": "OpenUnderdog",
+  "status": "parked",
+  "description": "Crypto volatility follows the New York clock, and the biggest jump of the day comes in the 15 minutes after the 9:30 ET US stock market open. The Kalshi price in that window doesn't fully expect the jump, so it treats the side that's currently losing as less likely to come back than it really is. On US trading days, a few minutes into the 9:30 window, buy that underdog side on ETH and BTC.",
+  "hypothesis": "Crypto intraday vol is shaped by US market hours (profile follows NY time across DST; the 9:30 ET window has ~2x the vol of 9:15). Kalshi's 15-minute price prices the remaining move off recent, calm pre-open vol, so in the 9:30 window implied vol is too low and the underdog is cheap. Losers: favourite buyers and quoting bots using trailing vol without a time-of-day prior. Wrong if: the underdog at next real fills after fee loses in either half of development data, the weekend/holiday 9:30 placebo shows the same, or the walk-forward months are mostly negative.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-02",
+  "next": "Parked inconclusive after full 2/3 (+4.3c/ct, CI -1.5..+10.5, 6/9 months). Sample-limited (~1 market per coin per US trading day). Needs more markets with the same 9:30 ET bell (other coins' 15-min series or older history; a download request) before spending the last full test.",
+  "paper_params": [
+    "slip_c=1"
+  ]
+}

@@ -20,9 +20,9 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   consistent given the BTC–ETH correlation; when ETH's is far off given BTC's, fade it.
 - **Kalshi trade-size signals.** → taken: `settle-lockin` (see Tried). Big Kalshi taker prints (top 1% size) in the last minutes: informed (copy)
   or fat-finger/overreaction (fade)? Data: Kalshi trades with aggressor side (backfill).
-- **Time-of-day and weekend regimes.** → partly screened in `btc-anchor-vol/research/bias_scan.py` (see Tried). Thin hours (weekends, 00–08 UTC) may be less efficient; condition
+- **Time-of-day and weekend regimes.** → partly screened in `btc-anchor-vol/research/bias_scan.py`; → taken: `us-hours-vol` (see Tried). Thin hours (weekends, 00–08 UTC) may be less efficient; condition
   existing signals on the hour, or find hour-specific biases.
-- **Scheduled macro events** (CPI, FOMC, NFP at 8:30/14:00 ET). Vol jumps at known times; does the
+- **Scheduled macro events** (CPI, FOMC, NFP at 8:30/14:00 ET). (8:30 slot as a whole screened in `us-hours-vol` H3: priced correctly; per-event calendar still untested.) Vol jumps at known times; does the
   market price the jump properly in the window around the release? Needs an event calendar (public).
 - **Round-number strikes.** Markets whose strike sits near a round number (ETH $2,000) may misprice
   barrier-like behaviour (support/resistance, option-pinning flow).
@@ -78,3 +78,8 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Underdog seller (maker on the favourite-longshot bias)** (`strategies/dog-seller/`): rejected at full test
   (−0.52¢/contract, CI −1.08..+0.08, 1/8 months). Underdog takers do overpay 2–4¢, but back-of-queue maker fills
   are adversely selected (−2.1¢ in 30 s). Needs real queue position to work.
+- **US-hours vol seasonality / 9:30 ET opening-bell underdog** (`strategies/us-hours-vol/`): **parked, inconclusive**
+  (full 2/3). Crypto vol follows the NY clock (DST test: corr 0.97 NY vs 0.75 UTC); the 9:30 ET window is ~2× the
+  9:15 window and Kalshi underprices it (iv ~0.3 log too low). Buying the 10–45¢ underdog in that window on ETH+BTC:
+  +4.32¢/ct, CI −1.5..+10.5, 6/9 months, 237 markets. Sample-limited; needs more coins' 15-min markets. Weekend vol,
+  the 8:30 release step and the 16:00 step-down are priced correctly (rejected at research).
