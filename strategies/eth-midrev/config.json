@@ -1,0 +1,23 @@
+{
+  "slug": "eth-midrev",
+  "name": "ETH Late-Confirmed Reversal",
+  "series": [
+    "KXETH15M"
+  ],
+  "class": "LateConfirmed",
+  "status": "paper",
+  "description": "Right after a 15-minute ETH window opens, if the previous window moved a lot (more than 1.5 of its usual standard deviations) and the last 5 minutes of it also ran hard the same way, buy the side that bets on a reversal. Moves that run into the 15-minute boundary tend to give some back in the next window, but the Kalshi price at the open treats it as a coin flip.",
+  "hypothesis": "The 15-minute reversal in crypto is a boundary effect (strongest for moves ending at :00/:15/:30/:45; research/offset_rev.py): a burst into the boundary (candle-close traders, hedgers of 15-minute binaries rebalancing into expiry) overshoots and gives back after it. The KXETH15M opening price ignores it. Losers: opening takers/quoters treating the window as a coin flip. Wrong if: fading |z15|>1.5 moves confirmed by |z5|>1.5 the same way isn't positive in May-Aug at real fills (research says +5.1c vs +0.1c for unconfirmed), the walk-forward months are mostly negative, or the lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-02",
+  "next": "Paper ~1-2 weeks to check fills at the open (slip_c=1). Its trades are a subset of eth-overreact's (same markets, same side), so run one or the other live, not both. Then kalshi-lab audit eth-midrev and the user's OK for a live trial.",
+  "paper_params": [
+    "rv_scale=1.09",
+    "slip_c=1"
+  ]
+}

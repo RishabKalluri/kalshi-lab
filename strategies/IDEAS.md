@@ -42,6 +42,12 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 
 ## Tried
 
+- **Late-confirmed reversal at the open** (`strategies/eth-midrev/`): **paper trading**. The 15-min reversal lives at
+  window boundaries; fading |z15|>1.5 only when the last 5 min also ran |z5|>1.5 the same way: walk-forward +5.42¢
+  (CI +2.0..+8.9, 7/9 months, +6.6¢ at 2× latency), lockbox pass +6.89¢ (CI −1.5..+14.8). Subset of eth-overreact's
+  trades. Same split holds on SOL (research +7.7/+9.7¢) → worth a SOL folder. Dead in the same folder (research):
+  mid-window fade, favourite after in-window moves, BTC→ETH lead-lag, ETH-vs-BTC idiosyncratic reversal, 08:00 UTC expiry.
+
 - **Fade the previous window's big move at the open** (`strategies/eth-overreact/`): **paper trading**. 15-min
   returns reverse in sign after |z| > 1.5 moves (~56%, all coins, every month); the opening price ignores it. ETH
   walk-forward +2.23¢ (CI +0.37..+4.10, 8/9 months), lockbox pass +2.21¢ (CI −2.1..+6.5). Decaying on ETH (May–Aug ~+0.8¢).
