@@ -1,0 +1,1 @@
+{"strategy": "strategies/sol-midrev/strategy.py", "series": ["KXSOL15M"], "params": ["rv_scale=1.11", "slip_c=1"], "sizing": "pct:0.5"}
