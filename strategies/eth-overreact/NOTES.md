@@ -91,7 +91,7 @@ Newest last. Every pipeline run gets a line; every change gets a reason.
   (the favourite does *worse* with a round level in between; the underdog side is still below costs).
 
 ## Current status
-- Stage: **paper trading** (since Oct 1, 0.5%/order, `slip_c=1`, `rv_scale=1.09`). Full test 1/3 used; lockbox spent (pass).
-- Next: ~1–2 weeks of paper (~13 trades/day) to check fills at the open; then `kalshi-lab audit eth-overreact` and the
-  live-trial decision (user's OK). Follow-up worth doing: the same strategy on KXSOL15M (new folder), where the
-  effect is twice as large.
+- Stage: **parked** (paper ran Oct 1–7, stopped at the user's request to free a paper slot). Full test 1/3 used; lockbox spent (pass).
+- Why: superseded by `eth-midrev`, whose trades are a subset of this strategy's (same market, same side). The trades
+  unique to this strategy (last 5 minutes not confirming the move) are the ones that decayed since May.
+- Restart only if eth-midrev fails in paper. The SOL follow-up was done as `sol-midrev` (late-confirmed rule).
