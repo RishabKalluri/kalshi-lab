@@ -96,12 +96,33 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 UNIT
+# Health check every 2 minutes: writes ~/kalshi-data/health.json (dashboard banner; laptop notifications via
+# `kalshi-lab health-watch`). Catches silent failures like a revoked Kalshi API key.
+sudo tee /etc/systemd/system/kalshi-health.service >/dev/null <<UNIT
+[Unit]
+Description=kalshi-lab health check
+[Service]
+Type=oneshot
+Nice=10
+User=$USER
+WorkingDirectory=$PWD
+ExecStart=$UV run -q kalshi-lab health --write
+UNIT
+sudo tee /etc/systemd/system/kalshi-health.timer >/dev/null <<UNIT
+[Unit]
+Description=run kalshi-lab health every 2 minutes
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+[Install]
+WantedBy=timers.target
+UNIT
 # Dashboard listens on localhost only; reach it with: ssh -L 8501:localhost:8501 <server>
 unit kalshi-dashboard "kalshi-lab dashboard" "$UV run streamlit run src/kalshi_lab/dashboard/app.py --server.port 8501 --server.address 127.0.0.1 --server.headless true --browser.gatherUsageStats false"
 sudo systemctl daemon-reload
 SERVICES="kalshi-recorder kalshi-worker kalshi-dashboard"
 sudo systemctl daemon-reload
-sudo systemctl enable --now $SERVICES kalshi-backfill.timer
+sudo systemctl enable --now $SERVICES kalshi-backfill.timer kalshi-health.timer
 for f in deploy/paper/*.json; do
   [ -e "$f" ] && sudo systemctl enable --now "kalshi-paper@$(basename "$f" .json)"
 done

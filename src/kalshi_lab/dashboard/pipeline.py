@@ -215,6 +215,31 @@ def activity_block(rows):
         c4.markdown(f"<span style='font-size:0.8rem'>estimate</span>  \n**{eta}**", unsafe_allow_html=True)
 
 
+def _paper_key(p: dict) -> str:
+    return json.dumps([_folder_of(p.get("strategy", "")), p.get("params"), p.get("sizing"), p.get("mode")], sort_keys=True, default=str)
+
+
+def combine_paper(runs: list[dict]) -> dict | None:
+    """Paper runs restart (deploys, a new API key, server reboots) and each restart writes a new results folder.
+    Join the latest run with the earlier runs of the same strategy, params and sizing into one record."""
+    if not runs:
+        return None
+    key = _paper_key(runs[0])  # runs are newest first
+    seg = [r for r in runs if _paper_key(r) == key]
+    if len(seg) == 1:
+        return {**seg[0], "_dirs": [seg[0]["_dir"]]}
+    tot = lambda k: sum((r.get(k) or 0) for r in seg)
+    traded = tot("markets_traded")
+    out = {**seg[0], "start": min(str(r.get("start")) for r in seg), "_dirs": [r["_dir"] for r in seg],
+           "pnl": tot("pnl"), "fees": tot("fees"), "contracts": tot("contracts"), "markets_traded": traded,
+           "orders": tot("orders"), "orders_filled": tot("orders_filled"), "orders_missed": tot("orders_missed"),
+           "rejects": tot("rejects"), "markets_settled": tot("markets_settled"),
+           "equity_change": tot("pnl") - (seg[0].get("pnl") or 0) + (seg[0].get("equity_change") or 0),
+           "win_rate": (sum((r.get("win_rate") or 0) * (r.get("markets_traded") or 0) for r in seg) / traded) if traded else None}
+    out["pnl_per_contract"] = out["pnl"] / out["contracts"] if out["contracts"] else None
+    return out
+
+
 def paper_stats(p: dict, T: dict, layout):
     el = None
     try:
@@ -240,9 +265,10 @@ def paper_stats(p: dict, T: dict, layout):
     })
     if p.get("orders_missed"):
         st.caption("Missed = the order reached the exchange after the price moved (immediate-or-cancel, unfilled).")
-    m = Path(p["_dir"]) / "markets.csv"
-    if m.exists():
-        df = pd.read_csv(m, parse_dates=["settle_time"])
+    dirs = p.get("_dirs") or [p["_dir"]]
+    parts = [pd.read_csv(Path(d) / "markets.csv", parse_dates=["settle_time"]) for d in dirs if (Path(d) / "markets.csv").exists()]
+    if parts:
+        df = pd.concat(parts, ignore_index=True)
         df = df[df.fills > 0].sort_values("settle_time")
         if len(df) >= 2:
             df["cum"] = df.pnl.cumsum()
@@ -251,7 +277,8 @@ def paper_stats(p: dict, T: dict, layout):
             fig.add_hline(y=0, line=dict(color=T["axis"], width=1))
             st.markdown("**Paper PnL over time** (settled markets)")
             st.plotly_chart(layout(fig, 170, yfmt="$,.0f", legend=False), width="stretch", config={"displayModeBar": False})
-    st.caption(f"results: `{Path(p['_dir']).name}` · saved {p['_age_min']:.0f} min ago")
+    joined = f" · joined from {len(dirs)} runs (restarts) with the same settings" if len(dirs) > 1 else ""
+    st.caption(f"results: `{Path(p['_dir']).name}`{joined} · saved {p['_age_min']:.0f} min ago")
 
 
 def _pooled(rec: dict) -> dict:
@@ -301,7 +328,7 @@ def stage_tab(stage, c, r, T, layout):
     if stage == "full":
         st.caption(f"Full tests used: {len(stage_runs)} of {c['budget'].get('full_tests', 3)}")
     if stage == "paper" and r["paper"]:
-        paper_stats(r["live_paper"] or r["paper"][0], T, layout)
+        paper_stats(combine_paper(r["paper"]), T, layout)
         shown = True
     aj = r["active_job"]
     if aj and aj["_state"] == "running" and aj.get("stage") == stage:

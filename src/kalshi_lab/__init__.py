@@ -22,7 +22,9 @@ COMMANDS = {
     "paper-start": ("kalshi_lab.paper_ctl", "start"),  # laptop: paper trade a registry strategy on the server
     "paper-stop": ("kalshi_lab.paper_ctl", "stop"),
     "paper-list": ("kalshi_lab.paper_ctl", "list_"),
-    "paper-conf": ("kalshi_lab.paper_ctl", "conf"),    # server: run deploy/paper/<id>.json (systemd template)
+    "paper-conf": ("kalshi_lab.paper_ctl", "conf"),
+    "health": ("kalshi_lab.health", "main"),            # server: are the recorder, feeds and paper traders alive?
+    "health-watch": ("kalshi_lab.health", "watch"),     # laptop: notify when the server's health changes    # server: run deploy/paper/<id>.json (systemd template)
 }
 
 

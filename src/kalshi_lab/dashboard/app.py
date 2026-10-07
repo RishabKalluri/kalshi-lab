@@ -479,6 +479,25 @@ def new_backtest_page():
     run_panel()
 
 
+def health_banner():
+    """Red banner when the server's health check (kalshi-lab health, every 2 min) reports a problem."""
+    p = DATA.parent / "health.json"
+    if not p.exists():
+        return
+    try:
+        h = json.loads(p.read_text())
+    except json.JSONDecodeError:
+        return
+    age = datetime.now(timezone.utc).timestamp() - h.get("checked", 0)
+    if age > 600:
+        st.error(f"The server health check hasn't run for {age / 60:.0f} min (kalshi-health.timer).")
+    elif h.get("problems"):
+        now = datetime.now(timezone.utc).timestamp()
+        lines = [f"- {pr} (for {(now - h['since'].get(pr, now)) / 60:.0f} min)" for pr in h["problems"]]
+        st.error("**Something is down:**\n" + "\n".join(lines))
+
+
+health_banner()
 nav = st.navigation([st.Page(pipeline_page, title="Strategies", default=True),
                      st.Page(runs_page, title="Runs"),
                      st.Page(new_backtest_page, title="New backtest")])
