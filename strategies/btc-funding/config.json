@@ -1,0 +1,19 @@
+{
+  "slug": "btc-funding",
+  "name": "BTC Funding-Time Drift",
+  "series": [
+    "KXBTC15M"
+  ],
+  "class": "",
+  "status": "rejected",
+  "description": "Tested whether BTC drifts predictably around the 8-hourly perpetual-swap funding settlement (00:00, 08:00, 16:00 UTC), which the Kalshi 15-minute market would not price. It doesn't: no drift or vol bump at those times in either half of the development data.",
+  "hypothesis": "Perp holders on the paying side of funding close before the 00/08/16 UTC snapshot and reopen after, so BTC spot drifts with the perp premium's sign into and out of those times; Kalshi quoters price those windows like any other. Wrong if the premium-signed 15-minute drift before/after funding times isn't significant in both halves (Dec-Apr, May-Aug), looks the same at other hours, or is below ~0.1 sigma.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-07",
+  "next": "Rejected at research (funding_drift.py). Revisit only with OKX funding-rate history, and only if a large signed effect is plausible."
+}

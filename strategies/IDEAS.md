@@ -35,9 +35,16 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   history download (public API).
 - **Order-book imbalance on spot exchanges.** Needs books recorded live from now (free) or bought
   history (Tardis.dev, Kaiko). Only worth it if the trade-flow idea above shows something.
-- **Funding / open interest swings** (OKX public metrics) as a regime filter for momentum vs reversal.
+- **Funding / open interest swings** (OKX public metrics) as a regime filter for momentum vs reversal. (Funding-*time* drift
+  screened in `btc-funding`: nothing; a funding-rate *regime filter* still needs OKX funding/OI history.)
 
 ## Tried
+
+- **BTC funding-time drift** (`strategies/btc-funding/`): rejected at research. No premium-signed drift or vol bump in BTC
+  spot in the 15 minutes before/after 00/08/16 UTC that holds in both halves; OKX perp vs Binance spot is a constant
+  ~−4.7 bp venue gap, useless as a funding-sign proxy.
+- **BTC late-confirmed reversal (eth-midrev's rule on BTC)** (`strategies/btc-midrev/`, H1): rejected at research.
+  +6.2¢ Jan–Apr, −2.3¢ May–Aug: decayed on BTC like the plain reversal. → the market-wide version (H2) in the same folder.
 
 - **SOL late-confirmed reversal at the open** (`strategies/sol-midrev/`): **paper trading**. eth-midrev's rule unchanged on
   KXSOL15M: walk-forward +8.77¢ (CI +3.6..+13.7, 7/8 months, +4.2¢ at 2× latency), lockbox pass but weak: +2.11¢
