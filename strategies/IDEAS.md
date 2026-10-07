@@ -27,9 +27,6 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Round-number strikes.** Markets whose strike sits near a round number (ETH $2,000) may misprice
   barrier-like behaviour (support/resistance, option-pinning flow).
 
-- **SOL version of the open reversal fade.** Same rule as `eth-overreact` on KXSOL15M: research +5.6¢ (t 4.0), 7/8
-  months, May–Aug still +2.6..+3.7¢ (vs ETH ~+1.5¢). Thinner market, larger effect. New folder; ready to run.
-
 ## Needs data or infrastructure first
 
 - **Ladder relative value** (KXBTC ranges vs the KXBTCD above/below ladder): thin range markets quoted
@@ -41,6 +38,10 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Funding / open interest swings** (OKX public metrics) as a regime filter for momentum vs reversal.
 
 ## Tried
+
+- **SOL late-confirmed reversal at the open** (`strategies/sol-midrev/`): **paper trading**. eth-midrev's rule unchanged on
+  KXSOL15M: walk-forward +8.77¢ (CI +3.6..+13.7, 7/8 months, +4.2¢ at 2× latency), lockbox pass but weak: +2.11¢
+  (CI −7.3..+10.8; Sep −1.0¢). Live-vs-Binance rv ratio SOL 1.11 (paper rv_scale), ETH 1.01 (ETH traders use 1.09).
 
 - **Late-confirmed reversal at the open** (`strategies/eth-midrev/`): **paper trading**. The 15-min reversal lives at
   window boundaries; fading |z15|>1.5 only when the last 5 min also ran |z5|>1.5 the same way: walk-forward +5.42¢
