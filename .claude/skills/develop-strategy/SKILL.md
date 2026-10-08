@@ -55,6 +55,8 @@ prove an edge in days.
 ## The workflow
 1. **Create your folder:** `uv run kalshi-lab new <slug> --series <MARKET> --name "<Name>"`
    (`<slug>` is short kebab-case, e.g. `sol-jump-fade`). Work only inside `strategies/<slug>/`.
+   If it builds on an existing strategy, set `"derived_from": "<slug>"` in its config.json now (see "One folder
+   per idea" below).
 2. **Write the hypothesis before testing anything**, in `config.json` (`hypothesis`, `description`) and
    `NOTES.md`: why the market is mispriced, who is on the other side, and what result would prove you wrong.
 3. **Research (optional but encouraged):** screening analyses on development data only, saved under
@@ -91,8 +93,14 @@ Your job is to find an edge, not to test one idea. When research or a pipeline s
 record why (NOTES.md, and IDEAS.md **Tried**), then **pivot and continue**:
 - **a variation**, if the evidence points to one: a different horizon, side, regime, or the subset where it
   did work, chosen for a reason you can state *before* looking at its result (not by scanning for a winner);
-- or **a new hypothesis**, from IDEAS.md or your own. Closely related: keep the same folder and add a new
-  section to NOTES.md. Unrelated: a new folder (`kalshi-lab new`). Each folder has its own budgets.
+- or **a new hypothesis**, from IDEAS.md or your own.
+**One folder per idea.** A variation, refinement or filter on an idea stays in that idea's folder (a new section in
+NOTES.md) and shares its budgets and its single lockbox, *including when the idea is another agent's strategy*: then
+don't edit their folder; build yours with `"derived_from": "<their slug>"` in config.json. Create a new folder only
+for (a) a genuinely different idea, or (b) an existing rule moved **unchanged** to other markets
+(`derived_from` set, fixed in advance, no tuning on the new market). Every strategy that builds on another one sets
+`derived_from`. The lockbox is one shot per family *and market*: if any related strategy already ran the lockbox
+on a market, the pipeline refuses yours on that market, because its result shaped your idea.
 **Lean towards the pipeline.** Research screens are cheap but can mislead in both directions. If an idea is
 plausible and the screen is inconclusive rather than clearly negative, implement it and run smoke and quick
 instead of polishing the screen; the full walk-forward is what decides.

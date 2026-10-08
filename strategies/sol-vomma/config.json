@@ -4,6 +4,7 @@
   "series": [
     "KXSOL15M"
   ],
+  "derived_from": "eth-volfav",
   "class": "SolVomma",
   "status": "rejected",
   "description": "A few minutes before each 15-minute SOL market closes, read how much movement the price implies (implied vol) and compare it with a forecast from recent SOL price action. When the market expects much more movement than is likely, the side that's currently winning is too cheap, so buy it. (Started as a vol-of-vol / vomma pricing idea; research showed that correction is too small to trade, the vol-level error is what's left.)",

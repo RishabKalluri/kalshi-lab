@@ -309,6 +309,13 @@ def main(argv=None):
             if not last_full or last_full.get("verdict") != "promising":
                 log("LOCKBOX: only after a promising full test.")
                 sys.exit(5)
+            from .strategy_dir import family_lockbox_conflicts
+            clash = family_lockbox_conflicts(folder.name, series, LOCKBOX_START.isoformat())
+            if clash:
+                log("LOCKBOX: this strategy's family already used the lockbox on these markets: " + "; ".join(clash) +
+                    ". A refinement of an idea can't be tested on the same held-out data twice. Keep refinements in the "
+                    "original folder, or move the rule unchanged to other markets; otherwise it waits for the lockbox to move.")
+                sys.exit(5)
             if last_full.get("code") != code_hash(folder, legacy=last_full.get("code_v") != CODE_V):
                 log("LOCKBOX: the code changed since the promising full test. Rerun the full test on this exact code first.")
                 sys.exit(5)
@@ -354,7 +361,7 @@ def main(argv=None):
             return
         windows = {r["name"]: [r["start"].isoformat(), r["end"].isoformat()] for r in runs}
         rec = dict(stage=a.stage, job=job, started=started, finished=datetime.now(UTC).isoformat(), git=git_rev(),
-                   code=code, code_v=CODE_V, params=params, note=a.note, iteration=count_runs(folder, "full") + 1, windows=windows,
+                   code=code, code_v=CODE_V, series=series, derived_from=cfg.get("derived_from") or None, params=params, note=a.note, iteration=count_runs(folder, "full") + 1, windows=windows,
                    cards=cards, verdict=verdict_, gate=gate, crashed=crashed, lockbox_start=LOCKBOX_START.isoformat())
         rec = ledger_append(folder.name, rec)  # authoritative
         append_result(folder, rec)              # display copy for the dashboard

@@ -337,6 +337,26 @@ def stage_tab(stage, c, r, T, layout):
         st.caption("Not reached yet." if STAGES.index(stage) > cur else "No runs recorded for this stage.")
 
 
+def family_note(c):
+    """Show the strategy's family (derived_from links) and flag a lockbox that wasn't independent."""
+    from kalshi_lab.strategy_dir import family, family_lockbox_conflicts, family_root
+    fam = sorted(family(c["slug"]) - {c["slug"]})
+    if not fam:
+        return
+    root = family_root(c["slug"])
+    parent = c.get("derived_from")
+    st.caption(f"Family **{root}** ({len(fam) + 1} strategies: {', '.join(fam)})"
+               + (f" · derived from `{parent}`" if parent else ""))
+    for rec in c["_runs"]:
+        if rec.get("stage") == "lockbox" and not rec.get("crashed"):
+            series = rec.get("series") or c.get("series", [])
+            earlier = family_lockbox_conflicts(c["slug"], series, rec.get("lockbox_start", ""), before=str(rec.get("finished")))
+            if earlier:
+                st.warning("**Lockbox not independent:** this family had already used the lockbox on the same markets ("
+                           + "; ".join(earlier) + "), and this version was built after that result. Treat its lockbox like a "
+                           "development result; paper trading is its real out-of-sample test.")
+
+
 def card(c, r, backfills, T, layout):
     with st.container(border=True):
         h1, h2 = st.columns([3, 1.4])
@@ -351,6 +371,7 @@ def card(c, r, backfills, T, layout):
             st.warning("⚠ results.json disagrees with the pipeline ledger (edited?). Numbers below may be wrong; "
                        "the ledger is authoritative.")
         st.markdown(f"**What it does:** {md(c.get('description', ''))}")
+        family_note(c)
         rows = activity_rows(c, r, backfills)
         if rows:
             st.markdown("**Running now**")
@@ -405,7 +426,12 @@ def page(T: dict, layout):
     active = [c for c in entries if c.get("status") not in ("rejected", "parked")]
     resolved = [(c, resolve(c, jobs, papers)) for c in active]
     order = {s: i for i, s in enumerate(reversed(STAGES))}
-    resolved.sort(key=lambda x: order.get(x[1]["stage"], 99))
+    from kalshi_lab.strategy_dir import family_root
+    roots = {c["slug"]: family_root(c["slug"]) for c, _ in resolved}
+    best = {}  # a family is listed where its most advanced member would be, members together
+    for c, r in resolved:
+        best[roots[c["slug"]]] = min(best.get(roots[c["slug"]], 99), order.get(r["stage"], 99))
+    resolved.sort(key=lambda x: (best[roots[x[0]["slug"]]], roots[x[0]["slug"]], order.get(x[1]["stage"], 99)))
     if not resolved:
         st.info("No active strategies. Start one with the develop-strategy skill.")
     for c, r in resolved:

@@ -4,6 +4,7 @@
   "series": [
     "KXETH15M"
   ],
+  "derived_from": "eth-overreact",
   "class": "LateConfirmed",
   "status": "paper",
   "description": "Right after a 15-minute ETH window opens, if the previous window moved a lot (more than 1.5 of its usual standard deviations) and the last 5 minutes of it also ran hard the same way, buy the side that bets on a reversal. Moves that run into the 15-minute boundary tend to give some back in the next window, but the Kalshi price at the open treats it as a coin flip.",

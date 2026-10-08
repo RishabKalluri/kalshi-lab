@@ -162,6 +162,68 @@ def results_match_ledger(folder: Path) -> bool:
     return shown == real
 
 
+# ---------------------------------------------------------------- strategy families
+# A strategy derived from another (config.json "derived_from": "<slug>") is in its family. Refinements of an idea
+# belong in the idea's own folder; a new folder is for a different idea, or the same rule moved unchanged to other
+# markets. The lockbox is one shot per *family and market*: once any member has run the lockbox on some series,
+# no other member may run it on those series until the lockbox moves forward (fresh data).
+
+
+def _parents(slug: str) -> set[str]:
+    out = set()
+    p = STRATEGIES / slug / "config.json"
+    if p.exists():
+        d = json.loads(p.read_text()).get("derived_from")
+        out |= set([d] if isinstance(d, str) else d or [])
+    for r in ledger_runs(slug):  # what it declared when it ran tests (config.json can be edited later)
+        d = r.get("derived_from")
+        out |= set([d] if isinstance(d, str) else d or [])
+    return {x for x in out if x}
+
+
+def family(slug: str) -> set[str]:
+    """Every strategy connected to `slug` through derived_from links (ancestors, descendants, siblings)."""
+    names = {p.name for p in STRATEGIES.iterdir() if p.is_dir() and not p.name.startswith("_")}
+    edges = {n: _parents(n) for n in names | {slug}}
+    fam, todo = set(), [slug]
+    while todo:
+        n = todo.pop()
+        if n in fam:
+            continue
+        fam.add(n)
+        todo += list(edges.get(n, set())) + [m for m, ps in edges.items() if n in ps]
+    return fam
+
+
+def family_root(slug: str) -> str:
+    seen, cur = set(), slug
+    while (ps := sorted(_parents(cur) - seen)):
+        seen.add(cur)
+        cur = ps[0]
+    return cur
+
+
+def _series_of(slug: str, rec: dict) -> set[str]:
+    if rec.get("series"):
+        return set(rec["series"])
+    p = STRATEGIES / slug / "config.json"
+    return set(json.loads(p.read_text()).get("series", [])) if p.exists() else set()
+
+
+def family_lockbox_conflicts(slug: str, series: list[str], lockbox_start: str, before: str | None = None) -> list[str]:
+    """Other family members' lockbox runs on the same lockbox window and any of these series (optionally only
+    those that finished before `before`)."""
+    out = []
+    for other in sorted(family(slug) - {slug}):
+        for r in ledger_runs(other):
+            if r.get("stage") == "lockbox" and not r.get("crashed") and r.get("lockbox_start") == lockbox_start \
+                    and (before is None or str(r.get("finished")) < before):
+                shared = _series_of(other, r) & set(series)
+                if shared:
+                    out.append(f"{other} ({', '.join(sorted(shared))}, {str(r.get('finished'))[:10]}, {r.get('verdict')})")
+    return out
+
+
 def count_runs(folder: Path, stage: str) -> int:
     """Budget accounting, from the ledger (not the editable results.json)."""
     return sum(1 for r in ledger_runs(folder.name) if r.get("stage") == stage and not r.get("crashed"))

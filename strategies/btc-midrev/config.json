@@ -6,6 +6,7 @@
     "KXETH15M",
     "KXSOL15M"
   ],
+  "derived_from": "eth-midrev",
   "class": "LateConfirmed",
   "status": "parked",
   "description": "Trades only BTC's 15-minute market. Right after a window opens, if BTC, ETH and SOL together moved a lot in the previous window (average more than 1.5 standard deviations) and all ran hard the same way in its last 5 minutes, buy the side that bets on BTC reversing. Market-wide bursts into the 15-minute boundary give some back; BTC-only bursts don't, and BTC's opening price doesn't tell them apart. ETH and SOL are listed only for their spot prices.",

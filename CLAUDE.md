@@ -29,6 +29,10 @@ See `SYSTEM.md` for how the system fits together and `README.md` for commands.
 - **Lockbox:** data from `LOCKBOX_START` (validate.py, currently 2026-08-20) on is never used by
   smoke/quick/full; each strategy gets one lockbox run after a promising full test. Move the date forward only
   deliberately and announce it.
+- **Families:** `derived_from` in config.json links related strategies (dashboard groups them). The lockbox is one
+  shot per family and market (`validate.py` refuses a second); a family's lockbox passes count as one piece of
+  evidence when choosing what to take live. eth-midrev's lockbox ran after eth-overreact's on the same ETH data, so
+  it isn't independent.
 - **Before any live trading:** run `kalshi-lab audit <slug>` (independent re-run of full + lockbox vs the
   ledger) and check the folder's results.json matches the ledger. Mismatch = stop and tell the user.
 
