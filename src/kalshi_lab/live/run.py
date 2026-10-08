@@ -109,7 +109,8 @@ def main(argv=None, mode: str = "paper"):
     out = Path(a.out or f"results/{mode}-{name}-{datetime.now():%Y%m%d-%H%M%S}")
     meta = {"mode": mode, "strategy": a.strategy, "params": parse_params(a.param), "resolved_params": vars(strat.p),
             "series": a.series, "source": mode, "sizing": a.sizing, "bankroll": a.bankroll,
-            "start": datetime.now().astimezone().isoformat(), "end": "(running)", "latency_ms": a.latency_ms}
+            "start": datetime.now().astimezone().isoformat(), "end": "(running)", "latency_ms": a.latency_ms,
+            "risk": vars(risk)}  # in periodic saves too, so the dashboard can show the limits while it runs
     from .history import recent_spot
     smap = spot_map(a.series)
     eng = LiveEngine(strat, source, exch, risk=risk, timer_ms=a.timer_ms, status_s=a.status_s,

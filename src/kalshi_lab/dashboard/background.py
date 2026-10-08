@@ -114,7 +114,7 @@ def paper_rows(papers) -> list[dict]:
             elapsed = None
         n = p.get("markets_traded") or 0
         rate = n / elapsed if elapsed and n else 0
-        rows.append(dict(kind="Paper", name=str(p.get("strategy", "")).split("/")[-1] + f" [{', '.join(p.get('series', []))}]",
+        rows.append(dict(kind="LIVE (real money)" if p.get("mode") == "live" else "Paper", name=str(p.get("strategy", "")).split("/")[-1] + f" [{', '.join(p.get('series', []))}]",
                          phase=f"{n} of ~{PAPER_GOAL} markets", frac=min(1.0, n / PAPER_GOAL),
                          detail=f"{n} markets traded so far", elapsed=elapsed,
                          eta=(PAPER_GOAL - n) / rate if rate else None,

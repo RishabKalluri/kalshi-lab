@@ -154,6 +154,7 @@ def resolve(c, jobs, papers) -> dict:
     active = next((j for j in ejobs if j["_state"] in ("running", "queued")), None)
     paper = [p for p in papers if _folder_of(p.get("strategy", "")) == f]
     live_paper = next((p for p in paper if p["_running"]), None)
+    live_real = next((p for p in paper if p["_running"] and p.get("mode") == "live"), None)
     label = status
     if status in ("paper", "live"):
         stage = status
@@ -161,6 +162,8 @@ def resolve(c, jobs, papers) -> dict:
         label = f"testing: {active.get('stage', '')}" if active["_state"] == "running" else "test queued"
         if active["_state"] == "running" and active.get("stage") in STAGES:
             stage = max(stage, active["stage"], key=STAGES.index)
+    elif live_real:
+        label = "LIVE trading (real money)" + (" + paper" if any(p["_running"] and p.get("mode") == "paper" for p in paper) else "")
     elif live_paper:
         label = "paper trading"
     elif runs:
@@ -248,7 +251,13 @@ def paper_stats(p: dict, T: dict, layout):
     except ValueError:
         pass
     wr, ppc = p.get("win_rate"), p.get("pnl_per_contract")
-    st.markdown("**Paper trading so far**")
+    is_live = p.get("mode") == "live"
+    st.markdown("**Live trading so far (real money)**" if is_live else "**Paper trading so far**")
+    if is_live:
+        r_ = p.get("risk") or {}
+        lim = (f" · stop-loss ${r_['max_loss']:,.0f} · max {r_['max_order_qty']:.0f}/order, {r_['max_position']:.0f}/market"
+               if r_ else "")
+        st.caption(f"Bankroll ${p.get('bankroll', 0):,.0f} · sizing {p.get('sizing')}{lim}")
     metric_grid({
         "settled PnL": _money(p.get("pnl")),
         "incl. open positions": _money(p.get("equity_change")),
@@ -275,7 +284,7 @@ def paper_stats(p: dict, T: dict, layout):
             fig = go.Figure(go.Scatter(x=df.settle_time, y=df.cum, mode="lines", line=dict(color=T["s1"], width=2),
                                        hovertemplate="%{y:$,.2f}<extra></extra>"))
             fig.add_hline(y=0, line=dict(color=T["axis"], width=1))
-            st.markdown("**Paper PnL over time** (settled markets)")
+            st.markdown(f"**{'Live' if is_live else 'Paper'} PnL over time** (settled markets)")
             st.plotly_chart(layout(fig, 170, yfmt="$,.0f", legend=False), width="stretch", config={"displayModeBar": False})
     joined = f" · joined from {len(dirs)} runs (restarts) with the same settings" if len(dirs) > 1 else ""
     st.caption(f"results: `{Path(p['_dir']).name}`{joined} · saved {p['_age_min']:.0f} min ago")
@@ -327,8 +336,9 @@ def stage_tab(stage, c, r, T, layout):
         shown = True
     if stage == "full":
         st.caption(f"Full tests used: {len(stage_runs)} of {c['budget'].get('full_tests', 3)}")
-    if stage == "paper" and r["paper"]:
-        paper_stats(combine_paper(r["paper"]), T, layout)
+    runs_of = [p for p in r["paper"] if p.get("mode", "paper") == stage]
+    if stage in ("paper", "live") and runs_of:
+        paper_stats(combine_paper(runs_of), T, layout)
         shown = True
     aj = r["active_job"]
     if aj and aj["_state"] == "running" and aj.get("stage") == stage:
