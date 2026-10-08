@@ -36,6 +36,8 @@ At 7 fixed checkpoints (T-360, 300, 240, 180, 120, 90, 60 s), if the market isn'
 | 8 | 10-01 | sizing 1% → 0.5%/order | — | worst drawdown 26% → ~13% | size for drawdown, not return |
 | 9 | 10-01 | execution check: paper (Oct 1 03:16–15:31) vs a backtest on the same recorded books | paper | identical orders/fills/prices (21 vs 22 orders); paper +$6.69, 77 ct, +8.7¢/ct over 9 markets | the paper/live sim is faithful |
 | 10 | 10-01 | why 43% of paper orders missed | paper | every miss: the touch moved 1–5 ticks against us in the 150 ms latency. Whole recording (Sep 29–Oct 1, 65 orders): fill rate 78% at the touch, **95% with a 1¢ allowance** (`slip_c=1`), 98% at 2¢; ¢/ct within noise (−4.1 / −4.4 / −3.8, 36–41 markets) | backfill's synthetic books never move, so backtests assume ~93% fills; real at-the-touch IOCs fill less. Paper now runs `slip_c=1` |
+| 11 | 10-08 | paper since slip_c=1: 160 markets, +2.87¢/ct (CI −4.2..+9.5), 95% fills | paper | in line with the walk-forward | |
+| 12 | 10-08 | **live trial** with the user's go-ahead: $196, pct:1, stop-loss $40. Pre-check: a 1¢ bid / 99¢ offer placed and cancelled via the live code | live | first test rejected: funds must sit on the market's exchange shard (crypto = 2) before API orders; after moving them, both orders acked and cancelled cleanly | Kalshi's API needs collateral pre-allocated per shard |
 
 ## Learnings
 - **Entry timing can flip the sign.** Evaluate at fixed times; "first moment the signal crosses" is adverse selection.
@@ -47,6 +49,6 @@ At 7 fixed checkpoints (T-360, 300, 240, 180, 120, 90, 60 s), if the market isn'
 - **Real books move under you.** At-the-touch IOCs miss ~20–40% on recorded books (the quote moves within 150 ms); backfill's synthetic books don't model that. Cross the touch by 1¢ (`slip_c=1`) to fill ~95%.
 
 ## Current status
-- Stage: **paper trading** (since Sep 30, 0.5%/order, `slip_c=1` from Oct 1, `deploy/paper/eth-volfav.json`).
+- Stage: **live trial** since Oct 8 ($196, 1%/order, stop-loss $40; server tmux `live-eth-volfav`). Paper keeps running alongside (0.5%/order, `slip_c=1`).
 - Lockbox: **spent**. It was developed on data through Sep 29 before the lockbox existed; paper is its out-of-sample test.
 - Next: ~1 week of paper (~100 markets), compare per-contract results and fills to the walk-forward, then the $200 live-trial decision.
