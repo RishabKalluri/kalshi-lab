@@ -35,6 +35,12 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   history download (public API).
 - **Order-book imbalance on spot exchanges.** Needs books recorded live from now (free) or bought
   history (Tardis.dev, Kaiko). Only worth it if the trade-flow idea above shows something.
+- **15-minute vs hourly ladder at the :00 close** (KXETHD/KXSOLD vs KXETH15M/KXSOL15M). The 15-min market closing at
+  :00 settles on the same 60 s CF average as that hour's above/below ladder; in the last 15 minutes of the hour the
+  ladder's interpolated CDF at the 15-min strike prices the same bet. *Two thin books quoted independently.* Needs
+  KXETHD/KXSOLD history (and more KXBTCD than the 8 lockbox days to check the concept on BTC). From `asym-vol`.
+- **Polymarket 15-minute crypto up/down vs Kalshi** (same windows, different reference: Chainlink). Cross-venue
+  mispricing. Needs Polymarket trade/book history.
 - **Funding / open interest swings** (OKX public metrics) as a regime filter for momentum vs reversal. (Funding-*time* drift
   screened in `btc-funding`: nothing; a funding-rate *regime filter* still needs OKX funding/OI history.)
 
@@ -101,3 +107,8 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   9:15 window and Kalshi underprices it (iv ~0.3 log too low). Buying the 10–45¢ underdog in that window on ETH+BTC:
   +4.32¢/ct, CI −1.5..+10.5, 6/9 months, 237 markets. Sample-limited; needs more coins' 15-min markets. Weekend vol,
   the 8:30 release step and the 16:00 step-down are priced correctly (rejected at research).
+- **ETH/SOL screens: SOL staleness, sign-asymmetric vol, SOL's own flow, round-price orders, in-window vol decay**
+  (`strategies/asym-vol/`): rejected at research. SOL's Kalshi lags spot < costs; the sign of a move doesn't predict
+  vol (only its size); SOL's own flow has no positive decile; round-priced orders aren't stale. New fact: vol decays
+  across every 15-min window (~1.4× the window mean early, ~0.75× late, 2× in the first 10 s), but late favourites
+  aren't cheap after costs.

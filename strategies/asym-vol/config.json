@@ -1,0 +1,21 @@
+{
+  "slug": "asym-vol",
+  "name": "Asymmetric Vol",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Research-only session on ETH and SOL: five new ideas screened (SOL quote staleness, sign-asymmetric vol, SOL's own order flow, stale round-price orders, and the vol decay inside each 15-minute window). None beat fees and spread at real fills, so nothing reached the pipeline.",
+  "hypothesis": "Main idea (H1): future 15-minute vol depends on the sign of the recent move (leverage effect), and Kalshi prices vol from unsigned trailing vol, so the side the sign favours is cheap. Losers: takers/quoters using unsigned trailing vol. Wrong if signed returns don't predict rest-of-window vol beyond HAR terms in both halves, or the favoured side isn't positive at next fills after fee. Also H0 (SOL staleness), H2 (SOL own flow), H3 (round-price orders), H4 (late-window vol overpriced given the in-window vol decay): see NOTES.md.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-10",
+  "next": "Rejected at research (H0-H4 all negative at real fills). New ground needs data: KXETHD/KXSOLD hourly ladders (15-min vs hourly at the :00 close), Polymarket 15-min crypto, or more coins' 15-min series."
+}
