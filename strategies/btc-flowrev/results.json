@@ -1,0 +1,362 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "btc-flowrev-1010-172847",
+   "started": "2026-10-10T22:31:42.895528+00:00",
+   "finished": "2026-10-10T22:31:56.694883+00:00",
+   "git": "17de64f",
+   "code": "4266c0269b0530e4",
+   "code_v": 2,
+   "series": [
+    "KXBTC15M"
+   ],
+   "derived_from": null,
+   "params": [],
+   "note": "v1 SessionFade: fade NY-session move (09:30->16:00 ET) in the 16:00 ET window, |R|>0.5, h 870-780, mid 30-70",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-19T18:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "failed",
+   "gate": "no fills in the smoke window (strategy may never trade, or the window is too short)",
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "",
+   "hash": "f8c1e2d6eb8400b1f4168d04111c265f6eef453d23112a4317b988d0ad9f44bf"
+  },
+  {
+   "stage": "quick",
+   "job": "btc-flowrev-1010-173207",
+   "started": "2026-10-10T22:32:30.098747+00:00",
+   "finished": "2026-10-10T22:33:18.059533+00:00",
+   "git": "17de64f",
+   "code": "4266c0269b0530e4",
+   "code_v": 2,
+   "series": [
+    "KXBTC15M"
+   ],
+   "derived_from": null,
+   "params": [],
+   "note": "v1 SessionFade (smoke can't trade: its 18:00-24:00 UTC window has no 09:30 ET anchor; ad-hoc Jun 1-15 matched research rule 6/6)",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-17T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": -19.93,
+     "contracts": 39.0,
+     "markets": 2,
+     "fees": 0.67,
+     "pnl_per_contract_c": -51.103,
+     "t_stat": -104.89,
+     "max_drawdown": 19.93,
+     "rejects": 0
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "f8c1e2d6eb8400b1f4168d04111c265f6eef453d23112a4317b988d0ad9f44bf",
+   "hash": "9997847e1038a0990f9768b458aa9f35e157f35e2808af6dbd6b4a595d75d9b6"
+  },
+  {
+   "stage": "full",
+   "job": "btc-flowrev-1010-173341",
+   "started": "2026-10-10T22:34:01.008757+00:00",
+   "finished": "2026-10-10T22:53:24.344983+00:00",
+   "git": "376fc36",
+   "code": "4266c0269b0530e4",
+   "code_v": 2,
+   "series": [
+    "KXBTC15M"
+   ],
+   "derived_from": null,
+   "params": [],
+   "note": "v1 SessionFade full 1/3: fade 09:30->16:00 ET session move in the 16:00 ET window, |R|>0.5",
+   "iteration": 1,
+   "windows": {
+    "wf-2025-12": [
+     "2025-12-10T00:00:00+00:00",
+     "2026-01-01T00:00:00+00:00"
+    ],
+    "wf-2026-01": [
+     "2026-01-01T00:00:00+00:00",
+     "2026-02-01T00:00:00+00:00"
+    ],
+    "wf-2026-02": [
+     "2026-02-01T00:00:00+00:00",
+     "2026-03-01T00:00:00+00:00"
+    ],
+    "wf-2026-03": [
+     "2026-03-01T00:00:00+00:00",
+     "2026-04-01T00:00:00+00:00"
+    ],
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ],
+    "lat2x-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2025-12": {
+     "pnl": -7.48,
+     "contracts": 78.0,
+     "markets": 5,
+     "fees": 1.23,
+     "pnl_per_contract_c": -9.59,
+     "t_stat": -0.4,
+     "max_drawdown": 19.8,
+     "rejects": 0,
+     "ci95_c": [
+      -47.905,
+      35.054
+     ],
+     "days_positive": "3/5"
+    },
+    "wf-2026-01": {
+     "pnl": 32.27,
+     "contracts": 250.0,
+     "markets": 12,
+     "fees": 4.36,
+     "pnl_per_contract_c": 12.908,
+     "t_stat": 0.95,
+     "max_drawdown": 13.7,
+     "rejects": 0,
+     "ci95_c": [
+      -12.331,
+      38.466
+     ],
+     "days_positive": "8/12"
+    },
+    "wf-2026-02": {
+     "pnl": 27.14,
+     "contracts": 271.0,
+     "markets": 15,
+     "fees": 4.58,
+     "pnl_per_contract_c": 10.015,
+     "t_stat": 0.9,
+     "max_drawdown": 21.03,
+     "rejects": 0,
+     "ci95_c": [
+      -9.693,
+      31.292
+     ],
+     "days_positive": "11/15"
+    },
+    "wf-2026-03": {
+     "pnl": 60.04,
+     "contracts": 323.0,
+     "markets": 16,
+     "fees": 5.55,
+     "pnl_per_contract_c": 18.588,
+     "t_stat": 1.65,
+     "max_drawdown": 15.19,
+     "rejects": 0,
+     "ci95_c": [
+      -4.272,
+      39.63
+     ],
+     "days_positive": "12/16"
+    },
+    "wf-2026-04": {
+     "pnl": -34.44,
+     "contracts": 262.0,
+     "markets": 15,
+     "fees": 4.43,
+     "pnl_per_contract_c": -13.145,
+     "t_stat": -1.02,
+     "max_drawdown": 34.44,
+     "rejects": 0,
+     "ci95_c": [
+      -35.41,
+      11.981
+     ],
+     "days_positive": "7/15"
+    },
+    "wf-2026-05": {
+     "pnl": -10.27,
+     "contracts": 299.0,
+     "markets": 14,
+     "fees": 5.03,
+     "pnl_per_contract_c": -3.435,
+     "t_stat": -0.26,
+     "max_drawdown": 48.94,
+     "rejects": 0,
+     "ci95_c": [
+      -27.004,
+      21.658
+     ],
+     "days_positive": "7/14"
+    },
+    "wf-2026-06": {
+     "pnl": 104.56,
+     "contracts": 265.0,
+     "markets": 12,
+     "fees": 4.41,
+     "pnl_per_contract_c": 39.457,
+     "t_stat": 2.89,
+     "max_drawdown": 11.13,
+     "rejects": 0,
+     "ci95_c": [
+      13.121,
+      56.683
+     ],
+     "days_positive": "10/12"
+    },
+    "wf-2026-07": {
+     "pnl": 15.6,
+     "contracts": 309.0,
+     "markets": 14,
+     "fees": 5.22,
+     "pnl_per_contract_c": 5.049,
+     "t_stat": 0.39,
+     "max_drawdown": 55.36,
+     "rejects": 0,
+     "ci95_c": [
+      -18.684,
+      30.054
+     ],
+     "days_positive": "8/14"
+    },
+    "wf-2026-08": {
+     "pnl": -23.88,
+     "contracts": 194.0,
+     "markets": 10,
+     "fees": 3.37,
+     "pnl_per_contract_c": -12.309,
+     "t_stat": -0.77,
+     "max_drawdown": 29.85,
+     "rejects": 0,
+     "ci95_c": [
+      -41.135,
+      18.357
+     ],
+     "days_positive": "4/10"
+    },
+    "lat2x-2026-06": {
+     "pnl": 104.56,
+     "contracts": 265.0,
+     "markets": 12,
+     "fees": 4.41,
+     "pnl_per_contract_c": 39.457,
+     "t_stat": 2.89,
+     "max_drawdown": 11.13,
+     "rejects": 0,
+     "ci95_c": [
+      13.121,
+      56.683
+     ],
+     "days_positive": "10/12"
+    },
+    "lat2x-2026-07": {
+     "pnl": 0.88,
+     "contracts": 237.0,
+     "markets": 11,
+     "fees": 3.95,
+     "pnl_per_contract_c": 0.371,
+     "t_stat": 0.03,
+     "max_drawdown": 43.26,
+     "rejects": 0,
+     "ci95_c": [
+      -24.186,
+      28.582
+     ],
+     "days_positive": "6/11"
+    },
+    "lat2x-2026-08": {
+     "pnl": -23.54,
+     "contracts": 194.0,
+     "markets": 10,
+     "fees": 3.37,
+     "pnl_per_contract_c": -12.134,
+     "t_stat": -0.76,
+     "max_drawdown": 29.85,
+     "rejects": 0,
+     "ci95_c": [
+      -40.897,
+      18.36
+     ],
+     "days_positive": "4/10"
+    },
+    "POOLED": {
+     "pnl": 163.54,
+     "contracts": 2251.0,
+     "markets": 113,
+     "pnl_per_contract_c": 7.265,
+     "ci95_c": [
+      -2.526,
+      16.059
+     ],
+     "days_positive": "70/113",
+     "max_drawdown": 69.93
+    },
+    "POOLED-lat2x": {
+     "pnl": 81.9,
+     "contracts": 696.0,
+     "markets": 33,
+     "pnl_per_contract_c": 11.767,
+     "ci95_c": [
+      -5.693,
+      28.715
+     ],
+     "days_positive": "20/33",
+     "max_drawdown": 54.84
+    }
+   },
+   "verdict": "inconclusive",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "9997847e1038a0990f9768b458aa9f35e157f35e2808af6dbd6b4a595d75d9b6",
+   "hash": "50a662fa0e918a3916a56d8215ee7dd47ff624588f4c40ef1dccb03b651bee34"
+  }
+ ]
+}

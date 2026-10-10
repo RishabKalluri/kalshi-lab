@@ -1,0 +1,20 @@
+{
+  "slug": "btc-flowrev",
+  "name": "BTC Post-Fixing Session Fade",
+  "series": [
+    "KXBTC15M"
+  ],
+  "derived_from": "",
+  "class": "SessionFade",
+  "status": "parked",
+  "description": "Trades one BTC 15-minute window a day: the one that opens at 4:00 pm New York time on US trading days. If BTC moved a lot since the 9:30 am stock-market open, buy the side that bets on part of that move coming back. The session's flow (ETF creations filled into the 3-4 pm fixing, the stock close) stops at 4:00 and the move partly reverts, but Kalshi opens that window near 50/50.",
+  "hypothesis": "US-session flow (spot-ETF creations/redemptions traded into the 15:00-16:00 ET CF fixing, CME settlement and the equity close at 16:00) pushes BTC with the session; at 16:00 the pressure stops and part reverts. Losers: opening takers/quoters pricing the 16:00 window as driftless. Found post hoc in a slot scan (H2 was momentum in the fixing hour, wrong sign): corr(session return, 16:00 window return) -0.36/-0.33 BTC, also ETH/SOL; fade at next real fills +11c in both halves. Wrong if the full walk-forward isn't promising or the lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-10",
+  "next": "Parked: full 1/3 inconclusive (+7.27c, CI -2.5..+16.1, 5/9 months, 113 markets). Sample-limited; the same rule unchanged on BTC+ETH+SOL continues in strategies/session-fade/."
+}

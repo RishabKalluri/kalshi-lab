@@ -27,6 +27,11 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **Round-number strikes.** Markets whose strike sits near a round number (ETH $2,000) may misprice
   barrier-like behaviour (support/resistance, option-pinning flow).
 
+- **16:00 ET session fade on ETH+SOL+BTC** (from `btc-flowrev` H3): the window opening at 16:00 ET reverses the NY
+  session's move on all three coins' spot (corr −0.3..−0.46, both halves). BTC alone is too few markets (full
+  inconclusive, +7.3¢); run the same rule unchanged on all three in `strategies/session-fade/` (derived_from btc-flowrev).
+  Slow test: three series per month (run on power).
+
 ## Needs data or infrastructure first
 
 - **Ladder relative value** (KXBTC ranges vs the KXBTCD above/below ladder): thin range markets quoted
@@ -112,3 +117,10 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   vol (only its size); SOL's own flow has no positive decile; round-priced orders aren't stale. New fact: vol decays
   across every 15-min window (~1.4× the window mean early, ~0.75× late, 2× in the first 10 s), but late favourites
   aren't cheap after costs.
+- **BTC Kalshi-only price moves** (`strategies/btc-flowrev/`, H1): rejected at research. The 60 s Kalshi move not
+  explained by a spot model neither reverts nor continues (t ≈ −0.5); fading loses fee + spread in every quintile.
+- **Intraday momentum into the 15:00–16:00 ET ETF fixing** (`strategies/btc-flowrev/`, H2): rejected at research (corr
+  −0.08/−0.13, wrong sign).
+- **BTC post-fixing session fade at 16:00 ET** (`strategies/btc-flowrev/`, H3): **parked, inconclusive** (full 1/3). Fade
+  the 09:30→16:00 ET move in the 16:00 window: +7.27¢/ct, CI −2.5..+16.1, 5/9 months, 113 markets. Edge sits in |R| > 1
+  sessions (+15¢, engine and research). Sample-limited; continue on three coins (see Ready to try).
