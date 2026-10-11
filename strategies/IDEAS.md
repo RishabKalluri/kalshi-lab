@@ -124,3 +124,10 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **BTC post-fixing session fade at 16:00 ET** (`strategies/btc-flowrev/`, H3): **parked, inconclusive** (full 1/3). Fade
   the 09:30→16:00 ET move in the 16:00 window: +7.27¢/ct, CI −2.5..+16.1, 5/9 months, 113 markets. Edge sits in |R| > 1
   sessions (+15¢, engine and research). Sample-limited; continue on three coins (see Ready to try).
+- **Volatility screens: vol-burst underdog, clock-aware vol fair value, jump share (HAR-CJ), realized skew, deep
+  favourites** (`strategies/vol-burst/`): rejected at research. Underdog never cheap after a 5-min vol burst; a vol
+  forecast with NY hour-of-week x quarter-hour lifts OOS R2 0.609 -> 0.631 but loses at the next real fill on both
+  sides; jump terms add +0.002 R2; skew |corr| < 0.02; 80-97c favourites negative on ETH/SOL/BTC.
+- **eth-volfav's signal as a maker** (`strategies/volfav-maker/`): rejected at engine ad hoc. Post-only bid one tick
+  above the favourite's bid: +0.77c/ct vs the taker's +1.77c/ct on the same signal (Jun-Jul); adverse selection
+  -5.7c in 30 s eats the saved fee + spread. Could still be checked on real books in a spare paper slot.

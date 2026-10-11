@@ -1,0 +1,20 @@
+{
+  "slug": "volfav-maker",
+  "name": "VolFav Maker",
+  "series": [
+    "KXETH15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "VolFavMaker",
+  "status": "rejected",
+  "description": "eth-volfav's signal (buy the favourite when the market's implied vol is well above a HAR vol forecast, a few minutes before close), executed as a maker: a post-only bid one tick above the favourite's best bid, cancelled after 25 s. Makers pay no fee and don't cross the spread, which is most of what a taker gives away on ETH.",
+  "hypothesis": "Written before testing: eth-volfav's taker edge (~+2c/contract) is roughly what fee + spread cost (~3-5c), so the same signal executed passively should earn several cents more per contract, IF the fills we get are not adversely selected away. Who's on the other side: the same reversal-buying underdog takers eth-volfav trades against, now selling the favourite into our bid instead of us lifting their offers. Proved wrong if the walk-forward's per-contract result is not above eth-volfav's own (+2.16c) or the CI includes zero, i.e. fills on the signal are adversely selected like dog-seller's back-of-queue fills (-2.1c within 30 s).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-11",
+  "next": "Rejected before the pipeline: engine ad hoc, maker +0.77c/ct vs taker +1.77c/ct on the identical signal (Jun-Jul), May -0.14c; adverse selection -5.7c in 30 s cancels the saved fee+spread. Optional real-book check: take=0 in a spare paper slot (execution only)."
+}

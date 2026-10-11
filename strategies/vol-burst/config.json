@@ -1,0 +1,21 @@
+{
+  "slug": "vol-burst",
+  "name": "Vol Burst",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Volatility-breakout underdog: when realized vol in the last few minutes jumps well above the trailing hour's, short-horizon vol clusters and the Kalshi price (quoted off a calmer trailing vol) underprices the rest-of-window move, so the underdog is cheap. Buys the underdog at fixed checkpoints.",
+  "hypothesis": "H1 (written before testing): spot vol clusters at minute horizons. When rv over the last 5 min is >> rv over the last hour (a vol burst starting), the remaining-window vol is higher than what Kalshi quoters price (they anchor on the calm stretch and on eth-volfav-type 'high iv' habits), so implied vol is too low and the underdog (10-45c) is underpriced. Losers: favourite buyers late in a newly volatile window and quoters slow to widen. This is the opposite side and opposite regime to eth-volfav. Wrong if: underdog PnL at the next real fill after fees is <= 0 in the top burst bucket in either half of development data (Dec-Apr vs May-Aug), or the full walk-forward CI is below zero.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-11",
+  "next": "Rejected at research (H1 burst underdog, H2 clock-aware vol fair value, H3 jump share, H4 realized skew, H5 deep favourites). H6 (eth-volfav signal as a maker) continues in strategies/volfav-maker/."
+}
