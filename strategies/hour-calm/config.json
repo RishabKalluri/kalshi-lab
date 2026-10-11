@@ -1,0 +1,22 @@
+{
+  "slug": "hour-calm",
+  "name": "Top-of-Hour Calm Favourite",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "bell-vol",
+  "class": "HourCalmFavourite",
+  "status": "developing",
+  "description": "Crypto prices move most right after the top of each hour and least in the last 15 minutes before it. Kalshi prices every 15-minute window as if the coming move were equally big, so in the window that ends on the hour the side that's currently winning is a bit cheaper than it should be. A few minutes into that window, buy the favourite (65-90c) on BTC, ETH and SOL and hold to settlement.",
+  "hypothesis": "Crypto vol has a minute-of-hour cycle (hourly candles, hourly TWAP/rebalancing, hourly expiries at :00): the :45->:00 quarter is the calmest of the hour (0.85-0.90x the hour's variance vs 1.10x for :00->:15, all coins, both halves). Kalshi prices all four quarter-hour windows off the same trailing vol, so it overprices the remaining move in the :45 window and the favourite is cheap. Losers: underdog buyers and quoting bots with no minute-of-hour prior. Wrong if: the favourite in :45 windows isn't positive at next real fills after fee in both halves on at least two coins, or the walk-forward isn't promising, or the lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-10",
+  "next": "smoke, quick, full"
+}

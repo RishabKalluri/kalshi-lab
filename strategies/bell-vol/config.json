@@ -1,0 +1,22 @@
+{
+  "slug": "bell-vol",
+  "name": "Exchange-Open Vol Steps",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M",
+    "KXBTC15M"
+  ],
+  "derived_from": "us-hours-vol",
+  "class": "",
+  "status": "rejected",
+  "description": "Tested whether the Tokyo, Shanghai/Hong Kong and London stock-market opens are volatility jumps that Kalshi's 15-minute crypto prices miss, the way they miss the 9:30 New York open. They aren't: Tokyo has a small vol step but the cheap-underdog effect flips sign between halves; Hong Kong and London show no vol step.",
+  "hypothesis": "Tokyo (00:00 UTC), Shanghai/HK (01:30 UTC) and London (08:00 London time) open at fixed local times; if crypto vol steps up at those opens like at 9:30 ET, a Kalshi quoter pricing off calm pre-open vol underprices the move and the underdog in the open window is cheap. Wrong if there's no vol step on the exchange's own clock, log(iv/rv_fut) there isn't low, or the underdog at next real fills after fee isn't positive in both halves on two coins.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-10",
+  "next": "Rejected at research. The screen's side finding (lower iv/rv in windows starting on the hour) became strategies/hour-calm/."
+}
