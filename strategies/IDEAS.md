@@ -131,3 +131,12 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
 - **eth-volfav's signal as a maker** (`strategies/volfav-maker/`): rejected at engine ad hoc. Post-only bid one tick
   above the favourite's bid: +0.77c/ct vs the taker's +1.77c/ct on the same signal (Jun-Jul); adverse selection
   -5.7c in 30 s eats the saved fee + spread. Could still be checked on real books in a spare paper slot.
+
+- **Top-of-hour calm favourite** (`strategies/hour-calm/`): **rejected at the lockbox.** Crypto vol has a minute-of-hour
+  cycle (each quarter-hour opens with a burst; :45->:00 is the calmest quarter, ~12% less vol than :00->:15, all coins).
+  Buying the 65-90c favourite in the :45 window: full v1 +0.62c (CI -0.1..+1.4); v2 (only h=720, a post-hoc subset)
+  promising +2.17c (CI +1.06..+3.36, 7/8 months); lockbox -1.21c (CI -3.6..+1.3), BTC and weekends reversed hardest.
+- **Other exchanges' opens as vol steps** (`strategies/bell-vol/`): rejected at research. Tokyo has a small vol step,
+  but the underdog flips sign between halves; HK and London have none. Only the NY 9:30 bell is a big missed step.
+- **Open-window lag on ETH/SOL** (`research/open_edge.py`, noted in hour-calm): the market beats a spot-vs-strike model
+  in the first minute on the thinner coins too.

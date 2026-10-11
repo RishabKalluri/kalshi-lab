@@ -42,7 +42,15 @@ Newest last. Every pipeline run gets a line; every change gets a reason.
 | 5 | 10-10 | v1 smoke; quick (job hour-calm-1010-190255) | smoke/quick | smoke passed (14 markets); quick passed: +3.82c/ct, CI -2.0..+9.4, 178 markets, 4/4 days | |
 | 6 | 10-10 | v1 (job hour-calm-1010-190411) | **full (1/3): inconclusive** | **+0.62c/ct, CI -0.11..+1.40**, 158k contracts, 12,311 markets, 5/8 months (Jan -1.2, Feb +1.2, Mar -0.5, Apr +0.1, May +0.5, Jun -1.4, Jul +0.8, Aug +4.9); 2x latency Jun-Aug +1.42c (CI +0.15..+2.64). By coin BTC +1.17, ETH +0.61, SOL -0.03. **By entry checkpoint: h=720 +2.23c (4,874 markets), 600 -0.15, 480 -0.06, 360 -1.82.** Weekends +2.19c, weekdays -0.03c | Half the research figure, and all of it in the first checkpoint. Reading: at h=720 the market's trailing vol still contains the burst that opens every quarter-hour (minute_vol.py: first minutes 1.2-1.6x), so it overstates the calm remainder most; at later checkpoints trailing vol has caught up and the fallback entries are markets that moved late (adverse). Screen 3 had already shown h=720 as the best fixed horizon on all three coins. **One change for v2: enter only at h=720.** (Weekend strength noted, deliberately not filtered.) |
 
+| 7 | 10-10 | v2 smoke; quick (job hour-calm-1010-194936) | smoke/quick | smoke passed (8 markets); quick passed: +9.83c/ct, CI +1.4..+17.3, 79 markets | |
+| 8 | 10-10 | v2 (job hour-calm-1010-195103) | **full (2/3): promising** | **+2.17c/ct, CI +1.06..+3.36**, 67k contracts, 4,874 markets, **7/8 months** (Jan +1.3, Feb +2.5, Mar -0.2, Apr +0.6, May +1.8, Jun +1.4, Jul +3.7, Aug +6.7); 2x latency Jun-Aug +3.53c (CI +1.56..+5.36) | Caveat: these are exactly v1's h=720 entries, picked after seeing v1's breakdown on the same data, so this full confirms the selection rather than testing it. The lockbox is the real test. |
+| 9 | 10-10 | v2 (job hour-calm-1010-212015) | **lockbox: FAIL** | **-1.21c/ct, CI -3.60..+1.26**, 15.4k contracts, 1,327 markets, 23/52 days; Aug 20-31 -0.56, Sep -1.35, Oct 1-10 -1.61, recorded books -1.57. By coin BTC -3.3, ETH +0.3, SOL -0.5; weekends -4.0, weekdays -0.2 | **Rejected.** The strongest development slices (BTC, weekends) reversed hardest. The vol cycle is real, but the favourite's underpricing in the :45 window didn't hold out of sample. |
+
 ## Learnings
+- **A post-hoc subset of an inconclusive full test is not new evidence.** v1 (all checkpoints) was +0.62c; keeping the
+  best checkpoint gave a "promising" +2.17c on the same trades, and the lockbox lost -1.2c. Next time, treat a
+  subset found in a full test's breakdown as a hypothesis for *new* data, and be sceptical of an edge that lives in
+  one slice of the breakdown.
 - **Crypto vol has a minute-of-hour cycle** on BTC, ETH and SOL: each quarter-hour opens with a burst (first minute
   1.3-1.6x) and decays to ~0.6x in its last minutes, and the quarter before the top of the hour (:45 -> :00) is the
   calmest of the hour (~12% less vol than :00 -> :15).
@@ -50,4 +58,7 @@ Newest last. Every pipeline run gets a line; every change gets a reason.
   (3 minutes in); by 5+ minutes in, the market's trailing vol has caught up.
 
 ## Current status
-- Stage: v2 (h=720 only) heading into smoke, quick, full 2/3.
+- Stage: **rejected at the lockbox** (one shot spent; no retry). Full budget used: 2 of 3.
+- Side screen while the full ran: `research/open_edge.py` (previously BTC only) on ETH/SOL. The market beats a
+  spot-vs-strike model in the first minute after the open and the combination adds <=0.001 Brier; not slow at the
+  open on the thinner coins either.
