@@ -1,0 +1,22 @@
+{
+  "slug": "cb-premium",
+  "name": "Coinbase Premium Drift",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Tested whether a widening Coinbase premium over Binance (US buyers working orders on USD venues) predicts the next 15-minute move, which Kalshi's opening price ignores. It does, consistently but weakly: about 51-55% right in the strongest tenth of cases, not enough to beat the fee and spread.",
+  "hypothesis": "US flow is worked on USD venues (Coinbase) over hours; while it's working, Coinbase trades at a premium/discount to Binance USDT and the global price keeps drifting that way. A widening premium should predict the next 15-min return in its direction; Kalshi opens each window at ~50/50. Wrong if corr(premium change, next return) isn't positive in both halves on two coins, or the top-decile hit rate is too low to beat a taker's fee + spread at the open (~53-54%).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-11",
+  "next": "Rejected at research: right sign everywhere (corr +0.02..+0.036) but too weak (top-decile hit 51-55%, ~+2c gross vs ~3c costs). Could be one input to a combined model; live use would also need a USDT feed recorded."
+}

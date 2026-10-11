@@ -140,3 +140,8 @@ Each idea: **what**, *why it might work / who loses*, the data it needs, and lea
   but the underdog flips sign between halves; HK and London have none. Only the NY 9:30 bell is a big missed step.
 - **Open-window lag on ETH/SOL** (`research/open_edge.py`, noted in hour-calm): the market beats a spot-vs-strike model
   in the first minute on the thinner coins too.
+- **Kalshi taker-flow herding** (`strategies/kalshi-herd/`): rejected at research. Net Kalshi taker imbalance over
+  1-10 minutes has corr ~0 with outcome minus price on BTC/ETH/SOL; fading or following loses fee + spread.
+- **Coinbase premium drift** (`strategies/cb-premium/`): rejected at research. A widening Coinbase-vs-Binance premium
+  predicts the next 15-min move in its direction (corr +0.02..+0.036, all coins, both halves) but only 51-55% hit in
+  the top decile, below costs at the open. Possible input to a combined model (needs a USDT feed recorded live).

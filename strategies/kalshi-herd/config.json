@@ -1,0 +1,22 @@
+{
+  "slug": "kalshi-herd",
+  "name": "Kalshi Taker Herding",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M",
+    "KXBTC15M"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Tested whether one-sided bursts of Kalshi taker buying overshoot (and can be faded) on the thin ETH/SOL 15-minute markets. They don't: net taker flow over the last 1-10 minutes has no predictive power for the outcome beyond the price, and fading or following it loses about the fee plus spread.",
+  "hypothesis": "On thin books a burst of one-sided Kalshi taker buying walks the price beyond what spot justifies (retail chasing, quoters stepping back) and drifts back; net signed taker flow over the last few minutes should predict y - mid with a negative sign. Wrong if corr(imbalance, y - mid) isn't consistently signed in both halves, or the extreme imbalance quintile isn't positive at next real fills after fee in both halves on ETH or SOL.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-11",
+  "next": "Rejected at research (corr -0.02..+0.005 at W=60/180/600 s; fade negative in every quintile, both halves, all coins)."
+}
