@@ -1,0 +1,45 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {"Sid": "Servers", "Effect": "Allow", "Action": "ec2:*", "Resource": "*"},
+    {"Sid": "NoHugeServers", "Effect": "Deny", "Action": "ec2:RunInstances",
+     "Resource": "arn:aws:ec2:*:*:instance/*",
+     "Condition": {"StringNotLike": {"ec2:InstanceType": [
+       "*.nano", "*.micro", "*.small", "*.medium", "*.large", "*.xlarge", "*.2xlarge"]}}},
+
+    {"Sid": "Buckets", "Effect": "Allow", "Action": "s3:*",
+     "Resource": ["arn:aws:s3:::kalshi-*", "arn:aws:s3:::kalshi-*/*"]},
+    {"Sid": "ListBuckets", "Effect": "Allow", "Action": "s3:ListAllMyBuckets", "Resource": "*"},
+
+    {"Sid": "CreateFencedRolesAndUsers", "Effect": "Allow",
+     "Action": ["iam:CreateRole", "iam:PutRolePolicy", "iam:AttachRolePolicy", "iam:PutRolePermissionsBoundary",
+                "iam:CreateUser", "iam:PutUserPolicy", "iam:AttachUserPolicy", "iam:PutUserPermissionsBoundary"],
+     "Resource": ["arn:aws:iam::531080694882:role/kalshi-*", "arn:aws:iam::531080694882:user/kalshi-*"],
+     "Condition": {"StringEquals": {"iam:PermissionsBoundary": "arn:aws:iam::531080694882:policy/kalshi-boundary"}}},
+    {"Sid": "ManageFencedRolesAndUsers", "Effect": "Allow",
+     "Action": ["iam:Get*", "iam:List*", "iam:TagRole", "iam:UntagRole", "iam:TagUser", "iam:UpdateAssumeRolePolicy",
+                "iam:DeleteRolePolicy", "iam:DetachRolePolicy", "iam:DeleteRole",
+                "iam:DeleteUserPolicy", "iam:DetachUserPolicy", "iam:DeleteUser",
+                "iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:UpdateAccessKey",
+                "iam:CreateInstanceProfile", "iam:DeleteInstanceProfile",
+                "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile"],
+     "Resource": ["arn:aws:iam::531080694882:role/kalshi-*", "arn:aws:iam::531080694882:user/kalshi-*",
+                  "arn:aws:iam::531080694882:instance-profile/kalshi-*"]},
+    {"Sid": "GiveRolesToServers", "Effect": "Allow", "Action": "iam:PassRole",
+     "Resource": "arn:aws:iam::531080694882:role/kalshi-*",
+     "Condition": {"StringEquals": {"iam:PassedToService": "ec2.amazonaws.com"}}},
+    {"Sid": "BudgetStopAction", "Effect": "Allow", "Action": "iam:PassRole",
+     "Resource": "arn:aws:iam::531080694882:role/kalshibruh"},
+    {"Sid": "ReadOnlyIAM", "Effect": "Allow",
+     "Action": ["iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicies", "iam:ListRoles", "iam:ListUsers"],
+     "Resource": "*"},
+    {"Sid": "NeverRemoveTheFence", "Effect": "Deny",
+     "Action": ["iam:DeleteRolePermissionsBoundary", "iam:DeleteUserPermissionsBoundary",
+                "iam:CreatePolicyVersion", "iam:SetDefaultPolicyVersion", "iam:DeletePolicy"],
+     "Resource": "*"},
+
+    {"Sid": "Costs", "Effect": "Allow",
+     "Action": ["budgets:*", "ce:Get*", "ce:Describe*", "ce:List*", "ssm:GetDocument", "ssm:ListDocuments"],
+     "Resource": "*"}
+  ]
+}

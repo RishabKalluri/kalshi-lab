@@ -1,0 +1,12 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {"Sid": "OwnBuckets", "Effect": "Allow", "Action": "s3:*",
+     "Resource": ["arn:aws:s3:::kalshi-*", "arn:aws:s3:::kalshi-*/*"]},
+    {"Sid": "ListBuckets", "Effect": "Allow", "Action": "s3:ListAllMyBuckets", "Resource": "*"},
+    {"Sid": "Logs", "Effect": "Allow",
+     "Action": ["logs:*", "cloudwatch:PutMetricData", "ec2:Describe*", "sts:GetCallerIdentity"], "Resource": "*"},
+    {"Sid": "StopOwnServers", "Effect": "Allow", "Action": ["ec2:StopInstances", "ec2:StartInstances"],
+     "Resource": "*", "Condition": {"StringLike": {"ec2:ResourceTag/Name": "kalshi-*"}}}
+  ]
+}
