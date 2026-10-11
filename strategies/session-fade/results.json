@@ -1,1 +1,51 @@
-{"runs": []}
+{
+ "runs": [
+  {
+   "stage": "quick",
+   "job": "session-fade-1010-225944",
+   "started": "2026-10-11T04:00:17.510335+00:00",
+   "finished": "2026-10-11T04:01:05.741640+00:00",
+   "git": "caab3d0",
+   "code": "4266c0269b0530e4",
+   "code_v": 2,
+   "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M"
+   ],
+   "derived_from": "btc-flowrev",
+   "params": [],
+   "note": "btc-flowrev 16:00 ET session fade unchanged on BTC+ETH+SOL (smoke window precedes 9:30 ET, mechanics checked ad hoc by btc-flowrev)",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-17T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": -41.64,
+     "contracts": 138.0,
+     "markets": 8,
+     "fees": 2.39,
+     "pnl_per_contract_c": -30.174,
+     "t_stat": -2.07,
+     "max_drawdown": 53.6,
+     "rejects": 0,
+     "ci95_c": [
+      -50.645,
+      -2.525
+     ],
+     "days_positive": "1/3"
+    }
+   },
+   "verdict": "rejected at quick",
+   "gate": "clearly negative: every quick run lost money and at least one 95% CI is entirely below zero",
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "",
+   "hash": "eedc8805f71545b12fc39a9fb4566c5c048d6f24564f6bfbe84b612b681d93cf"
+  }
+ ]
+}
