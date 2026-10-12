@@ -35,10 +35,13 @@ runs as a separate paper trader beside it.
 | 2 | 10-12 | pipeline smoke + quick | quick | smoke +13.7¢/ct (10 markets); quick passed +6.6¢/ct (99 markets, CI −0.7..+12.5) | same as v1, as expected. No full test: it would replay v1's walk-forward exactly |
 | 3 | 10-12 | rv_scale at real signal times: replayed recorded books Sep 29–Oct 10 through `_consider` (calibration only, no P&L or outcomes) | calibration | Binance/live ratio 1.016 at all clean checkpoints, 1.013–1.015 at unbiased signal selections; live crossings 269 at 1.09 → 381 at 1.02 (+42%; backtest-equivalent 463). Gaps distorted 31% of checkpoints and cost ~a quarter of signals | rv_scale=1.02 |
 | 4 | 10-12 | `paper-start` rv_scale=1.02, slip_c=1, 0.5%/order | paper | running as kalshi-paper@eth-volfav2 | |
+| 5 | 10-13 | capacity: replayed recorded books Sep 29–Oct 12 through v2, book at decision and +150 ms (605 would-be orders; no P&L) | calibration | depth on the buy side median 92 at the touch, 569 within +1¢, 1,145 within +2¢. IOC slippage vs size (+2¢ limit): 100 ct 0.28¢, 200 ct 0.44¢, 500 ct 0.67¢, 1,000 ct 0.94¢. ~48 signals/day on ~29 markets (1.65/market). Cleared levels rarely refill within 5 s | capacity is far above live size (~3 ct). Use +2¢ limit from ~100 ct; assume later checkpoints in the same market fill ≥1¢ worse |
 
 ## Learnings
 - **Calibrate live-vs-backtest inputs over weeks, not one day.** One partial day gave 1.09; two weeks give 1.02.
 - **Running sums over samples need gap handling** whenever the live feed can drop out.
+- **ETH's book is much deeper near the touch than backfill's `book_depth=43` suggests** (median 92 at the touch,
+  ~570 within 1¢ at signal times), so backfill tests understate capacity; they don't test the edge at large size.
 
 ## Current status
 - Stage: **paper** since Oct 12 (rv_scale=1.02, slip_c=1, 0.5%/order). Family lockbox spent (eth-volfav predates
