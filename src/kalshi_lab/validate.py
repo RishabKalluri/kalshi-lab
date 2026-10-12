@@ -58,6 +58,9 @@ def recorded_range(series: list[str]) -> tuple[datetime, datetime] | None:
 
 # The lockbox: data on/after this date is never used by smoke/quick/full. A strategy sees it exactly once,
 # in the `lockbox` stage, after its full test is promising. Move it forward only deliberately (it's global).
+# Research server (deploy/research/): the worker runs this stage inside a sandbox (kalshi-sandbox) as a user that
+# can't write the ledger, so the stage's ledger record and report go to SANDBOX_OUT and the worker records them.
+SANDBOX_OUT = Path(os.environ["KALSHI_SANDBOX_OUT"]) if os.environ.get("KALSHI_SANDBOX_OUT") else None
 LOCKBOX_START = datetime.fromisoformat(os.environ.get("KALSHI_LOCKBOX_START", "2026-08-20")).replace(tzinfo=UTC)
 
 
@@ -282,6 +285,7 @@ def main(argv=None):
     ap.add_argument("--force", action="store_true", help="override the full-test budget / one-shot lockbox (user only)")
     ap.add_argument("--note", default="", help="what changed in this iteration (logged to results.json)")
     ap.add_argument("--audit", action="store_true", help="re-run without recording; compare to the ledger (kalshi-lab audit)")
+    ap.add_argument("--preflight", action="store_true", help="only check the ledger/budget/lockbox rules (exit 0 = may run)")
     a = ap.parse_args(argv)
     log = lambda s: print(s, flush=True)
     folder = folder_for(a.strategy)
@@ -320,8 +324,10 @@ def main(argv=None):
                 log("LOCKBOX: the code changed since the promising full test. Rerun the full test on this exact code first.")
                 sys.exit(5)
 
+    if a.preflight:
+        return
     legacy_code = code_hash(folder, legacy=True) if folder else None
-    if folder and (a.stage == "lockbox" or a.audit):
+    if folder and (a.stage == "lockbox" or a.audit) and not SANDBOX_OUT:  # sandboxed: the worker holds params/
         _hold_params(folder, job, log)
 
     from .backtest import load_strategy
@@ -348,7 +354,7 @@ def main(argv=None):
 
     def one(i_r):
         i, r = i_r
-        out = RESULTS / f"{job}-{r['name']}"
+        out = Path(os.environ.get("KALSHI_RUNS_DIR", RESULTS)) / f"{job}-{r['name']}"
         return r["name"], out, run_backtest(spec, series, params, r, out, log, i, len(runs))
 
     code = code_hash(folder) if folder else None
@@ -363,6 +369,9 @@ def main(argv=None):
         rec = dict(stage=a.stage, job=job, started=started, finished=datetime.now(UTC).isoformat(), git=git_rev(),
                    code=code, code_v=CODE_V, series=series, derived_from=cfg.get("derived_from") or None, params=params, note=a.note, iteration=count_runs(folder, "full") + 1, windows=windows,
                    cards=cards, verdict=verdict_, gate=gate, crashed=crashed, lockbox_start=LOCKBOX_START.isoformat())
+        if SANDBOX_OUT:  # the worker checks and records it (jobs.py)
+            (SANDBOX_OUT / "record.json").write_text(json.dumps(rec, default=str))
+            return
         rec = ledger_append(folder.name, rec)  # authoritative
         append_result(folder, rec)              # display copy for the dashboard
 
@@ -398,7 +407,7 @@ def main(argv=None):
         v = "passed"
     log(format_cards(cards))
     log(f"verdict: {v}")
-    rep = RESULTS / "_jobs" / f"{job}.{a.stage}.json"
+    rep = SANDBOX_OUT / "report.json" if SANDBOX_OUT else RESULTS / "_jobs" / f"{job}.{a.stage}.json"
     rep.parent.mkdir(parents=True, exist_ok=True)
     rep.write_text(json.dumps(dict(job=job, stage=a.stage, strategy=spec, series=series, params=params,
                                    cards=cards, verdict=v, gate=stop, finished=datetime.now(UTC).isoformat()), indent=1))

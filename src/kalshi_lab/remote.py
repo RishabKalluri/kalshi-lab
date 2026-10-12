@@ -10,6 +10,7 @@ The trading server keeps only the last 2 days of books (storage.py), so tests ne
 """
 
 import argparse
+import os
 import shlex
 import subprocess
 import sys
@@ -54,6 +55,12 @@ def test(argv=None):
     ap.add_argument("--skip-smoke", action="store_true")
     ap.add_argument("--on-server", action="store_true", help="run the stages on the server instead of this laptop")
     a = ap.parse_args(argv)
+    if os.environ.get("KALSHI_SITE") == "research":
+        return _test_research(a)
+    if not os.environ.get("KALSHI_LOCAL_TESTS"):
+        sys.exit("Tests run on the research server now (one ledger, sandboxed; deploy/research/). Strategy agents run "
+                 "there too: ask Claude to start one. (KALSHI_LOCAL_TESTS=1 forces a local run that the official "
+                 "ledger never sees.)")
     if not a.on_server:
         return _test_local(a)
     sys.exit("--on-server is retired: the trading server keeps only 2 days of recorded books (the rest is in S3), "
@@ -113,6 +120,23 @@ def _test_local(a):
         wait(job)
 
 
+def _test_research(a):
+    """Research server: every stage, smoke included, runs in the worker's sandbox (deploy/research/); the data is
+    already here. Queue the job; with --wait, block until it finishes."""
+    from .jobs import enqueue
+    from .strategy_dir import folder_for
+    folder = folder_for(a.strategy)
+    if folder is None:
+        sys.exit("tests need a strategy folder (strategies/<slug>): kalshi-lab new <slug>")
+    job = f"{folder.name}-{datetime.now():%m%d-%H%M%S}"
+    stages = ([] if a.skip_smoke else ["smoke"]) + [s for s in a.stages.split(",") if s]
+    enqueue([a.strategy, *(["--series", *a.series] if a.series else []), *[x for p in a.param for x in ("-p", p)],
+             "--stages", ",".join(stages), "--job", job, "--note", a.note])
+    print(f"queued {job}; results appear in the dashboard as stages finish.")
+    if a.wait or not a.stages:  # smoke only: wait, like the foreground smoke on the laptop
+        wait(job)
+
+
 def wait(job: str):
     """Block until a job finishes; print each stage's verdict and the job status (for agents)."""
     import json
@@ -128,6 +152,8 @@ def wait(job: str):
             pooled = r["cards"].get("POOLED") or next(iter(r["cards"].values()), {})
             print(f"{stage}: verdict={r['verdict']} pooled={pooled}")
     print(f"job {job}: {j['status']}")
+    if j["status"] == "failed":
+        print("log tail:\n" + j.get("log_tail", "")[-1500:])
 
 
 def pull(argv=None):
@@ -136,5 +162,8 @@ def pull(argv=None):
     ap = argparse.ArgumentParser(prog="kalshi-lab pull")
     ap.add_argument("series", nargs="+")
     a = ap.parse_args(argv)
+    if os.environ.get("KALSHI_SITE") == "research":
+        print("the research server syncs all data from S3 automatically (hourly); nothing to pull")
+        return
     pull_data(a.series)
     print(f"pulled {a.series}")

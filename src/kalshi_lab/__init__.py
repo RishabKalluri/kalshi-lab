@@ -19,7 +19,9 @@ COMMANDS = {
     "data": ("kalshi_lab.validate", "data_status"),
     "audit": ("kalshi_lab.validate", "audit"),          # independent re-run vs the ledger (before live)     # what history exists; dev vs lockbox split
     "pull": ("kalshi_lab.remote", "pull"),              # download a series' data from S3 to this machine
-    "s3-push": ("kalshi_lab.storage", "push"),          # trading server, hourly: upload to S3, trim old recordings
+    "s3-push": ("kalshi_lab.storage", "push"),
+    "s3-pull": ("kalshi_lab.storage", "pull_all"),      # research server: sync all data from S3, set permissions
+    "research-merge": ("kalshi_lab.research_sync", "merge"),  # trading server: take in the research server's results          # trading server, hourly: upload to S3, trim old recordings
     "paper-start": ("kalshi_lab.paper_ctl", "start"),  # laptop: paper trade a registry strategy on the server
     "paper-stop": ("kalshi_lab.paper_ctl", "stop"),
     "paper-list": ("kalshi_lab.paper_ctl", "list_"),

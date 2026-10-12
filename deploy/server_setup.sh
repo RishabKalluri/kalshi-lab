@@ -76,26 +76,51 @@ if [ -f /etc/systemd/system/kalshi-worker.service ]; then
   sudo systemctl disable --now kalshi-worker 2>/dev/null; sudo rm -f /etc/systemd/system/kalshi-worker.service
 fi
 
-# Daily backfill (idempotent: skips days/markets already on disk) keeps the history growing: Kalshi trades,
-# spot prices and order flow (backfill/flow/).
-sudo tee /etc/systemd/system/kalshi-backfill.service >/dev/null <<UNIT
+# The nightly downloads moved to the research server (deploy/research/setup.sh), which this server wakes at 00:20 UTC.
+if [ -f /etc/systemd/system/kalshi-backfill.timer ]; then
+  sudo systemctl disable --now kalshi-backfill.timer 2>/dev/null
+  sudo rm -f /etc/systemd/system/kalshi-backfill.{timer,service}
+fi
+sudo tee /etc/systemd/system/kalshi-wake-research.service >/dev/null <<UNIT
 [Unit]
-Description=kalshi-lab daily backfill
+Description=start the research server for its nightly downloads
 [Service]
 Type=oneshot
-Nice=15
+User=$USER
+Environment=PATH=$HOME/.local/bin:/usr/bin:/bin
+ExecStart=/bin/sh -c 'aws ec2 start-instances --instance-ids \$\$(aws ec2 describe-instances --filters Name=tag:Name,Values=kalshi-research --query "Reservations[0].Instances[0].InstanceId" --output text)'
+StandardOutput=append:$HOME/kalshi-data/logs/wake-research.log
+StandardError=append:$HOME/kalshi-data/logs/wake-research.log
+UNIT
+sudo tee /etc/systemd/system/kalshi-wake-research.timer >/dev/null <<UNIT
+[Unit]
+Description=wake the research server nightly
+[Timer]
+OnCalendar=*-*-* 00:20:00 UTC
+[Install]
+WantedBy=timers.target
+UNIT
+# The research server's worker pushes results into ~/lab-inbox with a key that can write nothing else (rrsync);
+# research-merge copies them into this repo for the dashboard, never touching paper/live strategies or results.
+mkdir -p ~/lab-inbox ~/.ssh
+KEY="command=\"/usr/bin/rrsync -wo $HOME/lab-inbox\",restrict $(cat deploy/research/worker.pub)"
+grep -qF "$(cut -d' ' -f2 deploy/research/worker.pub)" ~/.ssh/authorized_keys 2>/dev/null || echo "$KEY" >> ~/.ssh/authorized_keys
+sudo tee /etc/systemd/system/kalshi-research-merge.service >/dev/null <<UNIT
+[Unit]
+Description=kalshi-lab: merge the research server's results into this repo
+[Service]
+Type=oneshot
+Nice=10
 User=$USER
 WorkingDirectory=$PWD
-ExecStart=$UV run kalshi-lab backfill --series KXBTC15M KXETH15M KXSOL15M KXGOLD15M --days 3
-StandardOutput=append:$HOME/kalshi-data/logs/kalshi-backfill.log
-StandardError=append:$HOME/kalshi-data/logs/kalshi-backfill.log
+ExecStart=$UV run -q kalshi-lab research-merge
 UNIT
-sudo tee /etc/systemd/system/kalshi-backfill.timer >/dev/null <<UNIT
+sudo tee /etc/systemd/system/kalshi-research-merge.timer >/dev/null <<UNIT
 [Unit]
-Description=run kalshi-lab backfill daily
+Description=merge research results every 2 minutes
 [Timer]
-OnCalendar=*-*-* 00:30:00 UTC
-Persistent=true
+OnBootSec=2min
+OnUnitActiveSec=2min
 [Install]
 WantedBy=timers.target
 UNIT
@@ -151,7 +176,7 @@ unit kalshi-dashboard "kalshi-lab dashboard" "$UV run streamlit run src/kalshi_l
 sudo systemctl daemon-reload
 SERVICES="kalshi-recorder kalshi-dashboard"
 sudo systemctl daemon-reload
-sudo systemctl enable --now $SERVICES kalshi-backfill.timer kalshi-health.timer kalshi-s3.timer
+sudo systemctl enable --now $SERVICES kalshi-health.timer kalshi-s3.timer kalshi-wake-research.timer kalshi-research-merge.timer
 for f in deploy/paper/*.json; do
   [ -e "$f" ] && sudo systemctl enable --now "kalshi-paper@$(basename "$f" .json)"
 done

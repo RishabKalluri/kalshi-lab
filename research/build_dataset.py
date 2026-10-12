@@ -43,7 +43,10 @@ OUT.mkdir(exist_ok=True)
 
 # --- spot: dense 1s array + cumulative squared returns for O(1) window RV
 secs, px = [], []
-for f in sorted((BF / "spot" / SPOT).glob(f"*{EXT}")):
+CUT = LOCKBOX_START.strftime("%Y-%m-%d")  # without --include-lockbox, never open lockbox-dated files (the research
+for f in sorted((BF / "spot" / SPOT).glob(f"*{EXT}")):  # server doesn't even let agents read them)
+    if not INCLUDE_LOCKBOX and f.name[:10] >= CUT:
+        continue
     for line in read_lines(f):
         d = json.loads(line)
         secs.append(d["t"] // 10**9)
@@ -78,6 +81,8 @@ def ndtri(p):
 
 rows = []
 for day in sorted(p for p in (BF / "kalshi" / series).iterdir() if p.is_dir()):
+    if not INCLUDE_LOCKBOX and day.name >= CUT:  # folders are by close day; these markets all close >= the lockbox
+        continue
     for f in sorted(day.glob(f"*{EXT}")):
         lines = [json.loads(l) for l in read_lines(f)]
         if lines[-1]["m"].get("event") != "settled":

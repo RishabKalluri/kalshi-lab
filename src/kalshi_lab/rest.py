@@ -13,8 +13,9 @@ RETRY_STATUS = {429, 500, 502, 503, 504}
 
 
 class KalshiREST:
-    def __init__(self, auth: KalshiAuth | None = None, base: str = API_BASE):
-        self.auth = auth or KalshiAuth()
+    def __init__(self, auth: KalshiAuth | None = None, base: str = API_BASE, anonymous: bool = False):
+        # anonymous: public market data only (backfill), e.g. on the research server, which has no Kalshi key
+        self.auth = None if anonymous else (auth or KalshiAuth())
         self.base = base.rstrip("/")
         self._prefix = urlparse(self.base).path
         self.client = httpx.Client(timeout=10)
@@ -23,7 +24,7 @@ class KalshiREST:
         """GET with retries on network errors, 429 and 5xx (reads are safe to repeat)."""
         for attempt in range(retries):
             try:
-                headers = self.auth.headers("GET", self._prefix + path)  # fresh timestamp per attempt
+                headers = self.auth.headers("GET", self._prefix + path) if self.auth else {}  # fresh timestamp
                 r = self.client.get(self.base + path, params=params or None, headers=headers)
                 if r.status_code not in RETRY_STATUS or attempt == retries - 1:
                     r.raise_for_status()

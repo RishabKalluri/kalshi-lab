@@ -41,8 +41,12 @@ See `SYSTEM.md` for how the system fits together and `README.md` for commands.
 - Pipeline: smoke → quick (gate) → full walk-forward over development data (strategies with a `fit()`
   classmethod are refit before each month on earlier data only, budget 3) → one-shot lockbox. Paper starts
   after a lockbox pass; live needs enough paper to check execution, a clean audit, and the user's OK.
-- Tests run on the laptop (the server's burstable CPU throttles); the server runs recorder, paper
-  trading, downloads and the dashboard. Deploy with `deploy/push.sh kalshi` (paper traders keep running).
+- Three places: the **trading server** (`ssh kalshi`, Lightsail: recorder, paper/live, dashboard, hourly S3
+  upload; deploy with `deploy/push.sh kalshi`, paper traders keep running), **S3** (all data,
+  `src/kalshi_lab/storage.py`), and the **research server** (`deploy/research.sh start`, `ssh kalshi-research`:
+  tests, the official ledger, nightly downloads, strategy agents; deploy with `deploy/research/push.sh`; it stops
+  itself when idle). On the research server agents' code runs only in `kalshi-sandbox` and file permissions keep
+  lockbox data from agents (`deploy/research/setup.sh` explains who can do what). Laptop tests are retired.
 - The dashboard reads strategy folders (config.json, results.json, NOTES.md); keep them and `SYSTEM.md`
   current. `strategies/_archive/registry.json` holds legacy ideas/rejections.
 - The project lives in `~/Downloads/kalshi` (not iCloud-synced; iCloud offloaded files in the old Desktop copy).

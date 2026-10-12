@@ -1,0 +1,87 @@
+#!/usr/bin/python3 -I
+"""Run one pipeline stage of an agent's strategy in a locked-down systemd unit (research server).
+Installed root-owned at /usr/local/sbin/kalshi-sandbox; the worker may sudo it (and nothing else).
+
+    kalshi-sandbox dev|lockbox <slug> <outdir> -- validate <stage> <strategy> [args...]
+    kalshi-sandbox stop <job> <stage>
+
+dev:     user `runner`: reads development data only (lockbox-dated files aren't readable by it), writes only
+         results/ (not the ledger or job queue), the strategy's folder, research/data/ and <outdir>.
+lockbox: user `lockrunner`: reads all data, writes only results/_lockbox/, the strategy's params/ and <outdir>,
+         all unreadable to agents (the worker restores params/ afterwards); no network.
+Both: private /tmp, the rest of the filesystem read-only, no AWS credentials (firewall), memory and CPU capped.
+"""
+import os
+import re
+import signal
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path("/srv/kalshi")
+DATA = Path("/srv/kalshi-data")
+PY = ROOT / ".venv" / "bin" / "python"
+
+
+def die(msg):
+    print(f"kalshi-sandbox: {msg}", file=sys.stderr)
+    sys.exit(2)
+
+
+def unit_name(job, stage):
+    return "kalshi-sb-" + re.sub(r"[^A-Za-z0-9_.-]", "_", f"{job}.{stage}")
+
+
+argv = sys.argv[1:]
+if argv[:1] == ["stop"] and len(argv) == 3:
+    sys.exit(subprocess.call(["systemctl", "stop", unit_name(argv[1], argv[2]) + ".service"]))
+if len(argv) < 7 or argv[0] not in ("dev", "lockbox") or argv[3] != "--" or argv[4] != "validate":
+    die(__doc__)
+kind, slug, out, vargs = argv[0], argv[1], Path(argv[2]), argv[5:]
+folder = ROOT / "strategies" / slug
+if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", slug) or not folder.is_dir():
+    die(f"no strategy folder {slug}")
+if out.resolve().parent != ROOT / "results" / "_sandbox" or not out.is_dir():
+    die("bad output dir")
+stage, strategy = vargs[0], vargs[1]
+if (stage == "lockbox") != (kind == "lockbox") or stage not in ("smoke", "quick", "full", "lockbox"):
+    die("stage/kind mismatch")
+if strategy.rstrip("/") not in (slug, f"strategies/{slug}", f"strategies/{slug}/strategy.py", str(folder)):
+    die("the strategy must be the folder's own")
+if any(x in ("--force", "--audit", "--preflight") for x in vargs):
+    die("--force/--audit/--preflight are not allowed here")
+job = vargs[vargs.index("--job") + 1] if "--job" in vargs else "x"
+
+env = {"KALSHI_DATA_ROOT": str(DATA / "raw"), "KALSHI_SANDBOX_OUT": str(out), "PYTHONDONTWRITEBYTECODE": "1",
+       "PYTHONUNBUFFERED": "1", "PATH": "/usr/bin:/bin", "KALSHI_SITE": "research",
+       "KALSHI_TEST_WORKERS": os.environ.get("KALSHI_TEST_WORKERS", "3")}
+props = ["PrivateTmp=yes", "ProtectSystem=strict", "ProtectHome=read-only", "NoNewPrivileges=yes",
+         "PrivateDevices=yes", "TemporaryFileSystem=/dev/shm:mode=1777", "MemoryMax=6G", "Nice=10", f"WorkingDirectory={ROOT}", f"ReadWritePaths={out}"]
+if kind == "dev":
+    user = "runner"
+    env["HOME"] = f"/home/{user}"
+    props += ["UMask=0002", f"ReadWritePaths={ROOT / 'results'}", f"ReadWritePaths={folder}",
+              f"ReadWritePaths={ROOT / 'research' / 'data'}",
+              *[f"ReadOnlyPaths={ROOT / 'results' / d}" for d in ("_ledger", "_jobs", "_lockbox")]]
+else:
+    user = "lockrunner"
+    env["KALSHI_RUNS_DIR"] = str(ROOT / "results" / "_lockbox")
+    # no network or shared IPC either: nothing seen here may leave except the stage's own results
+    props += ["UMask=0027", "PrivateNetwork=yes", "PrivateIPC=yes",
+              f"ReadWritePaths={ROOT / 'results' / '_lockbox'}", f"ReadWritePaths={folder / 'params'}"]
+    env["HOME"] = f"/home/{user}"  # its ~/.kalshi/lockbox.token unseals lockbox dates (validate.py run_backtest)
+
+unit = unit_name(job, stage)
+cmd = ["systemd-run", "--wait", "--pipe", "--quiet", "--collect", f"--unit={unit}", f"--uid={user}", f"--gid={user}",
+       *[x for p in props for x in ("-p", p)], *[x for k, v in env.items() for x in ("-E", f"{k}={v}")],
+       "--", str(PY), "-m", "kalshi_lab", "validate", *vargs]
+proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL)
+
+
+def stop(*_):
+    subprocess.call(["systemctl", "stop", unit + ".service"])
+
+
+signal.signal(signal.SIGTERM, stop)
+signal.signal(signal.SIGINT, stop)
+sys.exit(proc.wait())

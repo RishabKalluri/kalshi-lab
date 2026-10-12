@@ -2,7 +2,9 @@
 raw/ (the recorder's files) and backfill/ (the nightly downloads).
 
     kalshi-lab s3-push [--dry-run]   trading server, hourly (systemd timer): upload new/changed files, then trim
-    pull_data(series)                laptop / research server: download what tests need (remote.py, jobs)
+    kalshi-lab s3-push --dirs backfill --no-trim   research server, after the nightly downloads
+    kalshi-lab s3-pull               research server: download everything new, then set file permissions
+    pull_data(series)                laptop: download what tests need (remote.py)
 
 The trading server keeps KEEP_BOOK_DAYS of Kalshi books and KEEP_SPOT_DAYS of spot prices (live/paper strategies
 can load spot history at startup, live/history.py); older recordings are deleted locally, but only files S3 holds
@@ -12,6 +14,7 @@ old versions.
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 from datetime import datetime, timedelta, timezone
@@ -75,14 +78,67 @@ def trim(dry_run: bool = False) -> tuple[int, int]:
     return freed, held
 
 
+def _ends_by(path: str, t: datetime) -> bool:
+    """A backfilled market file (in the folder of the UTC day it closes) whose events all happen by t (+1s): the market
+    closing exactly at the lockbox start is development data although its folder carries the lockbox date."""
+    if "/backfill/kalshi/" not in path:
+        return False
+    import json
+    from .recorder.sink import read_lines
+    last = None
+    for last in read_lines(Path(path)):
+        pass
+    return last is not None and json.loads(last)["t"] <= int(t.timestamp() + 1) * 10**9  # settled event: close + 1ns
+
+
+def fix_perms(root: Path = DATA):
+    """Research server: agents (and the sandbox's dev runs) may read only development data. Files dated before the
+    lockbox start are world-readable; lockbox-dated and undated files only by group kdata (the worker's lockbox runs)."""
+    import grp
+    from .validate import LOCKBOX_START
+    cut = LOCKBOX_START.strftime("%Y-%m-%d")
+    gid = grp.getgrnam("kdata").gr_gid
+    date = re.compile(r"(\d{4}-\d{2}-\d{2})")
+    opened = closed = 0
+    for d in ("raw", "backfill"):
+        for dirpath, dirs, files in os.walk(root / d):
+            for name in [*dirs, *files]:
+                p = os.path.join(dirpath, name)
+                st = os.lstat(p)
+                if name in dirs:
+                    mode = 0o2755
+                else:
+                    m = date.search(p[len(str(root)):])
+                    mode = 0o644 if m and (m.group(1) < cut or m.group(1) == cut and _ends_by(p, LOCKBOX_START)) else 0o640
+                    opened, closed = opened + (mode == 0o644), closed + (mode == 0o640)
+                if st.st_gid != gid:
+                    os.chown(p, -1, gid)
+                if st.st_mode & 0o7777 != mode:
+                    os.chmod(p, mode)
+    print(f"permissions: {opened} development files readable, {closed} lockbox/undated files restricted", flush=True)
+
+
+def pull_all(argv=None):
+    os.umask(0o027)  # new files start restricted; fix_perms opens the development ones
+    s3 = f"s3://{BUCKET}"
+    rc = sync(f"{s3}/raw/", f"{DATA}/raw/", "--size-only") | sync(f"{s3}/backfill/", f"{DATA}/backfill/", "--size-only")
+    fix_perms()
+    print(f"{datetime.now():%F %T} pulled from S3{' WITH ERRORS' if rc else ''}", flush=True)
+    raise SystemExit(rc)
+
+
 def push(argv=None):
     ap = argparse.ArgumentParser(prog="kalshi-lab s3-push", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true", help="upload, but only report what trimming would delete")
     ap.add_argument("--no-trim", action="store_true")
+    ap.add_argument("--dirs", nargs="+", default=["raw", "backfill"], choices=["raw", "backfill"])
     a = ap.parse_args(argv)
     t0 = datetime.now()
-    rc = sync(f"{DATA}/raw/", f"s3://{BUCKET}/raw/") | sync(f"{DATA}/backfill/", f"s3://{BUCKET}/backfill/")
+    rc = 0
+    for d in a.dirs:
+        if (DATA / d).is_dir():
+            rc |= sync(f"{DATA}/{d}/", f"s3://{BUCKET}/{d}/")
     msg = f"uploaded in {(datetime.now() - t0).seconds}s"
     if rc:
         print(f"{t0:%F %T} {msg} WITH ERRORS (rc={rc}); not trimming", flush=True)

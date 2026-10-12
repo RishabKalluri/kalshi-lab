@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Stop this EC2 instance (shutdown = stop, not terminate) after 30 idle minutes: no agent tmux sessions,
-# no test jobs queued or running, nobody logged in over SSH. Runs every 5 minutes from a systemd timer.
+# Stop this EC2 instance (shutdown = stop, not terminate) after 30 idle minutes: no agents (Claude processes or
+# agent/head tmux sessions), no test jobs queued or running, no data job running, nobody logged in over SSH.
+# Runs every 5 minutes from a systemd timer.
 STATE=/tmp/idle-since
 busy=""
 tmux ls 2>/dev/null | grep -qE "^(agent|head)" && busy="agents"
-ls ~/kalshi/results/_jobs/running/*.json ~/kalshi/results/_jobs/queue/*.json >/dev/null 2>&1 && busy="$busy tests"
+pgrep -u agent >/dev/null && busy="$busy agent-user"
+ls /srv/kalshi/results/_jobs/running/*.json /srv/kalshi/results/_jobs/queue/*.json >/dev/null 2>&1 && busy="$busy tests"
+for u in kalshi-nightly kalshi-data-pull; do systemctl is-active --quiet $u && busy="$busy $u"; done
 [ -n "$(who)" ] && busy="$busy ssh"
 if [ -n "$busy" ]; then rm -f $STATE; exit 0; fi
 [ -f $STATE ] || date +%s > $STATE

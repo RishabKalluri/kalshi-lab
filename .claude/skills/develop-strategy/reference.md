@@ -1,15 +1,17 @@
 # develop-strategy reference
 
-All commands run from `~/Downloads/kalshi` with `uv run`.
+All commands run from the repo root with `uv run` (research server: `/srv/kalshi`; data in `/srv/kalshi-data`,
+which replaces `~/kalshi-data` below). On the research server, lockbox-dated data files are not readable at all:
+when your own scripts list data files, skip dates on/after the lockbox start instead of filtering after reading.
 
 ## Commands
 | Command | What it does |
 |---|---|
 | `kalshi-lab data [SERIES...]` | history range, development vs lockbox days, spot sources, recorded books |
-| `kalshi-lab pull SERIES...` | copy the server's history + recent recordings for these series to the laptop |
+| `kalshi-lab pull SERIES...` | laptop only: download the history + recordings for these series from S3 (the research server syncs automatically) |
 | `kalshi-lab new <slug> --series S --name N` | create `strategies/<slug>/` from `strategies/_template/` |
 | `kalshi-lab test <slug> --stages "" --note "..."` | smoke only (foreground, ~1 min) |
-| `kalshi-lab test <slug> --skip-smoke --stages quick\|full\|lockbox --wait --note "..."` | queue a stage on the laptop worker and wait for its verdict |
+| `kalshi-lab test <slug> --skip-smoke --stages quick\|full\|lockbox --wait --note "..."` | queue a stage on the test worker and wait for its verdict |
 | `kalshi-lab jobs` | job queue status |
 | `kalshi-lab backtest strategies/<slug>/strategy.py --source backfill --series S --start 2026-05-01 --end 2026-05-08 -p k=v` | ad-hoc debugging run (development dates only!). Writes `results/<name>-<time>/` |
 | `kalshi-lab backtest ... --sweep k=1,2,3` | parallel parameter sweep (counts toward overfitting: use sparingly, log it) |

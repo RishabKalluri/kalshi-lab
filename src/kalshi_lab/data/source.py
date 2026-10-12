@@ -97,8 +97,11 @@ class BackfillSource:
             iters.append(_backfill_markets(files, s_ns, e_ns))
         spot_dir = self.root / "spot"
         names = self.spot if self.spot is not None else sorted(p.name for p in spot_dir.glob("*") if p.is_dir())
+        # spot files are per UTC day: one starting at the (exclusive) end holds nothing in range; don't open it
+        # (on the research server a lockbox-dated file isn't readable at all)
+        last = (self.end - timedelta(microseconds=1)).date().isoformat()
         for n in names:
-            files = [p for d in days if (p := spot_dir / n / f"{d}{EXT}").exists()]
+            files = [p for d in days if d <= last and (p := spot_dir / n / f"{d}{EXT}").exists()]
             iters.append(_stream_events(f"spot/{n}", files, s_ns, e_ns))
         return merge(iters)
 
@@ -106,7 +109,12 @@ class BackfillSource:
 def _backfill_markets(files, s_ns, e_ns):
     # Each file is one market: a 'discovered' meta line at open, trades in time order, a 'settled' meta line.
     for f in files:
-        lines = [json.loads(line) for line in read_lines(f)]
+        try:
+            lines = [json.loads(line) for line in read_lines(f)]
+        except PermissionError:
+            # research server: lockbox-dated files are unreadable to development runs; the backtest already refuses
+            # windows past the lockbox start, so such a file is one that starts after this window's end
+            continue
         if not lines or lines[0]["t"] >= e_ns or lines[-1]["t"] < s_ns:
             continue
         for d in lines:

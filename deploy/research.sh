@@ -7,6 +7,12 @@ IID=$(aws ec2 describe-instances --filters Name=tag:Name,Values=kalshi-research 
       --query 'Reservations[0].Instances[0].InstanceId' --output text)
 case "${1:-status}" in
   start)
+    # SSH is only open to this laptop's current IP (it changes with the network): replace the rule
+    SG=$(aws ec2 describe-instances --instance-ids "$IID" --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' --output text)
+    ME=$(curl -s -m 10 https://checkip.amazonaws.com)/32
+    OLD=$(aws ec2 describe-security-groups --group-ids "$SG" --query 'SecurityGroups[0].IpPermissions[?FromPort==`22`].IpRanges[].CidrIp' --output text)
+    for c in $OLD; do [ "$c" = "$ME" ] || aws ec2 revoke-security-group-ingress --group-id "$SG" --protocol tcp --port 22 --cidr "$c" >/dev/null; done
+    echo "$OLD" | grep -qw "$ME" || aws ec2 authorize-security-group-ingress --group-id "$SG" --protocol tcp --port 22 --cidr "$ME" >/dev/null
     aws ec2 start-instances --instance-ids "$IID" >/dev/null
     aws ec2 wait instance-running --instance-ids "$IID"
     IP=$(aws ec2 describe-instances --instance-ids "$IID" --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)

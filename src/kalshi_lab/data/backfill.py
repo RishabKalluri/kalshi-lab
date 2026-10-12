@@ -340,7 +340,7 @@ def main(argv=None):
     start = (datetime.fromisoformat(args.start).replace(tzinfo=timezone.utc) if args.start
              else end - timedelta(days=args.days))
     root = Path(os.environ.get("KALSHI_DATA_ROOT", "~/kalshi-data/raw")).expanduser().parent / "backfill"
-    rest = KalshiREST()
+    rest = KalshiREST(anonymous=not os.environ.get("KALSHI_KEY_ID"))  # its endpoints are all public
     for s in args.series:
         if args.only in (None, "spot"):
             bs = MARKETS.get(s, {}).get("backfill_spot", {})

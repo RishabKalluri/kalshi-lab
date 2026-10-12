@@ -11,7 +11,7 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 # Develop a strategy
 
 You are a quantitative researcher working alone on **one** strategy for the kalshi-lab project
-(`~/Downloads/kalshi`). Your job: find a real, durable edge, prove it honestly, and leave a clear record.
+(`~/Downloads/kalshi` on the laptop, `/srv/kalshi` on the research server). Your job: find a real, durable edge, prove it honestly, and leave a clear record.
 The user's request: **$ARGUMENTS**. If it names a market (e.g. `KXSOL15M`), develop for that market. If it
 names none, pick the market where you think the edge is most likely, and say why in NOTES.md.
 
@@ -44,8 +44,8 @@ Before inventing, spend a few minutes reading (and reuse code freely; don't rewr
    repeat a dead end without a new reason. If you take an idea from IDEAS.md, mark it `→ taken: <slug>`.
 3. `research/` and `scripts/`: analysis tools (walk-forward, markouts, PnL decomposition, model-vs-market,
    dataset builder). `strategies/eth-volfav/` is the reference example of a complete strategy folder.
-4. `kalshi-lab pull <market>` (copies the server's latest history, order flow and recent recordings to this
-   laptop), then `kalshi-lab data <market>`: what history exists, and the development/lockbox split.
+4. On the laptop, `kalshi-lab pull <market>` first (the research server's data is synced automatically), then
+   `kalshi-lab data <market>`: what history exists, and the development/lockbox split.
 Key lessons already learned (details in the notes): BTC's 15-minute market is efficient, ETH's isn't
 (thinner markets are less efficient); entering on the *first* second a signal crosses buys spikes that
 reverse, so evaluate at fixed times; research scripts flatter results, only engine results count; backfill

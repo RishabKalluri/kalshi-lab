@@ -21,6 +21,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 Q = ROOT / "results" / "_jobs"
+# Research server: strategy code (written by agents) runs only inside kalshi-sandbox, as a user that can't write the
+# ledger or read lockbox data (dev stages) / can't leave anything an agent could read (lockbox). This worker, the
+# trusted side, checks the rules first and records the result itself. See deploy/research/.
+SANDBOX = os.environ.get("KALSHI_SANDBOX") == "1"
 
 
 def _dirs():
@@ -67,29 +71,82 @@ def list_jobs(argv=None):
 
 
 def _push(host: str | None, job_id: str | None = None):
-    """Laptop worker: copy job state and results to the server so its dashboard shows them."""
+    """Copy job state and results to the trading server so its dashboard shows them. Laptop: straight into its repo
+    (host:kalshi/...). Research server: KALSHI_PUSH_PREFIX="" and an SSH key that can only write the trading server's
+    drop folder (rrsync), which it merges itself (research_sync.py); then whole strategy folders go too."""
     if not host:
         return
-    subprocess.call(["rsync", "-az", f"{Q}/", f"{host}:kalshi/results/_jobs/"], stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL)
+    pre = os.environ.get("KALSHI_PUSH_PREFIX", "kalshi/")
+    quiet = dict(stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.call(["rsync", "-az", "--exclude", "running/", f"{Q}/", f"{host}:{pre}results/_jobs/"], **quiet)
+    subprocess.call(["rsync", "-az", "--delete", f"{Q}/running/", f"{host}:{pre}results/_jobs/running/"], **quiet)
     ledger = ROOT / "results" / "_ledger"
     if ledger.exists():  # the authoritative records: the server's dashboard verifies results.json against them
-        subprocess.call(["rsync", "-az", f"{ledger}/", f"{host}:kalshi/results/_ledger/"], stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL)
+        subprocess.call(["rsync", "-az", f"{ledger}/", f"{host}:{pre}results/_ledger/"], **quiet)
     if job_id:
         from .strategy_dir import folder_for
         # the job's results.json too, so the server's copy and its ledger always agree (the dashboard checks)
         job = next((json.loads(f.read_text()) for d in ("running", "done") for f in [Q / d / f"{job_id}.json"]
                     if f.exists()), None)
         folder = folder_for(job["strategy"]) if job else None
-        if folder and (folder / "results.json").exists():
+        if folder and SANDBOX:
+            subprocess.call(["rsync", "-az", "--exclude", "__pycache__", "--exclude", ".params-held*", f"{folder}/",
+                             f"{host}:{pre}strategies/{folder.name}/"], **quiet)
+        elif folder and (folder / "results.json").exists():
             subprocess.call(["rsync", "-az", str(folder / "results.json"),
-                             f"{host}:kalshi/{folder.relative_to(ROOT)}/results.json"],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        dirs = [str(p) for p in (ROOT / "results").glob(f"{job_id}-*") if p.is_dir()]
+                             f"{host}:{pre}{folder.relative_to(ROOT)}/results.json"], **quiet)
+        dirs = [str(p) for d in ("", "_lockbox") for p in (ROOT / "results" / d).glob(f"{job_id}-*") if p.is_dir()]
         if dirs:
-            subprocess.call(["rsync", "-az", *dirs, f"{host}:kalshi/results/"], stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL)
+            subprocess.call(["rsync", "-az", *dirs, f"{host}:{pre}results/"], **quiet)
+
+
+def _sandboxed(j: dict, stage: str, log):
+    """Prepare one sandboxed stage: run the rule checks here, then return (command, finish(rc) -> rc)."""
+    import shutil
+    from .strategy_dir import append_result, code_hash, folder_for, ledger_append
+    folder = folder_for(j["strategy"])
+    if folder is None:
+        log.write("research server: tests need a strategy folder (strategies/<slug>)\n")
+        return None, lambda rc: 2
+    args = ["validate", stage, j["strategy"], "--series", *j["series"], "--job", j["id"], "--note", j.get("note", "")] + \
+           [x for p in j["params"] for x in ("-p", p)]
+    rc = subprocess.call([sys.executable, "-m", "kalshi_lab", *args, "--preflight"], cwd=ROOT, stdout=log,
+                         stderr=subprocess.STDOUT)
+    if rc != 0:
+        return None, lambda _: rc
+    code = code_hash(folder)  # fingerprint taken here, not by the code under test
+    kind = "lockbox" if stage == "lockbox" else "dev"
+    out = ROOT / "results" / "_sandbox" / f"{j['id']}.{stage}"
+    shutil.rmtree(out, ignore_errors=True)
+    out.mkdir(parents=True)
+    held = folder / f".params-held-{j['id']}"
+    if kind == "lockbox":  # fit() must regenerate params/ from this code; a fresh params/ only the sandbox can read
+        shutil.chown(out, group="kdata")
+        out.chmod(0o2770)
+        if (folder / "params").exists():
+            (folder / "params").rename(held)
+        (folder / "params").mkdir()
+        shutil.chown(folder / "params", group="kdata")
+        (folder / "params").chmod(0o2770)
+    else:
+        out.chmod(0o2775)
+
+    def finish(rc: int) -> int:
+        if kind == "lockbox":
+            shutil.rmtree(folder / "params", ignore_errors=True)
+            if held.exists():
+                held.rename(folder / "params")
+        rep = out / "report.json"
+        if rep.exists():
+            shutil.copyfile(rep, Q / f"{j['id']}.{stage}.json")
+        rec_f = out / "record.json"
+        if rec_f.exists():
+            rec = json.loads(rec_f.read_text())
+            rec.update(stage=stage, job=j["id"], code=code, params=j["params"])
+            append_result(folder, ledger_append(folder.name, rec))
+        shutil.rmtree(out, ignore_errors=True)
+        return rc
+    return ["sudo", "-n", "/usr/local/sbin/kalshi-sandbox", kind, folder.name, str(out), "--", *args], finish
 
 
 def _code_stamp() -> float:
@@ -128,12 +185,22 @@ def worker(argv=None):
                        "--job", j["id"], "--note", j.get("note", "")] + [x for p in j["params"] for x in ("-p", p)]
                 log.write(f"\n=== {stage} {datetime.now(timezone.utc):%H:%M:%S} ===\n")
                 log.flush()
+                finish = None
+                if SANDBOX:
+                    cmd, finish = _sandboxed(j, stage, log)
+                    log.flush()
+                    if cmd is None:
+                        ok = False
+                        break
                 proc = subprocess.Popen(cmd, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
                 cancel = Q / f"{j['id']}.cancel"
                 last_push = 0.0
                 while proc.poll() is None:  # poll so a cancel request can stop the whole process group
                     if cancel.exists():
-                        os.killpg(proc.pid, signal.SIGTERM)
+                        if SANDBOX:  # the sandbox runs as root-managed systemd unit: ask it to stop
+                            subprocess.call(["sudo", "-n", "/usr/local/sbin/kalshi-sandbox", "stop", j["id"], stage])
+                        else:
+                            os.killpg(proc.pid, signal.SIGTERM)
                         proc.wait()
                         break
                     if a.push and time.time() - last_push > 30:
@@ -141,6 +208,8 @@ def worker(argv=None):
                         _push(a.push)
                         last_push = time.time()
                     time.sleep(2)
+                if finish:
+                    finish(proc.returncode)
                 _push(a.push, j["id"])
                 if proc.returncode == 4:  # quick gate: clearly negative, don't spend CPU on the full test
                     j["gated"] = stage
@@ -154,8 +223,6 @@ def worker(argv=None):
         j["log_tail"] = log_path.read_text()[-2000:]
         (Q / "done" / f.name).write_text(json.dumps(j, indent=1))
         f.unlink()
-        if a.push:  # the server copy of the running file must go too
-            subprocess.call(["ssh", a.push, f"rm -f kalshi/results/_jobs/running/{f.name}"], stdout=subprocess.DEVNULL)
         _push(a.push, j["id"])
         print(f"{j['id']}: {j['status']}", flush=True)
 
