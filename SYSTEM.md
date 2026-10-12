@@ -288,7 +288,7 @@ uv run kalshi-lab backtest <strategy.py> --source backfill --start ... --end ...
 uv run kalshi-lab paper-start <id> | paper-stop <id> | paper-list
 uv run kalshi-lab backfill --series KXETH15M --days 30     # download history
 deploy/push.sh kalshi          # deploy code to the server (paper traders keep running)
-deploy/pull_data.sh kalshi     # copy server data to the laptop
+deploy/pull_data.sh            # download all data from S3 to the laptop
 deploy/dashboard.sh            # (re)open the dashboard tunnel
 touch ~/kalshi-data/KILL       # on the server: halt paper/live trading and cancel everything
 ```

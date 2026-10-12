@@ -110,7 +110,7 @@ always-on Linux box in **AWS us-east-1** (closest to Kalshi; ~$10-20/month, e.g.
 ```
 deploy/push.sh ubuntu@<server-ip>        # copies code + key, installs uv/chrony, starts systemd services
 deploy/dashboard.sh                      # server dashboard in your browser (http://localhost:8502)
-deploy/pull_data.sh ubuntu@<server-ip>   # bring recorded data + results back to the laptop
+deploy/pull_data.sh                     # download all data from S3 + results from the server
 ```
 
 Services (`kalshi-recorder`, `kalshi-paper`, `kalshi-dashboard`) restart on failure and on boot; logs in
@@ -131,7 +131,7 @@ uv run kalshi-lab test strategies/my_idea.py --series KXETH15M [-p key=value ...
    month on earlier data only), the last 3 months at 2x latency, and all recorded books; months run in parallel.
 
 Tests run on the laptop by default (the server's burstable CPU is ~30x slower once throttled) and push results
-to the server; `--on-server` runs them there. **Decisions come from engine results only**; research scripts
+to the server. Data comes from S3 (`src/kalshi_lab/storage.py`); the trading server keeps only recent recordings. **Decisions come from engine results only**; research scripts
 (`research/`) are for screening ideas.
 
 Adding a market: one entry in `src/kalshi_lab/recorder/config.py` (`MARKETS`), then redeploy.

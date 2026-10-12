@@ -2,11 +2,11 @@
 
 Tests are compute-bound and the server's CPU is burstable (measured ~30x slower than this laptop once
 throttled), so tests run HERE by default and results are pushed to the server for the dashboard:
-1. pulls the data the tests need from the server (backfill history + recent recorded books),
+1. pulls the data the tests need from S3 (backfill history + recorded books; see storage.py),
 2. runs smoke locally (seconds),
 3. if it passes, queues quick + full for the local background worker (tmux session kalshi-worker),
    which pushes job state and results to the server as it goes.
-`--on-server` runs everything on the server instead (useful when the laptop will be closed).
+The trading server keeps only the last 2 days of books (storage.py), so tests never run there.
 """
 
 import argparse
@@ -30,15 +30,10 @@ def remote(cmd: str) -> int:
     return subprocess.call(["ssh", HOST, f"cd ~/kalshi && {UV} run -q kalshi-lab {cmd}"])
 
 
-def pull_data(series: list[str], recorded_days: int = 2):
-    """Bring the server's backfill + the last few days of recorded books for `series` to this laptop."""
-    data = Path("~/kalshi-data").expanduser()
-    subprocess.call(["rsync", "-az", f"{HOST}:kalshi-data/backfill/", f"{data}/backfill/"])
-    from datetime import datetime, timedelta, timezone
-    days = [(datetime.now(timezone.utc) - timedelta(days=d)).strftime("%Y-%m-%d") for d in range(recorded_days + 1)]
-    inc = ["--include=*/"] + [f"--include=kalshi_*/{s}/{d}/**" for s in series for d in days] + \
-          [f"--include=spot/*/{d}/**" for d in days] + ["--exclude=*"]
-    subprocess.call(["rsync", "-az", "--prune-empty-dirs", *inc, f"{HOST}:kalshi-data/raw/", f"{data}/raw/"])
+def pull_data(series: list[str]):
+    """Bring the downloaded history + every recorded day for `series` to this laptop, from S3 (storage.py)."""
+    from .storage import pull_data as s3_pull
+    s3_pull(series)
 
 
 def ensure_local_worker():
@@ -61,6 +56,8 @@ def test(argv=None):
     a = ap.parse_args(argv)
     if not a.on_server:
         return _test_local(a)
+    sys.exit("--on-server is retired: the trading server keeps only 2 days of recorded books (the rest is in S3), "
+             "so its results would differ. Tests run on this laptop (the research server is next).")
     job = f"{Path(a.strategy.split(':')[0]).stem}-{datetime.now():%m%d-%H%M%S}"
     params = "".join(f" -p {shlex.quote(p)}" for p in a.param)
     series = " ".join(a.series)
@@ -90,7 +87,7 @@ def _test_local(a):
         a.series = load_config(folder)["series"] if folder else ["KXBTC15M"]
     slug = folder.name if folder else Path(a.strategy.split(":")[0]).stem
     job = f"{slug}-{datetime.now():%m%d-%H%M%S}"
-    print(f"pulling data for {a.series} from {HOST}...", flush=True)
+    print(f"pulling data for {a.series} from S3...", flush=True)
     pull_data(a.series)
     sync()  # the server's dashboard reads strategy files/registry
     base = [sys.executable, "-m", "kalshi_lab"]
@@ -134,11 +131,10 @@ def wait(job: str):
 
 
 def pull(argv=None):
-    """`kalshi-lab pull SERIES ...`: copy the server's history + recent recordings for these series here."""
+    """`kalshi-lab pull SERIES ...`: download the history + recordings for these series from S3."""
     import argparse
     ap = argparse.ArgumentParser(prog="kalshi-lab pull")
     ap.add_argument("series", nargs="+")
-    ap.add_argument("--recorded-days", type=int, default=3)
     a = ap.parse_args(argv)
-    pull_data(a.series, a.recorded_days)
+    pull_data(a.series)
     print(f"pulled {a.series}")

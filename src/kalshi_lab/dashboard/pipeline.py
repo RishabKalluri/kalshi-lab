@@ -107,8 +107,8 @@ def run_card(name: str) -> dict | None:
 def health() -> list[tuple[str, bool, str]]:
     items = []
     papers = [f"kalshi-paper@{p.stem}" for p in sorted((ROOT / "deploy" / "paper").glob("*.json"))]
-    for svc in ["kalshi-recorder", *papers, "kalshi-worker"]:
-        label = {"kalshi-recorder": "Recorder", "kalshi-worker": "Test worker"}.get(svc, "Paper: " + svc.split("@")[-1])
+    for svc in ["kalshi-recorder", *papers, "kalshi-s3.timer"]:
+        label = {"kalshi-recorder": "Recorder", "kalshi-s3.timer": "S3 upload (hourly)"}.get(svc, "Paper: " + svc.split("@")[-1])
         try:
             r = subprocess.run(["systemctl", "is-active", svc], capture_output=True, text=True, timeout=3)
             items.append((label, r.stdout.strip() == "active", r.stdout.strip() or "unknown"))

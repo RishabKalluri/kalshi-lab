@@ -71,7 +71,10 @@ for old in kalshi-paper-gold kalshi-paper-eth; do
     sudo systemctl disable --now $old 2>/dev/null; sudo rm -f /etc/systemd/system/$old.service
   fi
 done
-unit kalshi-worker "kalshi-lab background validation worker" "env KALSHI_TEST_WORKERS=1 $UV run kalshi-lab worker" 15
+# Tests no longer run here: this server keeps only 2 days of recorded books (the rest is in S3, storage.py).
+if [ -f /etc/systemd/system/kalshi-worker.service ]; then
+  sudo systemctl disable --now kalshi-worker 2>/dev/null; sudo rm -f /etc/systemd/system/kalshi-worker.service
+fi
 
 # Daily backfill (idempotent: skips days/markets already on disk) keeps the history growing: Kalshi trades,
 # spot prices and order flow (backfill/flow/).
@@ -92,6 +95,32 @@ sudo tee /etc/systemd/system/kalshi-backfill.timer >/dev/null <<UNIT
 Description=run kalshi-lab backfill daily
 [Timer]
 OnCalendar=*-*-* 00:30:00 UTC
+Persistent=true
+[Install]
+WantedBy=timers.target
+UNIT
+# Hourly upload of everything to S3, then delete local recordings older than the keep windows that S3 has
+# (storage.py). Needs ~/.aws/credentials for the kalshi-uploader IAM user (write-only to the bucket, no deletes).
+uv tool install -q awscli
+sudo tee /etc/systemd/system/kalshi-s3.service >/dev/null <<UNIT
+[Unit]
+Description=kalshi-lab upload data to S3 + trim old local recordings
+[Service]
+Type=oneshot
+Nice=15
+IOSchedulingClass=idle
+User=$USER
+WorkingDirectory=$PWD
+Environment=PATH=$HOME/.local/bin:/usr/bin:/bin
+ExecStart=$UV run -q kalshi-lab s3-push
+StandardOutput=append:$HOME/kalshi-data/logs/kalshi-s3.log
+StandardError=append:$HOME/kalshi-data/logs/kalshi-s3.log
+UNIT
+sudo tee /etc/systemd/system/kalshi-s3.timer >/dev/null <<UNIT
+[Unit]
+Description=upload data to S3 hourly
+[Timer]
+OnCalendar=*-*-* *:05:00 UTC
 Persistent=true
 [Install]
 WantedBy=timers.target
@@ -120,15 +149,15 @@ UNIT
 # Dashboard listens on localhost only; reach it with: ssh -L 8501:localhost:8501 <server>
 unit kalshi-dashboard "kalshi-lab dashboard" "$UV run streamlit run src/kalshi_lab/dashboard/app.py --server.port 8501 --server.address 127.0.0.1 --server.headless true --browser.gatherUsageStats false"
 sudo systemctl daemon-reload
-SERVICES="kalshi-recorder kalshi-worker kalshi-dashboard"
+SERVICES="kalshi-recorder kalshi-dashboard"
 sudo systemctl daemon-reload
-sudo systemctl enable --now $SERVICES kalshi-backfill.timer kalshi-health.timer
+sudo systemctl enable --now $SERVICES kalshi-backfill.timer kalshi-health.timer kalshi-s3.timer
 for f in deploy/paper/*.json; do
   [ -e "$f" ] && sudo systemctl enable --now "kalshi-paper@$(basename "$f" .json)"
 done
 # Re-deploys restart only stateless services. Restarting the recorder leaves a gap, and restarting
 # paper traders resets their state: do that deliberately with RESTART_ALL=1 deploy/push.sh <host>.
-if [ "${RESTART_ALL:-0}" = 1 ]; then sudo systemctl restart $SERVICES; else sudo systemctl restart kalshi-worker kalshi-dashboard; fi
+if [ "${RESTART_ALL:-0}" = 1 ]; then sudo systemctl restart $SERVICES; else sudo systemctl restart kalshi-dashboard; fi
 sleep 5
 systemctl --no-pager --lines=0 status $SERVICES 'kalshi-paper@*' | grep -E "●|Active"
 chronyc tracking | grep -E "System time|Last offset"

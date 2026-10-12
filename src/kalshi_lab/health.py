@@ -6,7 +6,8 @@ died and the recorder got 401s for 4.5 hours without anyone noticing).
     kalshi-lab health-watch      laptop: poll the server's health.json, macOS notification on change
 
 Checks: the Kalshi feed for each recorded crypto series, spot prices for each (alert only if every exchange is
-silent), every configured paper trader (service up and saving results), the systemd services, and disk space.
+silent), every configured paper trader (service up and saving results), live traders, the systemd services,
+the hourly S3 upload, and disk space.
 """
 
 import argparse
@@ -60,7 +61,7 @@ def check() -> list[str]:
             known = [a for a in ages if a is not None]
             problems.append(f"no spot prices for {s} from any exchange " +
                             (f"for {min(known) / 60:.0f} min" if known else "(no recordings found)"))
-    for svc in ("kalshi-recorder", "kalshi-dashboard", "kalshi-worker"):
+    for svc in ("kalshi-recorder", "kalshi-dashboard"):
         if not _active(svc):
             problems.append(f"{svc} is not running")
     for conf in sorted((ROOT / "deploy" / "paper").glob("*.json")):
@@ -90,6 +91,14 @@ def check() -> list[str]:
             problems.append(f"LIVE trader {name} has not logged for {age / 60:.0f} min")
         if "max_loss hit" in tail or "KILL file present" in tail:
             problems.append(f"LIVE trader {name} halted (stop-loss or KILL file): no new orders")
+    # hourly S3 upload (storage.py): the only copy of old recordings once the server trims them
+    s3log = RAW.parent / "logs" / "kalshi-s3.log"
+    if s3log.exists():
+        last = s3log.read_text().strip().splitlines()[-1:] or [""]
+        if time.time() - s3log.stat().st_mtime > 3 * 3600:
+            problems.append(f"S3 upload hasn't run for {(time.time() - s3log.stat().st_mtime) / 3600:.0f} h")
+        elif "ERROR" in last[0] or "error" in last[0]:
+            problems.append(f"S3 upload failed: {last[0][:150]}")
     du = shutil.disk_usage(RAW)
     if du.free / du.total < 0.10:
         problems.append(f"disk {du.free / du.total:.0%} free")

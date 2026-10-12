@@ -30,6 +30,7 @@ BASH_FORBIDDEN = [
     (r"KALSHI_TEST_WORKERS", "test parallelism is fixed by the machine's capacity"),
     (r"kalshi-lab\s+(paper-stop|backfill|record)\b", "stopping paper traders / downloading / recording is infrastructure: ask the user"),
     (r"\b(systemctl|ssh|scp|rsync)\b", "the server and its services are off limits; use kalshi-lab commands"),
+    (r"(^|[\s;&|(`])aws\s|\.aws/|boto3|s3://", "AWS and the S3 data bucket are infrastructure (`kalshi-lab test` pulls the data it needs)"),
     (r"git\s+(push\s+(-f|--force)|reset\s+--hard|rebase|filter-branch)", "history-rewriting git commands are off limits"),
     (r"kalshi\.pem|\.kalshi/|(^|\s)\.env\b", "credentials are off limits"),
 ]

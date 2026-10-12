@@ -1,0 +1,94 @@
+"""S3 holds every byte of data; machines keep only what they need. The bucket mirrors ~/kalshi-data:
+raw/ (the recorder's files) and backfill/ (the nightly downloads).
+
+    kalshi-lab s3-push [--dry-run]   trading server, hourly (systemd timer): upload new/changed files, then trim
+    pull_data(series)                laptop / research server: download what tests need (remote.py, jobs)
+
+The trading server keeps KEEP_BOOK_DAYS of Kalshi books and KEEP_SPOT_DAYS of spot prices (live/paper strategies
+can load spot history at startup, live/history.py); older recordings are deleted locally, but only files S3 holds
+an identical-size copy of. Nothing ever deletes from S3 (the uploader key can't), and the bucket keeps 30 days of
+old versions.
+"""
+
+import argparse
+import os
+import shutil
+import subprocess
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+BUCKET = os.environ.get("KALSHI_S3_BUCKET", "kalshi-data-531080694882")
+DATA = Path(os.environ.get("KALSHI_DATA_ROOT", "~/kalshi-data/raw")).expanduser().parent
+KEEP_BOOK_DAYS = 2
+KEEP_SPOT_DAYS = 30
+
+
+def aws() -> str:
+    return shutil.which("aws") or str(Path("~/.local/bin/aws").expanduser())
+
+
+def sync(src: str, dst: str, *extra: str) -> int:
+    return subprocess.call([aws(), "s3", "sync", "--only-show-errors", "--no-progress", "--exclude", "*.tmp",
+                            src, dst, *extra])
+
+
+def pull_data(series: list[str]):
+    """Bring the downloaded history and every recorded day for `series` (plus spot) here. Incremental: only
+    new or grown files are downloaded."""
+    s3 = f"s3://{BUCKET}"
+    sync(f"{s3}/backfill/", f"{DATA}/backfill/", "--size-only")
+    for s in series:
+        for kind in ("kalshi_ws", "kalshi_meta"):
+            sync(f"{s3}/raw/{kind}/{s}/", f"{DATA}/raw/{kind}/{s}/", "--size-only")
+    sync(f"{s3}/raw/spot/", f"{DATA}/raw/spot/", "--size-only")
+
+
+def _s3_sizes(prefix: str) -> dict[str, int]:
+    out = subprocess.run([aws(), "s3api", "list-objects-v2", "--bucket", BUCKET, "--prefix", prefix,
+                          "--query", "Contents[].[Key,Size]", "--output", "text"], capture_output=True, text=True)
+    if out.returncode != 0:
+        raise RuntimeError(f"listing s3://{BUCKET}/{prefix} failed: {out.stderr.strip()}")
+    return {k: int(v) for k, v in (ln.split("\t") for ln in out.stdout.splitlines() if "\t" in ln)}
+
+
+def trim(dry_run: bool = False) -> tuple[int, int]:
+    """Delete local recordings older than the keep windows that S3 has; returns (bytes freed, files kept back)."""
+    today = datetime.now(timezone.utc).date()
+    freed, held = 0, 0
+    for kind, keep in (("kalshi_ws", KEEP_BOOK_DAYS), ("spot", KEEP_SPOT_DAYS)):
+        cutoff = (today - timedelta(days=keep)).isoformat()
+        for day in sorted((DATA / "raw" / kind).glob("*/*")):
+            if not day.is_dir() or day.name >= cutoff:
+                continue
+            rel = day.relative_to(DATA).as_posix()
+            remote = _s3_sizes(rel + "/")
+            for f in sorted(day.iterdir()):
+                size = f.stat().st_size
+                if remote.get(f"{rel}/{f.name}") != size:
+                    held += 1
+                    continue
+                if not dry_run:
+                    f.unlink()
+                freed += size
+            if not dry_run and not any(day.iterdir()):
+                day.rmdir()
+    return freed, held
+
+
+def push(argv=None):
+    ap = argparse.ArgumentParser(prog="kalshi-lab s3-push", description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--dry-run", action="store_true", help="upload, but only report what trimming would delete")
+    ap.add_argument("--no-trim", action="store_true")
+    a = ap.parse_args(argv)
+    t0 = datetime.now()
+    rc = sync(f"{DATA}/raw/", f"s3://{BUCKET}/raw/") | sync(f"{DATA}/backfill/", f"s3://{BUCKET}/backfill/")
+    msg = f"uploaded in {(datetime.now() - t0).seconds}s"
+    if rc:
+        print(f"{t0:%F %T} {msg} WITH ERRORS (rc={rc}); not trimming", flush=True)
+        raise SystemExit(rc)
+    if not a.no_trim:
+        freed, held = trim(a.dry_run)
+        msg += f"; {'would free' if a.dry_run else 'freed'} {freed / 1e9:.2f} GB" + \
+               (f", {held} old files not in S3 yet (kept)" if held else "")
+    print(f"{t0:%F %T} {msg}", flush=True)
