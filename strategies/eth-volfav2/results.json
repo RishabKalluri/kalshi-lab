@@ -1,0 +1,94 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "eth-volfav2-1012-171457",
+   "started": "2026-10-12T21:16:20.367881+00:00",
+   "finished": "2026-10-12T21:16:24.840144+00:00",
+   "git": "dd99375",
+   "code": "a76a9a5a55f274ed",
+   "code_v": 2,
+   "series": [
+    "KXETH15M"
+   ],
+   "derived_from": "eth-volfav",
+   "params": [],
+   "note": "v2: gap-safe rv; identical to eth-volfav on backfill Jul 1-15 (188 markets, same fills)",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-19T18:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 23.17,
+     "contracts": 169.0,
+     "markets": 10,
+     "fees": 1.35,
+     "pnl_per_contract_c": 13.71,
+     "t_stat": 2.68,
+     "max_drawdown": 0.0,
+     "rejects": 0,
+     "ci95_c": [
+      5.664,
+      21.185
+     ],
+     "days_positive": "1/1"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "",
+   "hash": "dbc36f0d3f6196847e4e3f7d1805b01a396383ee48874a93a749a6b3ccb4b1e5"
+  },
+  {
+   "stage": "quick",
+   "job": "eth-volfav2-1012-171457",
+   "started": "2026-10-12T21:16:29.784255+00:00",
+   "finished": "2026-10-12T21:16:52.220541+00:00",
+   "git": "dd99375",
+   "code": "a76a9a5a55f274ed",
+   "code_v": 2,
+   "series": [
+    "KXETH15M"
+   ],
+   "derived_from": "eth-volfav",
+   "params": [],
+   "note": "v2: gap-safe rv; identical to eth-volfav on backfill Jul 1-15 (188 markets, same fills)",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-17T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 127.69,
+     "contracts": 1945.0,
+     "markets": 99,
+     "fees": 19.2,
+     "pnl_per_contract_c": 6.565,
+     "t_stat": 1.92,
+     "max_drawdown": 37.72,
+     "rejects": 0,
+     "ci95_c": [
+      -0.707,
+      12.533
+     ],
+     "days_positive": "3/3"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "dbc36f0d3f6196847e4e3f7d1805b01a396383ee48874a93a749a6b3ccb4b1e5",
+   "hash": "586a52a63e42e768de7c5da5df75db67d5109e0df10e39875be2af4e691f9abb"
+  }
+ ]
+}
