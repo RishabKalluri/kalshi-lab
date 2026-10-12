@@ -1,0 +1,1 @@
+{"strategy": "strategies/eth-volfav2/strategy.py", "series": ["KXETH15M"], "params": ["rv_scale=1.02", "slip_c=1"], "sizing": "pct:0.5"}
