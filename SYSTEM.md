@@ -51,8 +51,10 @@ flowchart LR
 
 | Machine | Runs | Why there |
 |---|---|---|
-| **Server** (AWS Lightsail, us-east-1, 2 vCPU / 4 GB, ~$24/mo) | recorder, paper trading, nightly downloads, dashboard | Must run 24/7; light work. Kalshi feed arrives in ~14 ms (vs ~90 ms from home). |
-| **Laptop** (Apple M2) | backtests / validation tests, the dashboard tunnel | Tests are CPU-heavy; the server's burstable CPU gets throttled (~30× slower than the laptop once its credits run out). |
+| **Trading server** (`ssh kalshi`, AWS Lightsail, us-east-1, 2 vCPU / 4 GB, ~$24/mo) | recorders (crypto; weather in its own unit), paper + live trading, dashboard, hourly S3 upload | Must run 24/7; light work. Kalshi feed arrives in ~14 ms (vs ~90 ms from home). |
+| **Research server** (`ssh kalshi-research`, EC2, `deploy/research.sh start`; stops itself after 30 idle min) | tests (worker + `kalshi-sandbox`), the official ledger, nightly and one-off downloads (`systemd-run --unit=kalshi-data-<name>` keeps it awake), strategy agents, research screens | CPU-heavy work; agents' code is sandboxed and can't read lockbox data. |
+| **S3** | all data (`src/kalshi_lab/storage.py`) | The copy both servers pull from. |
+| **Laptop** | Claude Code, deploys, the dashboard tunnel | No tests or data jobs. |
 
 You can turn the laptop off at any time: recording and paper trading keep going on the server.
 
@@ -63,12 +65,12 @@ You can turn the laptop off at any time: recording and paper trading keep going 
 ```mermaid
 flowchart TB
     subgraph LIVE[Recorded live, from Sep 28]
-        B[Kalshi order books, BTC/ETH/SOL/gold:<br/>every change + every trade]
+        B[Kalshi order books, BTC/ETH/SOL/gold:<br/>every change + every trade<br/>+ weather from Oct 13: rain + 10 city highs]
         S[Spot prices: Coinbase, Kraken,<br/>Bitstamp for BTC/ETH/SOL; OKX for gold]
         M[Market info + settlements]
     end
     subgraph PAST[Downloaded history backfill]
-        T[Kalshi trades + settlements<br/>BTC, ETH: Dec 2025 to now; SOL: Jan 2026 to now]
+        T[Kalshi trades + settlements<br/>BTC, ETH: Dec 2025 to now; SOL: Jan 2026 to now;<br/>XRP: Feb 11, DOGE: Mar 19 to now;<br/>~150-market samples of 38 other series Jan-Aug 2026]
         P[Binance 1-second BTC/ETH/SOL,<br/>OKX 1-minute gold]
         F[Order flow per second, BTC/ETH/SOL:<br/>Binance spot + OKX perpetuals, Dec 2025 to now]
     end
@@ -261,7 +263,7 @@ downloads) is read automatically.
 
 | Strategy | Status | One line |
 |---|---|---|
-| **ETH VolFavorite** | **Paper trading (0.5%/order)** | Buy the side that's winning when ETH's implied vol is high vs a vol forecast, at 7 fixed checkpoints (T-6m to T-1m). Walk-forward over 8 months at realistic depth: **+2.16¢/contract, 95% CI +0.93 to +3.45**, 6/8 months positive, +3.0¢ at 2× latency; worst drawdown 26% at 1%/order, hence 0.5%. |
+| **ETH VolFavorite** | **Live, $1,000 at 1%/order since Oct 13** ($196 trial Oct 8-13: +$34.54); paper alongside; v2 (gap-safe vol, rv_scale 1.02) on paper | Buy the side that's winning when ETH's implied vol is high vs a vol forecast, at 7 fixed checkpoints (T-6m to T-1m). Walk-forward over 8 months at realistic depth: **+2.16¢/contract, 95% CI +0.93 to +3.45**, 6/8 months positive, +3.0¢ at 2× latency; worst drawdown 26% at 1%/order, hence 0.5%. |
 | BTC Ladder Relative Value | Research | Quote thin hourly BTC range markets around the fair value implied by the liquid above/below ladder. Promising signal (+1.3¢ when takers overpay); needs recorded books. |
 | Gold Maker | Rejected (parked) | Zero-fee market making on gold; break-even in backtest, loses live to faster traders. |
 | BTC Spread Maker | Rejected (parked) | Back-of-queue fills get picked off. |
@@ -324,6 +326,13 @@ Credentials: ~/.kalshi/kalshi.pem + .env (KALSHI_KEY_ID)
 ---
 
 ## 10. Open items
+
+- **Category survey (Oct 13, `research/category_survey.py`)**: scored every trade in ~150 settled markets per
+  series (38 series, Jan-Aug 19) against settlement. Weather takers overpay consistently (-0.3 to -1.6¢/contract,
+  cheap brackets, no maker fees); BTC/ETH 15M ~0; sports noisy, some with informed in-game takers. Next: weather
+  books are recording (maker test possible ~early Nov); a weather forecast-vs-price taker strategy can test on
+  history now; sports break-period screen (`research/sports_breaks.py`) to run on the research server.
+- **XRP/DOGE 15M** (Oct 13): history downloading on the research server (added to nightly); next: VolFavorite on them.
 
 - **SOL 15-minute added Oct 1** (about 1/3 of ETH's volume, so likely less efficient): recording books;
   history back to Jan 9, 2026 downloading. Next: recalibrate its book depth from a day of recordings, then
