@@ -49,6 +49,6 @@ At 7 fixed checkpoints (T-360, 300, 240, 180, 120, 90, 60 s), if the market isn'
 - **Real books move under you.** At-the-touch IOCs miss ~20–40% on recorded books (the quote moves within 150 ms); backfill's synthetic books don't model that. Cross the touch by 1¢ (`slip_c=1`) to fill ~95%.
 
 ## Current status
-- Stage: **live trial** since Oct 8 ($196, 1%/order, stop-loss $40; server tmux `live-eth-volfav`). Paper keeps running alongside (0.5%/order, `slip_c=1`).
+- Stage: **live**, scaled to $1,000 on Oct 13 01:06 UTC (1%/order ~13 contracts, stop-loss $200, max 25/order, 50/market; server tmux `live-eth-volfav`). First trial Oct 8–13 at $196: +$34.54 settled on 136 fills (first 80 markets +12.4¢/ct, CI +5.4..+18.5). Paper keeps running alongside (0.5%/order, `slip_c=1`).
 - Lockbox: **spent**. It was developed on data through Sep 29 before the lockbox existed; paper is its out-of-sample test.
-- Next: ~1 week of paper (~100 markets), compare per-contract results and fills to the walk-forward, then the $200 live-trial decision.
+- Next: watch fills and slippage at ~13 contracts/order (capacity check: ~0.3¢ slippage at 100 ct, so no change expected); compare with eth-volfav2 paper over 1–2 weeks and move live to v2 if it holds (user's OK).

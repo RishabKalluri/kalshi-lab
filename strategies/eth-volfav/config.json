@@ -19,5 +19,5 @@
     "lockbox_runs": 1
   },
   "created": "2026-09-30",
-  "next": "Live trial since 2026-10-08 19:10 UTC: $196 on the crypto shard, 1%/order (~3 contracts), stop-loss $40, max 5/order, 15/market; server tmux live-eth-volfav, log ~/kalshi-data/logs/live-eth-volfav.log. Paper keeps running for comparison. Review after ~100 live markets: fills, fees, c/contract vs paper."
+  "next": "Live since 2026-10-13 01:06 UTC at $1,000 on the crypto shard, 1%/order (~13 contracts), stop-loss $200, max 25/order, 50/market (first trial Oct 8-13 at $196: +$34.54 on 136 fills). Server tmux live-eth-volfav, log ~/kalshi-data/logs/live-eth-volfav.log. Paper keeps running for comparison; eth-volfav2 paper is the candidate to replace v1 live after 1-2 weeks."
 }
