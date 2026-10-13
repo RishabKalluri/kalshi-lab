@@ -32,6 +32,19 @@ applies, with the differences below.
     `## Requests` section says exactly what and why. Prefer working on something else that has data first.
   In the last 15 minutes you may stop without done.json once the report is complete.
 
+## Pick ideas worth the time
+Before you commit to an idea (and write it in the report), estimate from development data:
+- **Opportunities:** how many markets per month it would trade. The full walk-forward needs a few hundred trades over
+  the development months to show a confidence interval above zero; an idea that trades a handful of markets a week
+  can't be proven even if it's real. Rare-event ideas (one time slot a week, a few news days a year) need a very large
+  edge per trade to be worth it; otherwise skip them.
+- **Payoff:** opportunities × plausible edge per contract (cents) × contracts the book can take (`book_depth`,
+  sizing). An idea that would make a few dollars a month at $1,000 isn't worth a full test.
+- **Novelty:** if it's an existing strategy's rule moved to another time, market or filter, it's a variation of that
+  idea: it shares its family and lockbox (`derived_from`) and rarely adds much. Prefer genuinely different edges.
+Prefer ideas that trade often (most markets, or a large share of them) over narrow ones. If a quick test makes no
+trades, that's not evidence: fix the idea or the window, don't escalate to a full test.
+
 ## Differences from develop-strategy
 - **Tests:** `uv run kalshi-lab test <slug> --stages "" --note "..."` (smoke, waits for itself) and
   `uv run kalshi-lab test <slug> --skip-smoke --stages quick|full|lockbox --note "..."` (queues and returns a job id).
