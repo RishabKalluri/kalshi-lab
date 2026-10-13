@@ -33,6 +33,15 @@ MARKETS = {
                      backfill_spot={"binance": "SOLUSDT", "coinbase": "SOL-USD"},
                      flow={"binance": "SOLUSDT", "okx": "SOL-USDT-SWAP"}, settlement="avg60", record=True,
                      book_depth=13),
+    # Added Oct 13 2026 for VolFavorite expansion (retail-heavier alts; Kalshi series since Feb 11 / Mar 19).
+    # Backfill only for now (record=False): turn on recording once a backtest says they're worth paper.
+    # book_depth is a placeholder (SOL's): re-measure from recorded books before trusting capacity numbers.
+    "KXXRP15M": dict(live_spot=["coinbase:XRP-USD", "kraken:XRP/USD", "bitstamp:xrpusd"],
+                     backfill_spot={"binance": "XRPUSDT", "coinbase": "XRP-USD"},
+                     settlement="avg60", record=False, book_depth=13),
+    "KXDOGE15M": dict(live_spot=["coinbase:DOGE-USD", "kraken:DOGE/USD", "bitstamp:dogeusd"],
+                      backfill_spot={"binance": "DOGEUSDT", "coinbase": "DOGE-USD"},
+                      settlement="avg60", record=False, book_depth=13),
     # Gold settles on Pyth (key-gated). OKX's XAU perp tracks it within ~$1 over 15 minutes.
     "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
                       settlement="point", record=True, book_depth=635),

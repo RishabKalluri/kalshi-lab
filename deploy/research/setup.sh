@@ -152,7 +152,7 @@ $ENV
 Environment=PATH=/home/ubuntu/.local/bin:/usr/local/bin:/usr/bin:/bin
 UMask=0027
 ExecStart=$R/.venv/bin/python -m kalshi_lab s3-pull
-ExecStart=$R/.venv/bin/python -m kalshi_lab backfill --series KXBTC15M KXETH15M KXSOL15M KXGOLD15M --days 3
+ExecStart=$R/.venv/bin/python -m kalshi_lab backfill --series KXBTC15M KXETH15M KXSOL15M KXGOLD15M KXXRP15M KXDOGE15M --days 3
 ExecStart=$R/.venv/bin/python -m kalshi_lab s3-push --dirs backfill --no-trim
 ExecStart=$R/.venv/bin/python -c "from kalshi_lab.storage import fix_perms; fix_perms()"
 StandardOutput=append:$D/logs/nightly.log
