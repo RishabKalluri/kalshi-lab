@@ -30,6 +30,7 @@ BRIEFS = HOME / "briefs.txt"
 DEFAULT_BRIEFS = ["your choice: the most promising untaken idea in strategies/IDEAS.md, or your own",
                   "KXSOL15M: your choice of idea"]
 MAX_RESUMES = 8
+MODEL = "claude-opus-5-5"  # pinned: the account default (or a usage-limit fallback) would change research quality
 
 
 def claude() -> str:
@@ -61,7 +62,8 @@ def run_one(brief: str, rdir: Path, deadline: float):
                       "(check report.md, your strategy folders and `uv run kalshi-lab jobs`)."]
         else:
             prompt = [f"/research-strategy {brief}"]
-        cmd = [claude(), "-p", *prompt, "--output-format", "stream-json", "--verbose", "--permission-mode", "auto"]
+        cmd = [claude(), "-p", *prompt, "--output-format", "stream-json", "--verbose", "--permission-mode", "auto",
+               "--model", MODEL]
         t0 = time.time()
         proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         killer = threading.Timer(left, proc.terminate)

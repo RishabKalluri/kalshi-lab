@@ -70,6 +70,8 @@ def main():
             deny("credentials and the lockbox token are off limits")
     elif tool == "Bash":
         cmd = str(inp.get("command", ""))
+        # here-document bodies are text being written (notes, reports), not commands: check only the command lines
+        cmd = re.sub(r"<<-?\s*(['\"]?)(\w+)\1[^\n]*\n.*?\n\s*\2\s*(?=\n|$)", "<<heredoc", cmd, flags=re.S)
         for pat, why in BASH_FORBIDDEN:
             if re.search(pat, cmd):
                 deny(why)
