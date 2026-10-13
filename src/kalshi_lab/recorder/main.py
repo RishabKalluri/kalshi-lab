@@ -6,7 +6,7 @@ import signal
 from pathlib import Path
 
 from .. import auth  # noqa: F401  (loads .env)
-from .config import RECORD_DEFAULT, SERIES, WEATHER
+from .config import GROUPS, RECORD_DEFAULT, SERIES
 from .kalshi import KalshiRecorder
 from .sink import Sink
 from .spot import run_feed
@@ -52,9 +52,11 @@ async def amain(series: list[str], root: str):
 def main(argv=None):
     p = argparse.ArgumentParser(description="Record Kalshi series + underlying spot feeds")
     p.add_argument("--series", nargs="+", default=RECORD_DEFAULT, help=f"known: {list(SERIES)}")
-    p.add_argument("--weather", action="store_true", help=f"record the weather series instead: {WEATHER}")
+    p.add_argument("--group", choices=list(GROUPS), help="record a group of series instead (own unit per group)")
+    p.add_argument("--weather", action="store_true", help="same as --group weather")
     p.add_argument("--root", default=os.environ.get("KALSHI_DATA_ROOT", "data/raw"))
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    asyncio.run(amain(WEATHER if args.weather else args.series, str(Path(args.root).expanduser())))
+    group = "weather" if args.weather else args.group
+    asyncio.run(amain(GROUPS[group] if group else args.series, str(Path(args.root).expanduser())))

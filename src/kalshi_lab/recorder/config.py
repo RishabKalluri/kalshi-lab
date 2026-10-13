@@ -64,8 +64,14 @@ for _s in WEATHER:
 
 # Sports game winners (Oct 13 2026): backfill only, for the in-game longshot-fade POC (sports_breaks screen: takers
 # buying NBA/NHL sides under 20c lose 5-7c). No books recorded yet; book_depth is a conservative placeholder.
-for _s in ("KXNBAGAME", "KXNHLGAME"):
-    MARKETS[_s] = dict(live_spot=[], settlement="game", record=False, book_depth=50)
+# Books recorded from Oct 13 2026 (kalshi-recorder-sports) for maker research: pre-game and break quoting. Game markets
+# list up to ~2 weeks ahead (close_time is a backstop; they settle when the game ends).
+SPORTS = ["KXNFLGAME", "KXNFLTOTAL", "KXNCAAFGAME", "KXNBAGAME", "KXNHLGAME", "KXMLBGAME", "KXEPLGAME"]
+for _s in SPORTS:
+    MARKETS[_s] = dict(live_spot=[], settlement="game", record=False, lookahead_s=16 * 86400, needs_strike=False,
+                       settle_poll_s=600, book_depth=50)
+
+GROUPS = {"weather": WEATHER, "sports": SPORTS}  # `kalshi-lab record --group <name>`, one recorder unit each
 
 # Backward-compatible views.
 SERIES = {s: m["live_spot"] for s, m in MARKETS.items()}
