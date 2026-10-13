@@ -168,11 +168,42 @@ Persistent=true
 WantedBy=timers.target
 UNIT
 
+# --- autonomous strategy agents (src/kalshi_lab/agents.py): run folders + briefs, readable by the lab group
+sudo mkdir -p /srv/kalshi-agents/runs
+sudo touch /srv/kalshi-agents/briefs.txt
+sudo chown -R agent:lab /srv/kalshi-agents && sudo chmod 2775 /srv/kalshi-agents /srv/kalshi-agents/runs
+sudo chmod 664 /srv/kalshi-agents/briefs.txt
+sudo tee /etc/systemd/system/kalshi-agents.service >/dev/null <<UNIT
+[Unit]
+Description=kalshi-lab autonomous strategy agents (daily batch)
+After=network-online.target kalshi-nightly.service
+[Service]
+User=agent
+WorkingDirectory=$R
+$ENV
+Environment=PATH=/home/agent/.local/bin:/usr/local/bin:/usr/bin:/bin HOME=/home/agent UV_NO_SYNC=1
+UMask=0002
+ExecStart=$R/.venv/bin/python -m kalshi_lab agents-run --parallel 2 --hours 6
+TimeoutStopSec=60
+RuntimeMaxSec=7h
+StandardOutput=append:$D/logs/agents.log
+StandardError=append:$D/logs/agents.log
+UNIT
+# after the nightly downloads (woken at 00:20 UTC); not Persistent: a manual boot later doesn't start a batch
+sudo tee /etc/systemd/system/kalshi-agents.timer >/dev/null <<UNIT
+[Unit]
+Description=daily autonomous agents batch
+[Timer]
+OnCalendar=*-*-* 00:45:00 UTC
+[Install]
+WantedBy=timers.target
+UNIT
+
 # --- idle auto-stop (counts agents, tests, data jobs and SSH logins as busy)
 sudo install -m 755 deploy/research/idle-stop.sh /home/ubuntu/bin/idle-stop.sh
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now kalshi-imds-guard.service kalshi-data-pull.timer kalshi-nightly.timer >/dev/null
+sudo systemctl enable --now kalshi-imds-guard.service kalshi-data-pull.timer kalshi-nightly.timer kalshi-agents.timer >/dev/null
 sudo systemctl enable kalshi-worker >/dev/null
 sudo systemctl restart kalshi-imds-guard.service
 echo "research setup done"

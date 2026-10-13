@@ -133,16 +133,46 @@ def _test_research(a):
     enqueue([a.strategy, *(["--series", *a.series] if a.series else []), *[x for p in a.param for x in ("-p", p)],
              "--stages", ",".join(stages), "--job", job, "--note", a.note])
     print(f"queued {job}; results appear in the dashboard as stages finish.")
-    if a.wait or not a.stages:  # smoke only: wait, like the foreground smoke on the laptop
+    if a.wait:
         wait(job)
+    elif not a.stages and not wait(job, 540):  # smoke only: wait like the laptop's foreground smoke, under 10 min
+        sys.exit(3)
 
 
-def wait(job: str):
-    """Block until a job finishes; print each stage's verdict and the job status (for agents)."""
+def wait_cmd(argv=None):
+    """`kalshi-lab wait <job> [--minutes M]`: wait up to M minutes (default 9, under agents' 10-minute command limit)
+    for a queued job; prints its verdicts when done, else where it is (exit 3: still queued/running, call again)."""
+    import argparse
+    ap = argparse.ArgumentParser(prog="kalshi-lab wait")
+    ap.add_argument("job")
+    ap.add_argument("--minutes", type=float, default=9)
+    a = ap.parse_args(argv)
+    if not wait(a.job, a.minutes * 60):
+        sys.exit(3)
+
+
+def wait(job: str, timeout: float | None = None) -> bool:
+    """Block until a job finishes (or `timeout` seconds pass: returns False); print each stage's verdict and the job
+    status (for agents)."""
     import json
     import time
-    done = ROOT / "results" / "_jobs" / "done" / f"{job}.json"
+    q = ROOT / "results" / "_jobs"
+    done = q / "done" / f"{job}.json"
+    t0 = time.time()
     while not done.exists():
+        if timeout is not None and time.time() - t0 > timeout:
+            if (q / "running" / f"{job}.json").exists():
+                where = "running: " + json.loads((q / "running" / f"{job}.json").read_text()).get("stage", "?")
+            elif (q / "queue" / f"{job}.json").exists():
+                from .jobs import _smoke_only  # the worker's order: smoke-only jobs first, then oldest first
+                key = lambda p: (not _smoke_only(p), p.stat().st_mtime)  # noqa: E731
+                me = key(q / "queue" / f"{job}.json")
+                ahead = sum(key(p) < me for p in (q / "queue").glob("*.json")) + len(list((q / "running").glob("*.json")))
+                where = f"queued, {ahead} job(s) ahead"
+            else:
+                where = "unknown job"
+            print(f"job {job}: still {where}; call `kalshi-lab wait {job}` again (meanwhile, work on something else)")
+            return False
         time.sleep(15)
     j = json.loads(done.read_text())
     for stage in j["stages"]:
@@ -154,6 +184,7 @@ def wait(job: str):
     print(f"job {job}: {j['status']}")
     if j["status"] == "failed":
         print("log tail:\n" + j.get("log_tail", "")[-1500:])
+    return True
 
 
 def pull(argv=None):

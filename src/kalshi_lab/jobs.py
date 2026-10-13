@@ -32,6 +32,13 @@ def _dirs():
         (Q / d).mkdir(parents=True, exist_ok=True)
 
 
+def _smoke_only(p: Path) -> bool:
+    try:
+        return json.loads(p.read_text()).get("stages") == ["smoke"]
+    except (OSError, ValueError):
+        return False
+
+
 def enqueue(argv=None):
     ap = argparse.ArgumentParser(prog="kalshi-lab enqueue")
     ap.add_argument("strategy")
@@ -48,7 +55,8 @@ def enqueue(argv=None):
     slug = folder.name if folder else Path(a.strategy.split(":")[0]).stem
     job = a.job or f"{slug}-{datetime.now():%m%d-%H%M%S}"
     spec = dict(id=job, strategy=a.strategy, series=series, params=a.param, stages=a.stages.split(","),
-                note=a.note, created=datetime.now(timezone.utc).isoformat(), status="queued")
+                note=a.note, created=datetime.now(timezone.utc).isoformat(), status="queued",
+                agent_run=os.environ.get("KALSHI_AGENT_RUN", ""))  # which autonomous agent run queued it (agents.py)
     (Q / "queue" / f"{job}.json").write_text(json.dumps(spec, indent=1))
     print(f"queued {job}: {a.stages} for {a.strategy} on {a.series}")
 
@@ -164,7 +172,8 @@ def worker(argv=None):
         f.rename(Q / "queue" / f.name)
     started_code = _code_stamp()
     while True:
-        queued = sorted((Q / "queue").glob("*.json"), key=lambda p: p.stat().st_mtime)
+        # oldest first, but smoke-only jobs (about a minute) jump ahead of quick/full tests
+        queued = sorted((Q / "queue").glob("*.json"), key=lambda p: (not _smoke_only(p), p.stat().st_mtime))
         if not queued:
             if _code_stamp() != started_code:  # code changed while idle: restart so jobs never run stale code
                 print("code changed: restarting worker", flush=True)

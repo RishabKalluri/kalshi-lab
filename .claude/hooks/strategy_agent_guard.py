@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """PreToolUse guard for strategy-development agents (subagents, incl. the develop-strategy skill).
 
-Applies only when the tool call comes from a subagent (the hook input has `agent_id`); the main session,
-which maintains the infrastructure, is unaffected. Blocks (exit 2, reason shown to the agent):
+Applies when the tool call comes from a subagent (the hook input has `agent_id`) or from an autonomous agent run on the
+research server (KALSHI_AGENT_RUN set, src/kalshi_lab/agents.py); the main session, which maintains the
+infrastructure, is unaffected. Blocks (exit 2, reason shown to the agent):
   - editing pipeline records (results.json, the ledger, job reports) or the code that grades strategies
   - touching infrastructure that affects recording, downloads, paper/live trading or the server
   - reading credentials or the lockbox token; using --force or lockbox overrides
@@ -11,6 +12,7 @@ These are guardrails, not a sandbox: the independent audit before any live decis
 """
 
 import json
+import os
 import re
 import sys
 
@@ -52,7 +54,7 @@ def main():
         ev = json.load(sys.stdin)
     except Exception:
         return
-    if not ev.get("agent_id"):  # main session: unrestricted
+    if not ev.get("agent_id") and not os.environ.get("KALSHI_AGENT_RUN"):  # main session: unrestricted
         return
     tool, inp = ev.get("tool_name", ""), ev.get("tool_input", {}) or {}
     if tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
