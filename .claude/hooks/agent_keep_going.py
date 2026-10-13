@@ -2,8 +2,9 @@
 """Stop hook for autonomous research agents (research server, src/kalshi_lab/agents.py): don't let them quit early.
 
 Applies only when KALSHI_AGENT_RUN is set (an agent run's folder); the laptop and interactive sessions are unaffected.
-Blocks a stop while the agent's test jobs are queued or running, or before it has written done.json, unless less than
-WRAP_UP minutes are left before its deadline.
+Blocks a stop while the agent's test jobs are queued or running, before it has written done.json, or when done.json says
+"exhausted" with more than EXHAUSTED_AFTER minutes left (agents gave up after 37 min once their brief's ideas died),
+unless less than WRAP_UP minutes are left before its deadline.
 """
 
 import json
@@ -13,6 +14,7 @@ import time
 from pathlib import Path
 
 WRAP_UP = 15  # minutes
+EXHAUSTED_AFTER = 90  # minutes left: before then, "exhausted" means pivot to a new idea, not stop
 JOBS = Path(__file__).resolve().parents[2] / "results" / "_jobs"
 
 
@@ -39,7 +41,18 @@ def main():
     if pending:
         block(f"Your test job(s) {', '.join(pending)} haven't finished: `uv run kalshi-lab wait <job>` (repeat until it "
               f"prints a verdict), act on the result and continue. {left / 60:.1f} h left.")
-    if not (Path(run) / "done.json").exists():
+    done = Path(run) / "done.json"
+    reason = ""
+    if done.exists():
+        try:
+            reason = json.loads(done.read_text()).get("reason", "")
+        except ValueError:
+            pass
+    if reason == "exhausted" and left > EXHAUSTED_AFTER:
+        block(f"done.json says exhausted, but you have {left / 60:.1f} h left. Your brief is where you start, not where you "
+              "stop: its ideas are dead, so take the next most promising idea from strategies/IDEAS.md (untaken) or your "
+              "own, in any theme, and keep going. Use what you learned. Remove or update done.json when you're done.")
+    if not done.exists():
         block(f"You have {left / 60:.1f} h left and no done.json: keep going. Take the next pipeline step, or if the idea "
               "is dead, record why and pivot to the next hypothesis. Keep report.md current.")
 

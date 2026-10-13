@@ -27,7 +27,8 @@ applies, with the differences below.
   - `paper_candidate`: one of your strategies passed the lockbox. Don't start paper trading (that's the user's call);
     set its `status` to `"paper_candidate"` in config.json and say why in the report.
   - `exhausted`: you seriously tried at least 4 distinct hypotheses (each with real research and pipeline runs) and
-    none survived, or your budgets are used up.
+    none survived, or your budgets are used up. Only in your last 90 minutes: **your brief is where you start, not
+    where you stop.** When its ideas are dead, move to the next most promising idea (IDEAS.md or your own, any theme).
   - `needs_user`: everything worth trying next needs data or infrastructure only the user can provide; the report's
     `## Requests` section says exactly what and why. Prefer working on something else that has data first.
   In the last 15 minutes you may stop without done.json once the report is complete.
