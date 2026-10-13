@@ -30,7 +30,7 @@ BRIEFS = HOME / "briefs.txt"
 DEFAULT_BRIEFS = ["your choice: the most promising untaken idea in strategies/IDEAS.md, or your own",
                   "KXSOL15M: your choice of idea"]
 MAX_RESUMES = 8
-MODEL = "claude-opus-5-5"  # pinned: the account default (or a usage-limit fallback) would change research quality
+MODEL = "claude-sonnet-5-5"  # pinned: the account default (or a usage-limit fallback) would change it
 
 
 def claude() -> str:
