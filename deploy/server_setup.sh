@@ -47,6 +47,7 @@ unit kalshi-recorder "Kalshi market + spot recorder" "$UV run kalshi-lab record"
 # crypto recorder.
 unit kalshi-recorder-weather "Kalshi weather market recorder" "$UV run kalshi-lab record --group weather" 5
 unit kalshi-recorder-sports "Kalshi sports market recorder" "$UV run kalshi-lab record --group sports" 5
+unit kalshi-recorder-alts "Kalshi alt-coin 15M recorder (XRP)" "$UV run kalshi-lab record --group alts" -5
 # Paper trading: one template unit, one instance per deploy/paper/<id>.json (kalshi-lab paper-start <id>).
 # Each run writes a new timestamped results dir, so a restart never overwrites history.
 sudo tee /etc/systemd/system/kalshi-paper@.service >/dev/null <<UNIT
@@ -180,7 +181,7 @@ unit kalshi-dashboard "kalshi-lab dashboard" "$UV run streamlit run src/kalshi_l
 sudo systemctl daemon-reload
 SERVICES="kalshi-recorder kalshi-dashboard"
 sudo systemctl daemon-reload
-sudo systemctl enable --now $SERVICES kalshi-recorder-weather kalshi-recorder-sports kalshi-health.timer kalshi-s3.timer kalshi-wake-research.timer kalshi-research-merge.timer
+sudo systemctl enable --now $SERVICES kalshi-recorder-weather kalshi-recorder-sports kalshi-recorder-alts kalshi-health.timer kalshi-s3.timer kalshi-wake-research.timer kalshi-research-merge.timer
 for f in deploy/paper/*.json; do
   [ -e "$f" ] && sudo systemctl enable --now "kalshi-paper@$(basename "$f" .json)"
 done

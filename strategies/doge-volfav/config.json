@@ -1,0 +1,20 @@
+{
+  "slug": "doge-volfav",
+  "name": "DOGE VolFavorite",
+  "series": [
+    "KXDOGE15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "VolFavorite",
+  "status": "parked",
+  "description": "ETH VolFavorite (v2 code) applied unchanged to DOGE: late in each 15-minute window, buy the side that is winning when the market prices much more volatility than a forecast from DOGE's recent realized vol. The model and entry threshold are refit monthly on DOGE's own history.",
+  "hypothesis": "ETH's 15-minute market overprices short-horizon vol and the BTC market does not; the difference looks like efficiency (thinner, more retail markets misprice more). DOGE's 15-minute market is smaller and more retail than ETH's, so the same overpricing should appear. The other side: traders paying up for the trailing side late in the window. Wrong if the walk-forward on DOGE is flat or negative, or the edge appears only in one or two months.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Parked: full test inconclusive (+0.57c/ct, CI -0.45..+1.57). Lockbox untouched; 2 full tests left."
+}

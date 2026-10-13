@@ -71,7 +71,11 @@ for _s in SPORTS:
     MARKETS[_s] = dict(live_spot=[], settlement="game", record=False, lookahead_s=16 * 86400, needs_strike=False,
                        settle_poll_s=600, book_depth=50)
 
-GROUPS = {"weather": WEATHER, "sports": SPORTS}  # `kalshi-lab record --group <name>`, one recorder unit each
+# XRP 15M (Oct 13 2026): xrp-volfav passed its lockbox; recorded in its own unit (spot feeds + books) so paper has
+# warm-up history and books without restarting the main crypto recorder.
+ALTS = ["KXXRP15M"]
+
+GROUPS = {"weather": WEATHER, "sports": SPORTS, "alts": ALTS}  # `kalshi-lab record --group <name>`, one recorder unit each
 
 # Backward-compatible views.
 SERIES = {s: m["live_spot"] for s, m in MARKETS.items()}

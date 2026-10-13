@@ -1,0 +1,24 @@
+{
+  "slug": "xrp-volfav",
+  "name": "XRP VolFavorite",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "VolFavorite",
+  "status": "paper",
+  "description": "ETH VolFavorite (v2 code) applied unchanged to XRP: late in each 15-minute window, buy the side that is winning when the market prices much more volatility than a forecast from XRP's recent realized vol. The model and entry threshold are refit monthly on XRP's own history.",
+  "hypothesis": "ETH's 15-minute market overprices short-horizon vol and the BTC market does not; the difference looks like efficiency (thinner, more retail markets misprice more). XRP's 15-minute market is smaller and more retail than ETH's, so the same overpricing should appear. The other side: traders paying up for the trailing side late in the window. Wrong if the walk-forward on XRP is flat or negative, or the edge appears only in one or two months.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Paper since 2026-10-13 at rv_scale=1.05 (unmeasured for XRP), slip_c=1, 0.5%/order. Re-measure rv_scale and book depth from a week of recordings; ~2 weeks of paper before any live decision (user's OK).",
+  "paper_params": [
+    "rv_scale=1.05",
+    "slip_c=1"
+  ]
+}
