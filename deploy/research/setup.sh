@@ -186,6 +186,9 @@ UMask=0002
 ExecStart=$R/.venv/bin/python -m kalshi_lab agents-run --parallel 2 --hours 6
 TimeoutStopSec=60
 RuntimeMaxSec=7h
+# an agent's script that runs out of memory is killed alone (the agent sees it fail), not the whole batch
+MemoryMax=20G
+OOMPolicy=continue
 StandardOutput=append:$D/logs/agents.log
 StandardError=append:$D/logs/agents.log
 UNIT

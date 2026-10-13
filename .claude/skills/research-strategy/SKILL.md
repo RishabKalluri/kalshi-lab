@@ -61,6 +61,9 @@ trades, that's not evidence: fix the idea or the window, don't escalate to a ful
   `→ taken`, and mark yours at once. Don't edit other agents' strategy folders (use `derived_from`).
 - **Continuing earlier work** is fine and often best: if your brief names an existing strategy, or a `developing`
   or `parked` folder of an earlier run has a clear `next` step and budget left, pick it up and log it in its NOTES.md.
+- **Memory:** the server's memory is shared by two agents and the test worker. Keep each script under ~4 GB: load
+  per-second data (flow, spot) a few days or one month at a time, only the columns you need, aggregate as you go
+  (e.g. to 5-second or 1-minute bars) and keep the aggregates. A script that runs out of memory is killed.
 - **Tools:** use WebSearch/WebFetch for papers and ideas. Long computations: keep each command under 10 minutes
   (sample or chunk), or run it in the background and check on it.
 

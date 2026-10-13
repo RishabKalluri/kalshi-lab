@@ -112,9 +112,17 @@ def backfill_coinbase(root: Path, product: str, start: datetime, end: datetime):
                 t = day
                 while t < nxt:
                     t2 = min(t + timedelta(minutes=300), nxt)
-                    r = client.get(f"https://api.exchange.coinbase.com/products/{product}/candles",
-                                   params={"granularity": 60, "start": t.isoformat(), "end": t2.isoformat()})
-                    r.raise_for_status()
+                    for attempt in range(6):
+                        try:
+                            r = client.get(f"https://api.exchange.coinbase.com/products/{product}/candles",
+                                           params={"granularity": 60, "start": t.isoformat(), "end": t2.isoformat()})
+                            r.raise_for_status()
+                            break
+                        except httpx.HTTPError as e:
+                            if attempt == 5:
+                                raise
+                            log.warning("coinbase %s: %r, retrying", product, e)
+                            time.sleep(2 ** attempt)
                     rows += r.json()
                     t = t2
                     time.sleep(0.15)
