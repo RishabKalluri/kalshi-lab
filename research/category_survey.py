@@ -69,17 +69,36 @@ def download(series: list[str], max_markets: int, max_trades: int, seed: int):
         except Exception as e:
             log.warning("%s: no series metadata (%r), skipping", s, e)
             continue
-        markets = [(m, h) for m, h in settled_markets(rest, s, START, end, cutoff) if m.get("result") in ("yes", "no")]
+        # Stream the listing: ladder series have ~1M settled strikes, too many to hold in memory. Keep counts and a
+        # reservoir sample of markets that traded (most strikes far from the money never trade).
+        rng, keep = random.Random(seed), 20 * max_markets
+        n_all = n_traded = 0
+        vol, first, last, traded = 0.0, None, None, []
+        try:
+            for m, h in settled_markets(rest, s, START, end, cutoff):
+                if m.get("result") not in ("yes", "no"):
+                    continue
+                n_all += 1
+                v = float(m.get("volume_fp") or 0)
+                vol += v
+                first = min(first or m["close_time"], m["close_time"])
+                last = max(last or m["close_time"], m["close_time"])
+                if v <= 0:
+                    continue
+                n_traded += 1
+                if len(traded) < keep:
+                    traded.append((m, h))
+                elif (j := rng.randrange(n_traded)) < keep:
+                    traded[j] = (m, h)
+        except Exception:
+            log.exception("%s: listing failed, skipping (re-run to retry)", s)
+            continue
         info = dict(series=s, category=meta.get("category"), fee_type=meta.get("fee_type"),
-                    fee_multiplier=meta.get("fee_multiplier"), markets_total=len(markets),
-                    volume_total=sum(float(m.get("volume_fp") or 0) for m, _ in markets),
-                    first_close=min((m["close_time"] for m, _ in markets), default=None),
-                    last_close=max((m["close_time"] for m, _ in markets), default=None))
+                    fee_multiplier=meta.get("fee_multiplier"), markets_total=n_all, volume_total=vol,
+                    first_close=first, last_close=last)
         (ROOT / s).mkdir(parents=True, exist_ok=True)
         (ROOT / s / "_survey.json").write_text(json.dumps(info))
-        # Sample only markets that traded: most ladder strikes far from the money never trade.
-        traded = [x for x in markets if float(x[0].get("volume_fp") or 0) > 0]
-        random.Random(seed).shuffle(traded)
+        rng.shuffle(traded)
         n_trades = n_mk = 0
         for m, historical in traded:
             if n_mk >= max_markets or n_trades >= max_trades:
@@ -105,8 +124,8 @@ def download(series: list[str], max_markets: int, max_trades: int, seed: int):
             _write_atomic(path, lines)
             n_mk += 1
             n_trades += len(trades)
-        log.info("%s: %d settled (%d traded) in window, sampled %d markets / %d trades", s, len(markets),
-                 len(traded), n_mk, n_trades)
+        log.info("%s: %d settled (%d traded) in window, sampled %d markets / %d trades", s, n_all, n_traded,
+                 n_mk, n_trades)
 
 
 def _load(path: Path):
@@ -142,12 +161,14 @@ def _boot(per_event: dict, n=2000, seed=0):
     return mean, (float(np.percentile(bs, 2.5)), float(np.percentile(bs, 97.5)))
 
 
-def analyze(series: list[str], out: Path | None):
+def analyze(series: list[str], out: Path | None, max_files: int = 1500):
     rows = []
     for s in series:
         d = ROOT / s
         files = sorted(d.glob(f"*/*{EXT}"))
-        files = [f for f in files if f.parent.name < lockbox_start().strftime("%Y-%m-%d")]
+        files = [f for f in files if START.strftime("%Y-%m-%d") <= f.parent.name < lockbox_start().strftime("%Y-%m-%d")]
+        if len(files) > max_files:  # fully backfilled series (crypto 15M): same-size random sample
+            files = sorted(random.Random(0).sample(files, max_files))
         if not files:
             continue
         info = json.loads((d / "_survey.json").read_text()) if (d / "_survey.json").exists() else {}
@@ -205,13 +226,14 @@ def main(argv=None):
     p.add_argument("--max-trades", type=int, default=1_500_000)
     p.add_argument("--seed", type=int, default=7)
     p.add_argument("--out", type=Path)
+    p.add_argument("--max-files", type=int, default=1500, help="analyze: sample at most this many markets per series")
     a = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     if a.cmd == "download":
         download(a.series, a.max_markets, a.max_trades, a.seed)
     else:
-        analyze(a.series, a.out)
+        analyze(a.series, a.out, a.max_files)
 
 
 if __name__ == "__main__":
