@@ -14,6 +14,10 @@
   book_depth     contracts at the best price in backfill tests (history has trades but no order books);
                  the 25th percentile of real best-price depth measured from recorded books (Sep 30 2026)
 
+  lookahead_s    subscribe to markets closing within this many seconds (default 1800, for 15-minute series)
+  needs_strike   wait for floor_strike on discovery (default True; bracket markets may never have one)
+  settle_poll_s  min seconds between settlement checks per closed market (default: every discovery poll)
+
 Backfill of Kalshi trades works for any series without an entry (no spot), e.g. KXBTC / KXBTCD ladders.
 """
 
@@ -46,6 +50,16 @@ MARKETS = {
     "KXGOLD15M": dict(live_spot=["okx:XAU-USDT-SWAP"], backfill_spot={"okx": "XAU-USDT-SWAP"},
                       settlement="point", record=True, book_depth=635),
 }
+
+# Weather (added Oct 13 2026): books for market-making research. The category survey found takers overpay here
+# (cheap brackets), with no maker fees. No spot feed; recorded by a separate unit (kalshi-recorder-weather,
+# `kalshi-lab record --series` WEATHER) so the crypto recorder never restarts for it. Markets open ~14:00 UTC the
+# day before and close 05:00 UTC the day after; settlement comes hours later from the NWS climate report.
+WEATHER = ["KXRAIN", "KXHIGHLAX", "KXHIGHMIA", "KXHIGHNY", "KXHIGHCHI", "KXHIGHAUS", "KXHIGHTDAL", "KXHIGHTPHX",
+           "KXHIGHTHOU", "KXHIGHTATL", "KXHIGHTBOS"]
+for _s in WEATHER:
+    MARKETS[_s] = dict(live_spot=[], settlement="nws", record=False, lookahead_s=3 * 86400, needs_strike=False,
+                       settle_poll_s=600)
 
 # Backward-compatible views.
 SERIES = {s: m["live_spot"] for s, m in MARKETS.items()}

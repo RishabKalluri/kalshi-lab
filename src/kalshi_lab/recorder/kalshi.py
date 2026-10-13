@@ -16,6 +16,7 @@ import websockets
 
 from ..auth import WS_URL, KalshiAuth
 from ..rest import KalshiREST
+from .config import MARKETS
 from .sink import Sink
 
 log = logging.getLogger(__name__)
@@ -41,6 +42,11 @@ class KalshiRecorder:
         self.settled: set[str] = set()
         self.no_strike: set[str] = set()  # discovered before floor_strike was published
         self.open_time: dict[str, float] = {}
+        cfg = MARKETS.get(series, {})
+        self.lookahead_s = cfg.get("lookahead_s", 1800)  # subscribe to markets closing within this window
+        self.needs_strike = cfg.get("needs_strike", True)  # crypto: wait for floor_strike; brackets may have none
+        self.settle_poll_s = cfg.get("settle_poll_s", 0)  # min seconds between settlement checks per market
+        self.settle_checked: dict[str, float] = {}
 
     def _marker(self, kind: str, **kw):
         self.sink.write(self.ws_stream, json.dumps({"type": f"_{kind}", **kw}))
@@ -85,12 +91,12 @@ class KalshiRecorder:
 
             async def discover_once():
                 nonlocal next_id
-                # Everything closing in the next 30 min: the live market plus the next one(s), so we're
-                # subscribed before they open and capture the book from the first tick.
+                # Everything closing within lookahead (30 min for 15-minute series): the live market plus the next
+                # one(s), so we're subscribed before they open and capture the book from the first tick.
                 now = int(time.time())
                 open_markets = await asyncio.to_thread(
                     lambda: list(self.rest.markets(series_ticker=self.series, min_close_ts=now,
-                                                   max_close_ts=now + 1800))
+                                                   max_close_ts=now + self.lookahead_s))
                 )
                 open_tickers = {m["ticker"] for m in open_markets}
                 for m in open_markets:
@@ -99,7 +105,7 @@ class KalshiRecorder:
                         self.known.add(t)
                         self.open_time[t] = datetime.fromisoformat(m["open_time"].replace("Z", "+00:00")).timestamp()
                         self.sink.write(self.meta_stream, json.dumps({"event": "discovered", "market": m}))
-                        if m.get("floor_strike") is None:
+                        if self.needs_strike and m.get("floor_strike") is None:
                             self.no_strike.add(t)
                     elif t in self.no_strike and m.get("floor_strike") is not None:
                         self.no_strike.discard(t)
@@ -152,6 +158,9 @@ class KalshiRecorder:
 
     async def _check_settlements(self):
         for ticker in list(self.unsettled):
+            if self.settle_poll_s and time.time() - self.settle_checked.get(ticker, 0) < self.settle_poll_s:
+                continue
+            self.settle_checked[ticker] = time.time()
             m = (await asyncio.to_thread(self.rest.get, f"/markets/{ticker}"))["market"]
             if m.get("result"):
                 self.sink.write(self.meta_stream, json.dumps({"event": "settled", "market": m}))
