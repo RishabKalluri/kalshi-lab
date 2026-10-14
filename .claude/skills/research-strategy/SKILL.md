@@ -52,6 +52,9 @@ trades, that's not evidence: fix the idea or the window, don't escalate to a ful
   Then `uv run kalshi-lab wait <job>`: it waits up to 9 minutes (your commands are cut off at 10) and exits 3 if
   the job is still queued or running; call it again until it prints the verdict. While a full test runs, do useful
   work (research the next hypothesis, diagnose earlier runs) between waits. One job of yours in the queue at a time.
+- **The lockbox rolls monthly:** it holds data from the 1st of the previous month on (`uv run kalshi-lab data`
+  prints the date); on the 1st of each month the oldest month becomes development data. Recorded order books
+  start late Sep 2026, so they're lockbox until Nov 1, then development data.
 - **Every stage runs in a sandbox** as another user: your code can't read lockbox-dated data, and lockbox runs have
   no network and write where you can't read. Lockbox-dated files aren't readable by you at all; list data files by
   date and skip dates on/after the lockbox start (`uv run kalshi-lab data`).

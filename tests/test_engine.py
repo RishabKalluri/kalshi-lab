@@ -168,6 +168,16 @@ def test_lockbox_windows_and_verdict(monkeypatch):
     assert v.lockbox_verdict({"POOLED": {"pnl": -1, "contracts": 10, "ci95_c": [-3, 1]}}) == "fail"
 
 
+def test_lockbox_rolls_monthly():
+    from datetime import datetime, timezone
+    from kalshi_lab.validate import lockbox_start_for
+    u = lambda *a: datetime(*a, tzinfo=timezone.utc)
+    assert lockbox_start_for(u(2026, 10, 13, 21)) == u(2026, 9, 1)
+    assert lockbox_start_for(u(2026, 10, 31, 23, 59)) == u(2026, 9, 1)
+    assert lockbox_start_for(u(2026, 11, 1)) == u(2026, 10, 1)
+    assert lockbox_start_for(u(2027, 1, 5)) == u(2026, 12, 1)
+
+
 def test_strategy_folder_ledger_budget_and_tamper_detection(tmp_path, monkeypatch):
     import json
     import kalshi_lab.strategy_dir as sd
@@ -183,6 +193,11 @@ def test_strategy_folder_ledger_budget_and_tamper_detection(tmp_path, monkeypatc
         r = sd.ledger_append("demo", rec)
         sd.append_result(f, r)
     assert sd.count_runs(f, "full") == 1          # crashed runs don't use budget
+    for lb in ("2026-08-20T00:00:00+00:00", "2026-09-01T00:00:00+00:00"):
+        sd.append_result(f, sd.ledger_append("demo", {"stage": "lockbox", "job": lb, "verdict": "fail", "lockbox_start": lb}))
+    assert sd.count_runs(f, "lockbox", "2026-09-01T00:00:00+00:00") == 1  # one lockbox run per period
+    assert sd.count_runs(f, "lockbox", "2026-10-01T00:00:00+00:00") == 0 and sd.count_runs(f, "lockbox") == 2
+    assert [h["lockbox_start"][:10] for h in sd.family_lockbox_history("demo")] == ["2026-08-20", "2026-09-01"]
     assert sd.ledger_ok("demo") and sd.results_match_ledger(f)
     # an agent editing its own results.json is detected, and doesn't change budgets
     res = json.loads((f / "results.json").read_text())

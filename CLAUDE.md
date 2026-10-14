@@ -26,20 +26,22 @@ See `SYSTEM.md` for how the system fits together and `README.md` for commands.
 - The pipeline (`kalshi-lab test <slug> ...`) appends every run to a hash-chained ledger
   (`results/_ledger/<slug>.jsonl`) and copies it to the folder's results.json. Budgets and the lockbox gate read
   the ledger only. `.claude/hooks/strategy_agent_guard.py` restricts subagents (not the main session).
-- **Lockbox:** data from `LOCKBOX_START` (validate.py, currently 2026-08-20) on is never used by
-  smoke/quick/full; each strategy gets one lockbox run after a promising full test. Move the date forward only
-  deliberately and announce it.
-- **Families:** `derived_from` in config.json links related strategies (dashboard groups them). The lockbox is one
-  shot per family and market (`validate.py` refuses a second); a family's lockbox passes count as one piece of
-  evidence when choosing what to take live. eth-midrev's lockbox ran after eth-overreact's on the same ETH data, so
-  it isn't independent.
+- **Lockbox (rolling):** data from `LOCKBOX_START` on is never used by smoke/quick/full. `lockbox_start_for` in
+  validate.py moves it on the 1st of each month to the 1st of the previous month (4-9 weeks held out; fixed at
+  2026-08-20 until Oct 2026); `KALSHI_LOCKBOX_START` overrides it. Each strategy folder gets one lockbox run per
+  period after a promising full test. The research server's `fix_perms` (run by s3-pull) opens each month as it
+  leaves the lockbox.
+- **Families:** `derived_from` in config.json links related strategies (dashboard groups them and shows the
+  family's whole lockbox history). Versions of an idea may each run the lockbox (the user chose no per-family cap,
+  Oct 2026); a pass after earlier failed versions on the same held-out data is weak evidence, and a family's passes
+  count as one piece of evidence when choosing what to take live.
 - **Before any live trading:** run `kalshi-lab audit <slug>` (independent re-run of full + lockbox vs the
   ledger) and check the folder's results.json matches the ledger. Mismatch = stop and tell the user.
 
 ## Rules the system is built on
 - Decisions come from engine results only (the validation pipeline); `research/` scripts are for screening.
 - Pipeline: smoke → quick (gate) → full walk-forward over development data (strategies with a `fit()`
-  classmethod are refit before each month on earlier data only, budget 3) → one-shot lockbox. Paper starts
+  classmethod are refit before each month on earlier data only, budget 3) → lockbox (one run per strategy per monthly period). Paper starts
   after a lockbox pass; live needs enough paper to check execution, a clean audit, and the user's OK.
 - Three places: the **trading server** (`ssh kalshi`, Lightsail: recorder, paper/live, dashboard, hourly S3
   upload; deploy with `deploy/push.sh kalshi`, paper traders keep running), **S3** (all data,

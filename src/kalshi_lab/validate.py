@@ -9,8 +9,9 @@ Stages (each is one or more ordinary backtests):
   smoke  recorded books, last 2 hours (or 6h of backfill): it runs, trades, isn't rejected by risk limits
   quick  backfill, last 3 days + recorded books, last 6 hours   (~5-10 min on the server). Gate: a clearly
          negative quick (all runs lose, a CI entirely below zero) stops the job before the full test.
-  lockbox  ONE SHOT on data from LOCKBOX_START on (never used by smoke/quick/full), only after a promising
-           full test: pass if profitable, strong pass if the 95% CI is above 0. Fail = reject the idea.
+  lockbox  one run per strategy per lockbox period, on data from LOCKBOX_START on (never used by smoke/quick/full),
+           only after a promising full test: pass if profitable, strong pass if the 95% CI is above 0. Fail = reject
+           that version. The lockbox rolls monthly (lockbox_start_for), so held-out data stays recent.
   full   WALK-FORWARD over all backfilled months before the lockbox: one backtest per month. If the strategy defines
          fit(series, until), it's refit before each month on data before that month only, so every
          month is out of sample. + the last 3 months again at 2x latency + all recorded books.
@@ -56,12 +57,20 @@ def recorded_range(series: list[str]) -> tuple[datetime, datetime] | None:
     return f(first), min(datetime.now(UTC) - timedelta(minutes=20), f(last) + timedelta(hours=1))
 
 
-# The lockbox: data on/after this date is never used by smoke/quick/full. A strategy sees it exactly once,
-# in the `lockbox` stage, after its full test is promising. Move it forward only deliberately (it's global).
+# The lockbox: data on/after this date is never used by smoke/quick/full. A strategy sees it once per lockbox period,
+# in the `lockbox` stage, after its full test is promising. It rolls on the 1st of each month to the 1st of the
+# previous month (4-9 weeks held out); the month that leaves it becomes development data. Only ever moves forward.
 # Research server (deploy/research/): the worker runs this stage inside a sandbox (kalshi-sandbox) as a user that
 # can't write the ledger, so the stage's ledger record and report go to SANDBOX_OUT and the worker records them.
 SANDBOX_OUT = Path(os.environ["KALSHI_SANDBOX_OUT"]) if os.environ.get("KALSHI_SANDBOX_OUT") else None
-LOCKBOX_START = datetime.fromisoformat(os.environ.get("KALSHI_LOCKBOX_START", "2026-08-20")).replace(tzinfo=UTC)
+def lockbox_start_for(now: datetime) -> datetime:
+    """The rolling lockbox: from the 1st of the previous month (before Oct 2026 it was fixed at 2026-08-20)."""
+    first = now.astimezone(UTC).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    return (first - timedelta(days=1)).replace(day=1)
+
+
+LOCKBOX_START = (datetime.fromisoformat(os.environ["KALSHI_LOCKBOX_START"]).replace(tzinfo=UTC)
+                 if os.environ.get("KALSHI_LOCKBOX_START") else lockbox_start_for(datetime.now(UTC)))
 
 
 def _unseal_token() -> str:
@@ -119,7 +128,7 @@ def plan(stage: str, series: list[str], fits: bool = False, min_train: int = 2) 
             runs.append(dict(name=f"lat2x-{s0:%Y-%m}", source="backfill", start=s0, end=e0, fit_until=s0,
                              latency_ms=300))
     elif stage == "lockbox":
-        # One shot at data the strategy has never seen, fit only on data before the lockbox.
+        # Data the strategy has never been tested on, fit only on data before the lockbox.
         if data_end > LOCKBOX_START:
             for s0, e0 in _months(LOCKBOX_START, data_end):
                 runs.append(dict(name=f"lockbox-{s0:%Y-%m}", source="backfill", start=s0, end=e0, fit_until=LOCKBOX_START))
@@ -237,7 +246,7 @@ def smoke_checks(summary: dict) -> list[str]:
 
 
 def lockbox_verdict(cards: dict) -> str:
-    """One shot, so no tuning: pass if the never-seen data is profitable; strong pass if its 95% CI is above 0."""
+    """No tuning on it: pass if the never-seen data is profitable; strong pass if its 95% CI is above 0."""
     pooled = cards.get("POOLED")
     if not pooled or not pooled.get("contracts"):
         return "incomplete"
@@ -282,7 +291,7 @@ def main(argv=None):
     ap.add_argument("--series", nargs="+", help="default: the folder's config.json")
     ap.add_argument("-p", "--param", action="append", default=[])
     ap.add_argument("--job", default=None, help="job id (names the result dirs)")
-    ap.add_argument("--force", action="store_true", help="override the full-test budget / one-shot lockbox (user only)")
+    ap.add_argument("--force", action="store_true", help="override the full-test / lockbox budgets (user only)")
     ap.add_argument("--note", default="", help="what changed in this iteration (logged to results.json)")
     ap.add_argument("--audit", action="store_true", help="re-run without recording; compare to the ledger (kalshi-lab audit)")
     ap.add_argument("--preflight", action="store_true", help="only check the ledger/budget/lockbox rules (exit 0 = may run)")
@@ -305,20 +314,15 @@ def main(argv=None):
             log(f"BUDGET: {slug} has used its {budget['full_tests']} full tests. Log what you learned and stop, "
                 f"or ask the user for more (validate --force).")
             sys.exit(5)
-        if a.stage == "lockbox" and count_runs(folder, "lockbox") >= budget.get("lockbox_runs", 1):
-            log(f"LOCKBOX: {slug} already used its lockbox. It is one-shot; a failed lockbox means the idea is rejected.")
+        if a.stage == "lockbox" and count_runs(folder, "lockbox", LOCKBOX_START.isoformat()) >= budget.get("lockbox_runs", 1):
+            log(f"LOCKBOX: {slug} already used its lockbox run for the period from {LOCKBOX_START:%Y-%m-%d}. A failed "
+                "lockbox rejects this version: build a new version for a stated reason (a new folder with "
+                "derived_from), or wait for the lockbox to roll on the 1st of next month.")
             sys.exit(5)
         if a.stage == "lockbox":
             last_full = next((r for r in reversed(ledger_runs(folder.name)) if r.get("stage") == "full"), None)
             if not last_full or last_full.get("verdict") != "promising":
                 log("LOCKBOX: only after a promising full test.")
-                sys.exit(5)
-            from .strategy_dir import family_lockbox_conflicts
-            clash = family_lockbox_conflicts(folder.name, series, LOCKBOX_START.isoformat())
-            if clash:
-                log("LOCKBOX: this strategy's family already used the lockbox on these markets: " + "; ".join(clash) +
-                    ". A refinement of an idea can't be tested on the same held-out data twice. Keep refinements in the "
-                    "original folder, or move the rule unchanged to other markets; otherwise it waits for the lockbox to move.")
                 sys.exit(5)
             if last_full.get("code") != code_hash(folder, legacy=last_full.get("code_v") != CODE_V):
                 log("LOCKBOX: the code changed since the promising full test. Rerun the full test on this exact code first.")

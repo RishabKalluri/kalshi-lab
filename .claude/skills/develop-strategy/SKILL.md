@@ -74,10 +74,11 @@ prove an edge in days.
      `scripts/decompose.py` on a run dir, fills/orders CSVs in `results/<job>-<run>/`), write the learning
      in NOTES.md, change **one motivated thing**, and rerun from smoke. Budget: **3 full tests**. When it's
      used up, write up what you learned and stop.
-   - **lockbox** (one shot, only after a promising full):
+   - **lockbox** (one run per strategy per lockbox period, only after a promising full):
      `uv run kalshi-lab test <slug> --skip-smoke --stages lockbox --wait --note "..."`.
-     **Pass / strong pass** → paper trading. **Fail** → the idea is rejected (`status: rejected`); do not
-     tweak and retry; record why.
+     **Pass / strong pass** → paper trading. **Fail** → this version is rejected (`status: rejected`); record
+     why. Don't rerun it unchanged. A new version built for a reason you can state from development data (not
+     from the lockbox numbers) goes in a new folder with `derived_from` and gets its own lockbox run.
 6. **Paper trading** (after a lockbox pass): `uv run kalshi-lab paper-start <slug>` (uses `paper_params`
    and `sizing` from config.json; max 4 paper traders on the server). Then set `status: paper`.
 7. **Record and checkpoint:** keep NOTES.md current at every step (iteration log row per pipeline run,
@@ -95,12 +96,13 @@ record why (NOTES.md, and IDEAS.md **Tried**), then **pivot and continue**:
   did work, chosen for a reason you can state *before* looking at its result (not by scanning for a winner);
 - or **a new hypothesis**, from IDEAS.md or your own.
 **One folder per idea.** A variation, refinement or filter on an idea stays in that idea's folder (a new section in
-NOTES.md) and shares its budgets and its single lockbox, *including when the idea is another agent's strategy*: then
+NOTES.md) and shares its budgets, *including when the idea is another agent's strategy*: then
 don't edit their folder; build yours with `"derived_from": "<their slug>"` in config.json. Create a new folder only
 for (a) a genuinely different idea, or (b) an existing rule moved **unchanged** to other markets
 (`derived_from` set, fixed in advance, no tuning on the new market). Every strategy that builds on another one sets
-`derived_from`. The lockbox is one shot per family *and market*: if any related strategy already ran the lockbox
-on a market, the pipeline refuses yours on that market, because its result shaped your idea.
+`derived_from`. Each folder gets one lockbox run per lockbox period (versions after a lockbox failure need a new
+folder); the dashboard shows the family's whole lockbox history, so a pass after several failed versions on the
+same held-out data counts for less. Don't make versions just to retry the lockbox.
 **Lean towards the pipeline.** Research screens are cheap but can mislead in both directions. If an idea is
 plausible and the screen is inconclusive rather than clearly negative, implement it and run smoke and quick
 instead of polishing the screen; the full walk-forward is what decides.

@@ -198,7 +198,7 @@ flowchart LR
     F -->|clearly negative| D
     F --> G{full<br/>budget 3}
     G -->|not promising: log learning,<br/>change one thing| D
-    G -->|promising| H{lockbox<br/>one shot}
+    G -->|promising| H{lockbox<br/>rolling monthly}
     H -->|fail| R[rejected]
     H -->|pass| P[paper-start]
 ```
@@ -208,9 +208,11 @@ strategies/<slug>/  strategy.py · config.json · NOTES.md (learnings, kept curr
 strategies/_template/  copied by `kalshi-lab new`     strategies/_archive/  older experiments + legacy registry
 ```
 
-**The lockbox:** data from 2026-08-20 on is held out. Smoke/quick/full only use earlier "development" data;
-after a promising full test a strategy gets **one** run on the lockbox (pass = profitable, strong pass = CI above
-0, fail = rejected, not tweaked). This is the defense against overfitting by iteration.
+**The lockbox:** the most recent 4-9 weeks are held out: data from the 1st of the previous month on, rolling on
+the 1st of each month (the month leaving it becomes development data). Smoke/quick/full only use earlier
+"development" data; after a promising full test a strategy gets **one** lockbox run per period (pass = profitable,
+strong pass = CI above 0, fail = that version is rejected). Versions of an idea each get a run; the dashboard
+shows the family's lockbox history. This is the defense against overfitting by iteration.
 
 **Anti-cheating layers:** (1) every pipeline run is appended to a hash-chained ledger outside the strategy's
 folder (`results/_ledger/<slug>.jsonl`); budgets and gates read only the ledger, and the dashboard flags a

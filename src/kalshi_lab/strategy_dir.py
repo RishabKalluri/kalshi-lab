@@ -165,8 +165,8 @@ def results_match_ledger(folder: Path) -> bool:
 # ---------------------------------------------------------------- strategy families
 # A strategy derived from another (config.json "derived_from": "<slug>") is in its family. Refinements of an idea
 # belong in the idea's own folder; a new folder is for a different idea, or the same rule moved unchanged to other
-# markets. The lockbox is one shot per *family and market*: once any member has run the lockbox on some series,
-# no other member may run it on those series until the lockbox moves forward (fresh data).
+# markets. Each member gets its own lockbox run per lockbox period; the dashboard shows the family's whole lockbox
+# history so repeated attempts on the same held-out data are visible.
 
 
 def _parents(slug: str) -> set[str]:
@@ -210,23 +210,21 @@ def _series_of(slug: str, rec: dict) -> set[str]:
     return set(json.loads(p.read_text()).get("series", [])) if p.exists() else set()
 
 
-def family_lockbox_conflicts(slug: str, series: list[str], lockbox_start: str, before: str | None = None) -> list[str]:
-    """Other family members' lockbox runs on the same lockbox window and any of these series (optionally only
-    those that finished before `before`)."""
+def family_lockbox_history(slug: str) -> list[dict]:
+    """Every lockbox run by any family member, oldest first: slug, series, lockbox_start, finished, verdict."""
     out = []
-    for other in sorted(family(slug) - {slug}):
-        for r in ledger_runs(other):
-            if r.get("stage") == "lockbox" and not r.get("crashed") and r.get("lockbox_start") == lockbox_start \
-                    and (before is None or str(r.get("finished")) < before):
-                shared = _series_of(other, r) & set(series)
-                if shared:
-                    out.append(f"{other} ({', '.join(sorted(shared))}, {str(r.get('finished'))[:10]}, {r.get('verdict')})")
-    return out
+    for member in family(slug):
+        for r in ledger_runs(member):
+            if r.get("stage") == "lockbox" and not r.get("crashed"):
+                out.append(dict(slug=member, series=sorted(_series_of(member, r)), lockbox_start=r.get("lockbox_start", ""),
+                                finished=str(r.get("finished", "")), verdict=r.get("verdict")))
+    return sorted(out, key=lambda x: x["finished"])
 
 
-def count_runs(folder: Path, stage: str) -> int:
-    """Budget accounting, from the ledger (not the editable results.json)."""
-    return sum(1 for r in ledger_runs(folder.name) if r.get("stage") == stage and not r.get("crashed"))
+def count_runs(folder: Path, stage: str, lockbox_start: str | None = None) -> int:
+    """Budget accounting, from the ledger (not the editable results.json); optionally only one lockbox period's."""
+    return sum(1 for r in ledger_runs(folder.name) if r.get("stage") == stage and not r.get("crashed")
+               and (lockbox_start is None or r.get("lockbox_start", "2026-08-20T00:00:00+00:00") == lockbox_start))
 
 
 def git_rev() -> str:

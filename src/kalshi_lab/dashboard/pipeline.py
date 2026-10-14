@@ -32,7 +32,7 @@ STAGE_INFO = {
     "smoke": "Runs the strategy on 6 hours of development data (~1 min): does it work, trade, and size orders sensibly?",
     "quick": "The last 3 days of development data (~1-10 min). Gate: clearly negative stops here; the full test never runs.",
     "full": "Walk-forward through the engine over all development months (before the lockbox), refit monthly on earlier data, plus the last 3 months at 2x latency. Promising = pooled 95% CI above 0, >=60% of months up, survives 2x latency. Budget: 3 per strategy.",
-    "lockbox": "One shot at the ~6 weeks the strategy has never seen (from the lockbox date on), only after a promising full test. Pass = profitable; strong pass = CI above 0; fail = the idea is rejected, not tweaked.",
+    "lockbox": "One run per lockbox period on the 4-9 most recent weeks, which smoke/quick/full never use (the lockbox rolls on the 1st of each month), only after a promising full test. Pass = profitable; strong pass = CI above 0; fail = this version is rejected. Versions of one idea each get a run; the family's full lockbox history is shown above.",
     "paper": "Live data, simulated money, 24/7 on the server, after the lockbox passes. Checks live fills and signals match the backtest.",
     "live": "Real money at small size with stop rules set in advance. Needs the user's go-ahead.",
 }
@@ -348,8 +348,8 @@ def stage_tab(stage, c, r, T, layout):
 
 
 def family_note(c):
-    """Show the strategy's family (derived_from links) and flag a lockbox that wasn't independent."""
-    from kalshi_lab.strategy_dir import family, family_lockbox_conflicts, family_root
+    """Show the strategy's family (derived_from links) and every lockbox run any member made."""
+    from kalshi_lab.strategy_dir import family, family_lockbox_history, family_root
     fam = sorted(family(c["slug"]) - {c["slug"]})
     if not fam:
         return
@@ -357,14 +357,20 @@ def family_note(c):
     parent = c.get("derived_from")
     st.caption(f"Family **{root}** ({len(fam) + 1} strategies: {', '.join(fam)})"
                + (f" · derived from `{parent}`" if parent else ""))
-    for rec in c["_runs"]:
-        if rec.get("stage") == "lockbox" and not rec.get("crashed"):
-            series = rec.get("series") or c.get("series", [])
-            earlier = family_lockbox_conflicts(c["slug"], series, rec.get("lockbox_start", ""), before=str(rec.get("finished")))
-            if earlier:
-                st.warning("**Lockbox not independent:** this family had already used the lockbox on the same markets ("
-                           + "; ".join(earlier) + "), and this version was built after that result. Treat its lockbox like a "
-                           "development result; paper trading is its real out-of-sample test.")
+    hist = family_lockbox_history(c["slug"])
+    if hist:
+        rows = [f"{h['finished'][:10]} `{h['slug']}` {', '.join(h['series'])} (lockbox from {h['lockbox_start'][:10]}): "
+                f"**{h['verdict']}**" for h in hist]
+        same = {}
+        for h in hist:
+            for s in h["series"]:
+                same[(s, h["lockbox_start"])] = same.get((s, h["lockbox_start"]), 0) + 1
+        repeat = max(same.values()) > 1
+        msg = "**Family lockbox history** (" + str(len(hist)) + " runs):  \n" + "  \n".join(rows)
+        if repeat:
+            msg += ("  \nSeveral versions ran on the same held-out data: a pass after earlier attempts is weaker "
+                    "evidence; paper trading is the real out-of-sample test.")
+        (st.warning if repeat else st.caption)(msg)
 
 
 def card(c, r, backfills, T, layout):
