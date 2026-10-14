@@ -62,7 +62,10 @@ mkdir -p research/data && sudo chown ubuntu:lab research/data && sudo chmod 2775
 
 # --- results: the worker's; agents may queue jobs; lockbox outputs and sandbox scratch kept from agents
 sudo mkdir -p results/_ledger results/_jobs/{queue,running,done} results/_sandbox results/_lockbox
-sudo chown -R worker:lab results && sudo chmod 2775 results results/_jobs results/_sandbox
+# not recursive into _lockbox/_sandbox: running sandboxed stages own their files there (a recursive chown during a
+# deploy once locked a running lockbox out of its own output)
+sudo find results \( -path results/_lockbox -o -path results/_sandbox \) -prune -o -exec chown worker:lab {} +
+sudo chown worker:lab results/_sandbox && sudo chmod 2775 results results/_jobs results/_sandbox
 sudo chmod 3775 results/_jobs/queue
 sudo chown worker:worker results/_ledger && sudo chmod 755 results/_ledger
 sudo chown worker:kdata results/_lockbox && sudo chmod 2770 results/_lockbox
