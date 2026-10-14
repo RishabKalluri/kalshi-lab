@@ -265,7 +265,7 @@ downloads) is read automatically.
 
 | Strategy | Status | One line |
 |---|---|---|
-| **ETH VolFavorite** | **Live, $1,000 at 1%/order since Oct 13** ($196 trial Oct 8-13: +$34.54); paper alongside; v2 (gap-safe vol, rv_scale 1.02) on paper | Buy the side that's winning when ETH's implied vol is high vs a vol forecast, at 7 fixed checkpoints (T-6m to T-1m). Walk-forward over 8 months at realistic depth: **+2.16¢/contract, 95% CI +0.93 to +3.45**, 6/8 months positive, +3.0¢ at 2× latency; worst drawdown 26% at 1%/order, hence 0.5%. |
+| **ETH VolFavorite** | **Live as v2 (gap-safe vol, rv_scale 1.02) since Oct 14, $1,000 at 1%/order**; v1 live Oct 8-14 (+$34.54 at $196, +$30.72 at $1k); v1 + v2 paper alongside; XRP port on paper | Buy the side that's winning when ETH's implied vol is high vs a vol forecast, at 7 fixed checkpoints (T-6m to T-1m). Walk-forward over 8 months at realistic depth: **+2.16¢/contract, 95% CI +0.93 to +3.45**, 6/8 months positive, +3.0¢ at 2× latency; worst drawdown 26% at 1%/order, hence 0.5%. |
 | BTC Ladder Relative Value | Research | Quote thin hourly BTC range markets around the fair value implied by the liquid above/below ladder. Promising signal (+1.3¢ when takers overpay); needs recorded books. |
 | Gold Maker | Rejected (parked) | Zero-fee market making on gold; break-even in backtest, loses live to faster traders. |
 | BTC Spread Maker | Rejected (parked) | Back-of-queue fills get picked off. |

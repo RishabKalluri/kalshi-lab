@@ -5,7 +5,7 @@
     "KXETH15M"
   ],
   "class": "VolFavorite",
-  "status": "live",
+  "status": "paper",
   "description": "On Kalshi's 15-minute ETH up/down markets, a few minutes before close, compare how much the market 'expects' ETH to move (implied volatility, read off the contract price) with how much it will probably move (a forecast from recent price action). When the market expects far more movement than is likely, the side that's currently winning is underpriced, so buy it.",
   "hypothesis": "ETH's 15-minute market overprices short-horizon volatility after volatile stretches (participants anchor on recent moves), so favorites are cheap late in the window. Takers on the other side are paying for reversals that rarely happen. Wrong if: walk-forward months are mostly negative, or the same test works on BTC (would mean a method artifact, not an ETH inefficiency).",
   "params": [],
@@ -19,5 +19,5 @@
     "lockbox_runs": 1
   },
   "created": "2026-09-30",
-  "next": "Live since 2026-10-13 01:06 UTC at $1,000 on the crypto shard, 1%/order (~13 contracts), stop-loss $200, max 25/order, 50/market (first trial Oct 8-13 at $196: +$34.54 on 136 fills). Server tmux live-eth-volfav, log ~/kalshi-data/logs/live-eth-volfav.log. Paper keeps running for comparison; eth-volfav2 paper is the candidate to replace v1 live after 1-2 weeks."
+  "next": "Live moved to eth-volfav2 on 2026-10-14 03:05 UTC (user's call). v1 live record: $196 trial Oct 8-13 +$34.54 (136 fills); $1,000 at 1%/order Oct 13 01:06 - Oct 14 03:05 +$30.72 (24 fills). v1 paper keeps running as the comparison for v2's extra trades."
 }
