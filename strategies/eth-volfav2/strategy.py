@@ -19,7 +19,9 @@ Mechanics, identical to the research:
 
 import json
 import math
+import os
 import sys
+import time
 from pathlib import Path
 from statistics import NormalDist
 
@@ -30,6 +32,10 @@ from kalshi_lab.strategy import Strategy  # noqa: E402
 
 NS = 1_000_000_000
 PARAMS = Path(__file__).parent / "params"
+# Live/paper only: monthly refits (research/refit_live.py -> S3 -> `kalshi-lab models-pull`) land here and take
+# precedence over params/; the trader re-reads the file when it changes, so a refit needs no restart.
+LIVE_MODELS = (Path(os.environ.get("KALSHI_DATA_ROOT", "~/kalshi-data/raw")).expanduser().parent / "models"
+               / Path(__file__).parent.name)
 _inv = NormalDist().inv_cdf
 
 
@@ -95,6 +101,7 @@ class VolFavorite(Strategy):
         self.models: dict[str, dict] = {}
         self.basis: dict[str, float] = {}
         self.entries: dict[str, list[int]] = {}
+        self.live = bool(ctx.spot_history)  # only live/paper engines provide spot history
         # Live/paper: preload the last 4h of spot from the recorder so there's no warm-up after a restart.
         if ctx.spot_history:
             for series in ctx.spot_map:
@@ -104,11 +111,21 @@ class VolFavorite(Strategy):
                     h.add(sec, px)
                 ctx.log.info("VolFavorite: preloaded %d seconds of %s spot history", len(pts), series)
 
-    def _model(self, series):
-        if series not in self.models:
-            name = self.p.model or f"vol_model_{series}.json"
-            self.models[series] = json.loads((PARAMS / name).read_text())
-        return self.models[series]
+    def _model(self, series, ctx=None):
+        name = self.p.model or f"vol_model_{series}.json"
+        c = self.models.get(series)
+        if c and (not self.live or time.monotonic() - c["checked"] < 300):
+            return c["m"]
+        path = LIVE_MODELS / name if self.live and not self.p.model and (LIVE_MODELS / name).exists() else PARAMS / name
+        mtime = path.stat().st_mtime
+        if not c or c["path"] != path or c["mtime"] != mtime:
+            m = json.loads(path.read_text())
+            if ctx is not None and self.live:
+                ctx.log.info("VolFavorite: %s model %s (fit until %s, %s markets, threshold %.3f)", series, path,
+                             m.get("fit_until"), m.get("n_markets"), m["ratio_threshold"])
+            c = self.models[series] = dict(m=m, path=path, mtime=mtime)
+        c["checked"] = time.monotonic()
+        return c["m"]
 
     def _rv(self, h: "_Hist", window: int) -> float | None:
         """Realized vol ($/sqrt s) over the last `window` seconds of 1s samples, O(1) via running sums."""
@@ -162,7 +179,7 @@ class VolFavorite(Strategy):
         if z * D <= 0:
             return  # spot and market disagree on the side: implied vol undefined
         iv = D / (z * math.sqrt(tau - 40))
-        md = self._model(m.series)
+        md = self._model(m.series, ctx)
         hour = (m.close_ts // NS // 3600) % 24
         x = [1.0, math.log(rv15), math.log(rv60), math.log(rv4h)] + [1.0 if hour == hh else 0.0 for hh in range(1, 24)] + [math.log(tau)]
         fc = math.exp(sum(b * v for b, v in zip(md["beta"], x)))

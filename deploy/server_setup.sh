@@ -142,6 +142,7 @@ IOSchedulingClass=idle
 User=$USER
 WorkingDirectory=$PWD
 Environment=PATH=$HOME/.local/bin:/usr/bin:/bin
+ExecStart=-$UV run -q kalshi-lab models-pull
 ExecStart=$UV run -q kalshi-lab s3-push
 StandardOutput=append:$HOME/kalshi-data/logs/kalshi-s3.log
 StandardError=append:$HOME/kalshi-data/logs/kalshi-s3.log

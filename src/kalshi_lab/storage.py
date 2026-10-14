@@ -148,3 +148,11 @@ def push(argv=None):
         msg += f"; {'would free' if a.dry_run else 'freed'} {freed / 1e9:.2f} GB" + \
                (f", {held} old files not in S3 yet (kept)" if held else "")
     print(f"{t0:%F %T} {msg}", flush=True)
+
+
+def models_pull(argv=None):
+    """Trading server, hourly: bring the monthly model refits (research/refit_live.py, s3://.../models/<slug>/) to
+    ~/kalshi-data/models/, where live/paper VolFavorite traders pick them up without a restart."""
+    rc = sync(f"s3://{BUCKET}/models/", f"{DATA}/models/", "--exclude", "_*")
+    print(f"{datetime.now():%F %T} models pulled{' WITH ERRORS' if rc else ''}", flush=True)
+    raise SystemExit(rc)
