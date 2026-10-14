@@ -162,78 +162,114 @@ def _code_stamp() -> float:
     return max(p.stat().st_mtime for p in (ROOT / "src" / "kalshi_lab").rglob("*.py"))
 
 
+SLOTS = int(os.environ.get("KALSHI_WORKER_SLOTS", "3"))  # jobs at once (research server: 4 cores, one left for agents)
+
+
+def _slug(p: Path) -> str:
+    try:
+        return Path(json.loads(p.read_text())["strategy"].split(":")[0]).parts[1]
+    except (OSError, ValueError, KeyError, IndexError):
+        return p.stem
+
+
+def run_job(f: Path, push: str | None):
+    """Run one job's stages (f is its file in running/)."""
+    j = json.loads(f.read_text())
+    j["status"], j["started"] = "running", datetime.now(timezone.utc).isoformat()
+    log_path = ROOT / "results" / "_jobs" / f"{j['id']}.log"
+    ok = True
+    with open(log_path, "a") as log:
+        for stage in j["stages"]:
+            j["stage"] = stage
+            f.write_text(json.dumps(j, indent=1))
+            cmd = [sys.executable, "-m", "kalshi_lab", "validate", stage, j["strategy"], "--series", *j["series"],
+                   "--job", j["id"], "--note", j.get("note", "")] + [x for p in j["params"] for x in ("-p", p)]
+            log.write(f"\n=== {stage} {datetime.now(timezone.utc):%H:%M:%S} ===\n")
+            log.flush()
+            finish = None
+            if SANDBOX:
+                cmd, finish = _sandboxed(j, stage, log)
+                log.flush()
+                if cmd is None:
+                    ok = False
+                    break
+            proc = subprocess.Popen(cmd, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+            cancel = Q / f"{j['id']}.cancel"
+            last_push = 0.0
+            while proc.poll() is None:  # poll so a cancel request can stop the whole process group
+                if cancel.exists():
+                    if SANDBOX:  # the sandbox runs as root-managed systemd unit: ask it to stop
+                        subprocess.call(["sudo", "-n", "/usr/local/sbin/kalshi-sandbox", "stop", j["id"], stage])
+                    else:
+                        os.killpg(proc.pid, signal.SIGTERM)
+                    proc.wait()
+                    break
+                if push and time.time() - last_push > 30:
+                    log.flush()
+                    _push(push)
+                    last_push = time.time()
+                time.sleep(2)
+            if finish:
+                finish(proc.returncode)
+            _push(push, j["id"])
+            if proc.returncode == 4:  # quick gate: clearly negative, don't spend CPU on the full test
+                j["gated"] = stage
+                break
+            if cancel.exists() or proc.returncode != 0:
+                ok = False
+                break
+    cancelled = (Q / f"{j['id']}.cancel").exists()
+    j["status"] = "cancelled" if cancelled else ("rejected at quick" if j.get("gated") else ("ok" if ok else "failed"))
+    j["finished"] = datetime.now(timezone.utc).isoformat()
+    j["log_tail"] = log_path.read_text()[-2000:]
+    (Q / "done" / f.name).write_text(json.dumps(j, indent=1))
+    f.unlink()
+    _push(push, j["id"])
+    print(f"{j['id']}: {j['status']}", flush=True)
+
+
+def _run_safe(f: Path, push: str | None):
+    """run_job in a thread: an unexpected error fails that job instead of leaving it in running/ forever."""
+    try:
+        run_job(f, push)
+    except Exception as e:  # noqa: BLE001
+        import traceback
+        traceback.print_exc()
+        if f.exists():
+            j = json.loads(f.read_text())
+            j.update(status="failed", finished=datetime.now(timezone.utc).isoformat(), log_tail=f"worker error: {e!r}")
+            (Q / "done" / f.name).write_text(json.dumps(j, indent=1))
+            f.unlink()
+
+
 def worker(argv=None):
+    import threading
     ap = argparse.ArgumentParser(prog="kalshi-lab worker")
     ap.add_argument("--push", help="ssh host to copy job state/results to after each step (laptop worker)")
     a = ap.parse_args(argv)
     _dirs()
-    print("worker started", flush=True)
+    print(f"worker started ({SLOTS} jobs at once)", flush=True)
     for f in (Q / "running").glob("*.json"):  # jobs interrupted by a restart go back in the queue
         f.rename(Q / "queue" / f.name)
     started_code = _code_stamp()
+    active: dict[str, threading.Thread] = {}  # strategy slug -> its running job
     while True:
-        # oldest first, but smoke-only jobs (about a minute) jump ahead of quick/full tests
+        active = {k: t for k, t in active.items() if t.is_alive()}
+        stale = _code_stamp() != started_code
+        if stale and not active:  # code changed: restart once nothing runs, so jobs never run stale code
+            print("code changed: restarting worker", flush=True)
+            os.execv(sys.executable, [sys.executable, "-m", "kalshi_lab", "worker"] + (["--push", a.push] if a.push else []))
+        # oldest first, but smoke-only jobs (about a minute) jump ahead of quick/full tests. Never two jobs of one
+        # strategy at once (a lockbox moves its params/ aside); no new jobs while waiting to restart on new code.
         queued = sorted((Q / "queue").glob("*.json"), key=lambda p: (not _smoke_only(p), p.stat().st_mtime))
-        if not queued:
-            if _code_stamp() != started_code:  # code changed while idle: restart so jobs never run stale code
-                print("code changed: restarting worker", flush=True)
-                os.execv(sys.executable, [sys.executable, "-m", "kalshi_lab", "worker"] +
-                         (["--push", a.push] if a.push else []))
+        nxt = next((p for p in queued if _slug(p) not in active), None)
+        if stale or nxt is None or len(active) >= SLOTS:
             time.sleep(5)
             continue
-        f = queued[0].rename(Q / "running" / queued[0].name)
-        j = json.loads(f.read_text())
-        j["status"], j["started"] = "running", datetime.now(timezone.utc).isoformat()
-        log_path = ROOT / "results" / "_jobs" / f"{j['id']}.log"
-        ok = True
-        with open(log_path, "a") as log:
-            for stage in j["stages"]:
-                j["stage"] = stage
-                f.write_text(json.dumps(j, indent=1))
-                cmd = [sys.executable, "-m", "kalshi_lab", "validate", stage, j["strategy"], "--series", *j["series"],
-                       "--job", j["id"], "--note", j.get("note", "")] + [x for p in j["params"] for x in ("-p", p)]
-                log.write(f"\n=== {stage} {datetime.now(timezone.utc):%H:%M:%S} ===\n")
-                log.flush()
-                finish = None
-                if SANDBOX:
-                    cmd, finish = _sandboxed(j, stage, log)
-                    log.flush()
-                    if cmd is None:
-                        ok = False
-                        break
-                proc = subprocess.Popen(cmd, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-                cancel = Q / f"{j['id']}.cancel"
-                last_push = 0.0
-                while proc.poll() is None:  # poll so a cancel request can stop the whole process group
-                    if cancel.exists():
-                        if SANDBOX:  # the sandbox runs as root-managed systemd unit: ask it to stop
-                            subprocess.call(["sudo", "-n", "/usr/local/sbin/kalshi-sandbox", "stop", j["id"], stage])
-                        else:
-                            os.killpg(proc.pid, signal.SIGTERM)
-                        proc.wait()
-                        break
-                    if a.push and time.time() - last_push > 30:
-                        log.flush()
-                        _push(a.push)
-                        last_push = time.time()
-                    time.sleep(2)
-                if finish:
-                    finish(proc.returncode)
-                _push(a.push, j["id"])
-                if proc.returncode == 4:  # quick gate: clearly negative, don't spend CPU on the full test
-                    j["gated"] = stage
-                    break
-                if cancel.exists() or proc.returncode != 0:
-                    ok = False
-                    break
-        cancelled = (Q / f"{j['id']}.cancel").exists()
-        j["status"] = "cancelled" if cancelled else ("rejected at quick" if j.get("gated") else ("ok" if ok else "failed"))
-        j["finished"] = datetime.now(timezone.utc).isoformat()
-        j["log_tail"] = log_path.read_text()[-2000:]
-        (Q / "done" / f.name).write_text(json.dumps(j, indent=1))
-        f.unlink()
-        _push(a.push, j["id"])
-        print(f"{j['id']}: {j['status']}", flush=True)
+        f = nxt.rename(Q / "running" / nxt.name)
+        t = threading.Thread(target=_run_safe, args=(f, a.push), daemon=True)
+        t.start()
+        active[_slug(f)] = t
 
 
 def cancel(argv=None):

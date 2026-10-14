@@ -130,6 +130,8 @@ for day in sorted(p for p in (BF / "kalshi" / series).iterdir() if p.is_dir()):
                 next_ask=nxt_buy, next_bid=nxt_sell, age_ask=t - buy_t, age_bid=t - sell_t,
             ))
 df = pd.DataFrame(rows)
-df.to_parquet(OUT / f"{series}{TAG}.parquet")
+tmp = OUT / f".{series}{TAG}.{os.getpid()}.parquet"  # atomic: several test jobs may build it at once
+df.to_parquet(tmp)
+os.replace(tmp, OUT / f"{series}{TAG}.parquet")
 print(f"{series}: {df.ticker.nunique()} markets, {len(df)} rows -> {OUT / f'{series}{TAG}.parquet'}")
 print(df.describe().T[["mean", "50%", "min", "max"]].round(3).to_string())
