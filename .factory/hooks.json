@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Execute|Edit|Create|ApplyPatch|MultiEdit|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${FACTORY_PROJECT_DIR:-$PWD}/.claude/hooks/strategy_agent_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${FACTORY_PROJECT_DIR:-$PWD}/.claude/hooks/agent_keep_going.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -19,7 +19,7 @@ import sys
 PROTECTED_FILES = re.compile(
     r"(strategies/[^/]+/results\.json|results/_ledger/|results/_jobs/|"
     r"src/kalshi_lab/(validate|strategy_dir|backtest|jobs|remote|paper_ctl|engine|strategy|sizing|report)\.py|"
-    r"src/kalshi_lab/(recorder|live|sim|core|data)/|deploy/|\.claude/|CLAUDE\.md|"
+    r"src/kalshi_lab/(recorder|live|sim|core|data)/|deploy/|\.claude/|\.factory/|CLAUDE\.md|AGENTS\.md|"
     r"strategies/(_archive|_template|eth-volfav)/|strategies/_budgets\.json|tests/)"
 )
 SECRETS = re.compile(r"(lockbox\.token|kalshi\.pem|\.kalshi/|(^|/)\.env\b)")
@@ -57,6 +57,12 @@ def main():
     if not ev.get("agent_id") and not os.environ.get("KALSHI_AGENT_RUN"):  # main session: unrestricted
         return
     tool, inp = ev.get("tool_name", ""), ev.get("tool_input", {}) or {}
+    # Factory Droid's tool names (.factory/hooks.json): same checks as Claude Code's equivalents
+    tool = {"Execute": "Bash", "Create": "Write", "ApplyPatch": "Edit"}.get(tool, tool)
+    if tool == "Edit" and not inp.get("file_path"):  # a patch: check every file it names, and its text
+        text = json.dumps(inp)
+        paths = re.findall(r"(?:\*\*\* (?:Add|Update|Delete) File: |\+\+\+ b/|--- a/|\"path\": \")([^\s\"\\]+)", text)
+        inp = {"file_path": " ".join(paths) or text, "content": text}
     if tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
         path = str(inp.get("file_path") or inp.get("notebook_path") or "")
         if PROTECTED_FILES.search(path) or SECRETS.search(path):
