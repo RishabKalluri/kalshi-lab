@@ -27,6 +27,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import httpx
+import orjson
 
 from .backfill import EXT, _write_atomic
 
@@ -69,12 +70,13 @@ class Converter:
                        "no_dollars_fp": [[_fp(p), f"{q:.2f}"] for (sd, p), q in sorted(cur.items()) if sd == "no"]}
                 self.lines.append((t, json.dumps({"type": "orderbook_snapshot", "msg": msg})))
             else:
-                for key in sorted(set(cur) | set(self.prev)):
-                    d = cur.get(key, 0.0) - self.prev.get(key, 0.0)
-                    if abs(d) > 1e-9:
-                        self.lines.append((t, json.dumps({"type": "orderbook_delta", "msg": {
-                            "market_ticker": self.ticker, "side": key[0], "price_dollars": _fp(key[1]),
-                            "delta_fp": f"{d:.2f}"}})))
+                prev = self.prev
+                if cur != prev:
+                    for key in sorted(cur.keys() | prev.keys()):
+                        d = cur.get(key, 0.0) - prev.get(key, 0.0)
+                        if d > 1e-9 or d < -1e-9:
+                            self.lines.append((t, '{"type":"orderbook_delta","msg":{"market_ticker":"%s","side":"%s",'
+                                                  '"price_dollars":"%s","delta_fp":"%.2f"}}' % (self.ticker, key[0], _fp(key[1]), d)))
             self.prev = cur
 
 
@@ -122,7 +124,7 @@ async def fetch_market(client: httpx.AsyncClient, lim: Limiter, ticker: str, sta
             break
         else:
             raise RuntimeError(f"{ticker}: gave up after retries")
-        d = r.json()
+        d = orjson.loads(r.content)
         page = d.get("snapshots") or []
         if sink:
             sink(page)
