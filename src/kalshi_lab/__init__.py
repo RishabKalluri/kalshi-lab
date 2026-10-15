@@ -24,6 +24,7 @@ COMMANDS = {
     "s3-push": ("kalshi_lab.storage", "push"),          # trading server, hourly: upload to S3, trim old recordings
     "s3-pull": ("kalshi_lab.storage", "pull_all"),      # research server: sync all data from S3, set permissions
     "models-pull": ("kalshi_lab.storage", "models_pull"),  # trading server, hourly: monthly model refits from S3
+    "books-download": ("kalshi_lab.data.books", "main"),  # research server: historical order books (Predexon)
     "research-merge": ("kalshi_lab.research_sync", "merge"),  # trading server: take in the research server's results
     "paper-start": ("kalshi_lab.paper_ctl", "start"),  # laptop: paper trade a registry strategy on the server
     "paper-stop": ("kalshi_lab.paper_ctl", "stop"),
