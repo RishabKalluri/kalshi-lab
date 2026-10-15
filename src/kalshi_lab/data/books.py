@@ -51,25 +51,37 @@ def _fp(cents: int) -> str:
     return f"{cents / 100:.4f}"
 
 
+class Converter:
+    """Snapshots -> recorder-style lines (t_ns, message json): one snapshot, then per-level deltas. Fed page by page
+    so only the current book is held in memory."""
+
+    def __init__(self, ticker: str):
+        self.ticker, self.prev, self.lines, self.n = ticker, None, [], 0
+
+    def feed(self, snaps: list[dict]):
+        for s in snaps:
+            cur = _ladders(s)
+            t = _ns(s["timestamp"])
+            self.n += 1
+            if self.prev is None:
+                msg = {"market_ticker": self.ticker, "source": "predexon",
+                       "yes_dollars_fp": [[_fp(p), f"{q:.2f}"] for (sd, p), q in sorted(cur.items()) if sd == "yes"],
+                       "no_dollars_fp": [[_fp(p), f"{q:.2f}"] for (sd, p), q in sorted(cur.items()) if sd == "no"]}
+                self.lines.append((t, json.dumps({"type": "orderbook_snapshot", "msg": msg})))
+            else:
+                for key in sorted(set(cur) | set(self.prev)):
+                    d = cur.get(key, 0.0) - self.prev.get(key, 0.0)
+                    if abs(d) > 1e-9:
+                        self.lines.append((t, json.dumps({"type": "orderbook_delta", "msg": {
+                            "market_ticker": self.ticker, "side": key[0], "price_dollars": _fp(key[1]),
+                            "delta_fp": f"{d:.2f}"}})))
+            self.prev = cur
+
+
 def convert(ticker: str, snaps: list[dict]) -> list[tuple[int, str]]:
-    """Snapshots -> recorder-style lines (t_ns, message json): one snapshot, then per-level deltas."""
-    lines, prev = [], None
-    for s in snaps:
-        cur = _ladders(s)
-        t = _ns(s["timestamp"])
-        if prev is None:
-            msg = {"market_ticker": ticker, "source": "predexon",
-                   "yes_dollars_fp": [[_fp(p), f"{q:.2f}"] for (side, p), q in sorted(cur.items()) if side == "yes"],
-                   "no_dollars_fp": [[_fp(p), f"{q:.2f}"] for (side, p), q in sorted(cur.items()) if side == "no"]}
-            lines.append((t, json.dumps({"type": "orderbook_snapshot", "msg": msg})))
-        else:
-            for key in sorted(set(cur) | set(prev)):
-                d = cur.get(key, 0.0) - prev.get(key, 0.0)
-                if abs(d) > 1e-9:
-                    lines.append((t, json.dumps({"type": "orderbook_delta", "msg": {
-                        "market_ticker": ticker, "side": key[0], "price_dollars": _fp(key[1]), "delta_fp": f"{d:.2f}"}})))
-        prev = cur
-    return lines
+    c = Converter(ticker)
+    c.feed(snaps)
+    return c.lines
 
 
 class Limiter:
@@ -87,7 +99,9 @@ class Limiter:
             await asyncio.sleep(delay)
 
 
-async def fetch_market(client: httpx.AsyncClient, lim: Limiter, ticker: str, start_ms: int, end_ms: int) -> list[dict]:
+async def fetch_market(client: httpx.AsyncClient, lim: Limiter, ticker: str, start_ms: int, end_ms: int,
+                       sink=None) -> list[dict]:
+    """All snapshots in the window; with `sink`, each page goes to sink(page) instead (nothing accumulated)."""
     snaps, key = [], None
     while True:
         params = dict(ticker=ticker, start_time=start_ms, end_time=end_ms, limit=2000)
@@ -109,7 +123,11 @@ async def fetch_market(client: httpx.AsyncClient, lim: Limiter, ticker: str, sta
         else:
             raise RuntimeError(f"{ticker}: gave up after retries")
         d = r.json()
-        snaps += d.get("snapshots") or []
+        page = d.get("snapshots") or []
+        if sink:
+            sink(page)
+        else:
+            snaps += page
         pg = d.get("pagination") or {}
         key = pg.get("pagination_key")
         if not pg.get("has_more") or not key:
@@ -169,12 +187,14 @@ async def run(series: list[str], start: datetime, end: datetime, rps: float, wor
         while not q.empty():
             s, ticker, o, c, day = q.get_nowait()
             try:
-                snaps = await fetch_market(client, lim, ticker, max(o, floor), min(c + 3600_000, cap))
+                conv = Converter(ticker)
+                await fetch_market(client, lim, ticker, max(o, floor), min(c + 3600_000, cap), sink=conv.feed)
                 path = DATA / "backfill" / "books" / s / day / f"{ticker}{EXT}"
-                lines = convert(ticker, snaps) or [(_ns(c), json.dumps({"type": "_empty", "msg": {"market_ticker": ticker}}))]
+                lines = conv.lines or [(_ns(c), json.dumps({"type": "_empty", "msg": {"market_ticker": ticker}}))]
                 await asyncio.to_thread(_write_atomic, path, lines)
                 stats["done"] += 1
-                stats["snaps"] += len(snaps)
+                stats["snaps"] += conv.n
+                del conv, lines
             except Exception:
                 stats["failed"] += 1
                 log.exception("%s: failed (re-run to retry)", ticker)
