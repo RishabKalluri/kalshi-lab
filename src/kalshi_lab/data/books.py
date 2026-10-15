@@ -116,11 +116,12 @@ async def fetch_market(client: httpx.AsyncClient, lim: Limiter, ticker: str, sta
             return snaps
 
 
-def markets_for(series: str, start: datetime, end: datetime) -> list[tuple[str, int, int, str]]:
-    """(ticker, open ms, close ms, close date) for markets that traded, from backfill/kalshi, else Kalshi's listing."""
+def markets_for(series: str, start: datetime, end: datetime, listing: bool = False) -> list[tuple[str, int, int, str]]:
+    """(ticker, open ms, close ms, close date) for markets that traded, from backfill/kalshi (complete history for the
+    series there) unless `listing`, else Kalshi's settled-markets listing."""
     out = []
     root = DATA / "backfill" / "kalshi" / series
-    files = sorted(root.glob(f"*/*{EXT}")) if root.is_dir() else []
+    files = sorted(root.glob(f"*/*{EXT}")) if root.is_dir() and not listing else []
     if files:
         import zstandard
         for f in files:
@@ -145,13 +146,14 @@ def _ms(iso: str) -> int:
     return int(datetime.fromisoformat(iso.replace("Z", "+00:00")).timestamp() * 1000)
 
 
-async def run(series: list[str], start: datetime, end: datetime, rps: float, workers: int, limit: int | None):
+async def run(series: list[str], start: datetime, end: datetime, rps: float, workers: int, limit: int | None,
+              listing: bool = False):
     key = os.environ.get("PREDEXON_API_KEY")
     if not key:
         raise SystemExit("PREDEXON_API_KEY not set")
     jobs = []
     for s in series:
-        ms = markets_for(s, start, end)
+        ms = markets_for(s, start, end, listing)
         todo = [m for m in ms if not (DATA / "backfill" / "books" / s / m[3] / f"{m[0]}{EXT}").exists()]
         log.info("%s: %d markets in range, %d to download", s, len(ms), len(todo))
         jobs += [(s, *m) for m in todo]
@@ -197,10 +199,12 @@ def main(argv=None):
     ap.add_argument("--rps", type=float, default=1.0, help="requests per second (free tier 1, Pro 100)")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--limit", type=int, help="only the first N markets (testing)")
+    ap.add_argument("--listing", action="store_true",
+                    help="take markets from Kalshi's listing (for series whose backfill/kalshi holds only a sample)")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     from .. import auth  # noqa: F401  (loads .env)
     start = datetime.fromisoformat(a.start).replace(tzinfo=timezone.utc)
     end = datetime.fromisoformat(a.end).replace(tzinfo=timezone.utc)
-    asyncio.run(run(a.series, max(start, FIRST), end, a.rps, a.workers, a.limit))
+    asyncio.run(run(a.series, max(start, FIRST), end, a.rps, a.workers, a.limit, a.listing))
