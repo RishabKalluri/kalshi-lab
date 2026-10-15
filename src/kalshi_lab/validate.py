@@ -102,36 +102,40 @@ def _months(first: datetime, last: datetime) -> list[tuple[datetime, datetime]]:
     return out
 
 
-def plan(stage: str, series: list[str], fits: bool = False, min_train: int = 2) -> list[dict]:
-    """The backtest runs (name + source + window + overrides) that make up a stage."""
+def plan(stage: str, series: list[str], fits: bool = False, min_train: int = 2, source: str = "backfill") -> list[dict]:
+    """The backtest runs (name + source + window + overrides) that make up a stage. source="books" (config.json
+    "source") replays historical order books (data/books.py) instead of trades only: for maker strategies."""
     rec = recorded_range(series)
     days = backfill_days(series)
     runs = []
     if not days:
         return runs
     first = datetime.fromisoformat(days[0]).replace(tzinfo=UTC)
+    if source == "books":
+        from .data.books import FIRST
+        first = max(first, FIRST)
     data_end = datetime.fromisoformat(days[-1]).replace(tzinfo=UTC) + timedelta(days=1)
     dev_end = min(LOCKBOX_START, data_end)  # everything before the lockbox
     if stage == "smoke":
         # Mechanics only: the last 6 hours of development data (long enough for ~1h warm-ups).
-        runs.append(dict(name="smoke", source="backfill", start=dev_end - timedelta(hours=6), end=dev_end,
+        runs.append(dict(name="smoke", source=source, start=dev_end - timedelta(hours=6), end=dev_end,
                          fit_until=dev_end - timedelta(hours=6)))
     elif stage == "quick":
-        runs.append(dict(name="quick-backfill", source="backfill", start=dev_end - timedelta(days=3), end=dev_end,
+        runs.append(dict(name="quick-backfill", source=source, start=dev_end - timedelta(days=3), end=dev_end,
                          fit_until=dev_end - timedelta(days=3)))
     elif stage == "full":
         months = _months(first, dev_end)
         train_months = min_train if fits else 0
         for s0, e0 in months[train_months:]:
-            runs.append(dict(name=f"wf-{s0:%Y-%m}", source="backfill", start=s0, end=e0, fit_until=s0))
+            runs.append(dict(name=f"wf-{s0:%Y-%m}", source=source, start=s0, end=e0, fit_until=s0))
         for s0, e0 in months[train_months:][-3:]:
-            runs.append(dict(name=f"lat2x-{s0:%Y-%m}", source="backfill", start=s0, end=e0, fit_until=s0,
+            runs.append(dict(name=f"lat2x-{s0:%Y-%m}", source=source, start=s0, end=e0, fit_until=s0,
                              latency_ms=300))
     elif stage == "lockbox":
         # Data the strategy has never been tested on, fit only on data before the lockbox.
         if data_end > LOCKBOX_START:
             for s0, e0 in _months(LOCKBOX_START, data_end):
-                runs.append(dict(name=f"lockbox-{s0:%Y-%m}", source="backfill", start=s0, end=e0, fit_until=LOCKBOX_START))
+                runs.append(dict(name=f"lockbox-{s0:%Y-%m}", source=source, start=s0, end=e0, fit_until=LOCKBOX_START))
         if rec and rec[1] > LOCKBOX_START:
             runs.append(dict(name="lockbox-recorded", source="recorded", start=max(rec[0], LOCKBOX_START), end=rec[1],
                              fit_until=LOCKBOX_START))
@@ -337,7 +341,7 @@ def main(argv=None):
     from .backtest import load_strategy
     cls = load_strategy(spec)
     fits = callable(getattr(cls, "fit", None))
-    runs = plan(a.stage, series, fits=fits)
+    runs = plan(a.stage, series, fits=fits, source=cfg.get("source", "backfill"))
     if not runs:
         log(f"no data for {series} to run the {a.stage} stage")
         sys.exit(2)
