@@ -127,3 +127,124 @@ def _backfill_markets(files, s_ns, e_ns):
                 yield from parse("kalshi_meta/x", d["t"], m)
             elif s_ns <= d["t"] < e_ns:
                 yield from parse("kalshi_ws/x", d["t"], m)
+
+
+class BooksSource:
+    """Historical order books (backfill/books, Predexon; see data/books.py) + trades and settlements (backfill/kalshi),
+    so maker strategies get real queues on months of history, the same way RecordedSource replays our recordings.
+
+    Markets overlap in time (weather brackets, sports games), so each market is its own time-ordered iterator, opened
+    when the market opens and merged lazily. A market already open at `start` is fast-forwarded: its book is rebuilt
+    from the file and handed to the engine as one snapshot at `start`."""
+
+    LOOKAHEAD = timedelta(days=16)  # markets close up to ~2 weeks after they trade (sports); find them by close date
+
+    def __init__(self, series: list[str], start: datetime, end: datetime, spot: list[str] | None = None,
+                 root: str | None = None):
+        self.root = _root(root).parent / "backfill"
+        self.series, self.start, self.end, self.spot = series, start, end, spot
+
+    def _markets(self):
+        s_ns, e_ns = int(self.start.timestamp() * 1e9), int(self.end.timestamp() * 1e9)
+        day, last = self.start.date(), (self.end + self.LOOKAHEAD).date()
+        out = []
+        while day <= last:
+            for s in self.series:
+                for f in sorted((self.root / "kalshi" / s / day.isoformat()).glob(f"*{EXT}")):
+                    try:
+                        first = json.loads(next(iter(read_lines(f))))
+                    except (StopIteration, PermissionError):
+                        continue
+                    if first["t"] >= e_ns:
+                        continue
+                    books = self.root / "books" / s / day.isoformat() / f.name
+                    out.append((first["t"], f, books if books.exists() else None))
+            day += timedelta(days=1)
+        return s_ns, e_ns, sorted(out, key=lambda x: x[0])
+
+    @staticmethod
+    def _market(trades: Path, books: Path | None, s_ns: int, e_ns: int):
+        def trade_events():
+            for line in read_lines(trades):
+                d = json.loads(line)
+                m = d["m"]
+                if m.get("event") == "discovered":
+                    m = {**m, "market": {**m["market"], "result": "", "expiration_value": ""}}
+                    yield from parse("kalshi_meta/x", d["t"], m)
+                elif m.get("event") == "settled":
+                    if d["t"] < e_ns:
+                        yield from parse("kalshi_meta/x", d["t"], m)
+                    return
+                elif s_ns <= d["t"] < e_ns:
+                    yield from parse("kalshi_ws/x", d["t"], m)
+
+        def book_events():
+            if books is None:
+                return
+            book, ticker, caught_up = {"yes": {}, "no": {}}, None, False
+            for line in read_lines(books):
+                d = json.loads(line)
+                t, m = d["t"], d["m"]
+                if t >= e_ns:
+                    break
+                if t < s_ns:  # before the window: just rebuild the book
+                    msg = m.get("msg", {})
+                    ticker = msg.get("market_ticker", ticker)
+                    if m.get("type") == "orderbook_snapshot":
+                        book = {"yes": dict(msg.get("yes_dollars_fp") or []), "no": dict(msg.get("no_dollars_fp") or [])}
+                    elif m.get("type") == "orderbook_delta":
+                        lv = book[msg["side"]]
+                        q = float(lv.get(msg["price_dollars"], 0)) + float(msg["delta_fp"])
+                        if q > 1e-9:
+                            lv[msg["price_dollars"]] = f"{q:.2f}"
+                        else:
+                            lv.pop(msg["price_dollars"], None)
+                    continue
+                if not caught_up and ticker is not None:
+                    yield from parse("kalshi_ws/x", s_ns, {"type": "orderbook_snapshot", "msg": {
+                        "market_ticker": ticker, "yes_dollars_fp": list(book["yes"].items()),
+                        "no_dollars_fp": list(book["no"].items())}})
+                caught_up = True
+                yield from parse("kalshi_ws/x", t, m)
+            if not caught_up and ticker is not None and s_ns < e_ns:  # open at `start` but no change in the window
+                yield from parse("kalshi_ws/x", s_ns, {"type": "orderbook_snapshot", "msg": {
+                    "market_ticker": ticker, "yes_dollars_fp": list(book["yes"].items()),
+                    "no_dollars_fp": list(book["no"].items())}})
+
+        # trades file first on ties: the market's discovery precedes its first book
+        return heapq.merge(trade_events(), book_events(), key=lambda e: e.ts)
+
+    def __iter__(self):
+        s_ns, e_ns, markets = self._markets()
+        iters = [self._lazy(markets, s_ns, e_ns)]
+        spot_dir = self.root / "spot"
+        if self.spot:
+            days, day = [], self.start.date()
+            while day <= self.end.date():
+                days.append(day.isoformat())
+                day += timedelta(days=1)
+            for n in self.spot:
+                files = [p for d in days if (p := spot_dir / n / f"{d}{EXT}").exists()]
+                iters.append(_stream_events(f"spot/{n}", files, s_ns, e_ns))
+        return merge(iters)
+
+    def _lazy(self, markets, s_ns, e_ns):
+        """Merge per-market iterators, opening each only when the replay reaches its first event."""
+        heap, i, n = [], 0, 0
+        while heap or i < len(markets):
+            while i < len(markets) and (not heap or markets[i][0] <= heap[0][0]):
+                _, trades, books = markets[i]
+                i += 1
+                it = self._market(trades, books, s_ns, e_ns)
+                e = next(it, None)
+                if e is not None:
+                    heapq.heappush(heap, (e.ts, n, e, it))
+                    n += 1
+            if not heap:
+                continue
+            _, _, e, it = heapq.heappop(heap)
+            yield e
+            nxt = next(it, None)
+            if nxt is not None:
+                heapq.heappush(heap, (nxt.ts, n, nxt, it))
+                n += 1

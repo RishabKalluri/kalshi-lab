@@ -23,7 +23,7 @@ from pathlib import Path
 
 from .core.fees import Fees
 from .core.risk import RiskLimits
-from .data.source import BackfillSource, RecordedSource
+from .data.source import BackfillSource, BooksSource, RecordedSource
 from .engine import Engine
 from .recorder.config import book_depth, spot_map
 from .report import print_summary, save, summarize
@@ -80,21 +80,22 @@ def run_one(args: dict) -> dict:
     from .validate import lockbox_guard
     lockbox_guard(start, end)  # lockbox dates only via the pipeline's lockbox stage (or the user's own tools)
     recorded = args["source"] == "recorded"
+    has_book = args["source"] in ("recorded", "books")  # books: historical order books (data/books.py)
     smap = spot_map(args["series"], backfill=not recorded)
     if args["spot"]:  # explicit override: these streams for every series
         smap = {s: list(args["spot"]) for s in args["series"]}
-    src_cls = RecordedSource if recorded else BackfillSource
+    src_cls = {"recorded": RecordedSource, "books": BooksSource}.get(args["source"], BackfillSource)
     source = src_cls(args["series"], start, end, spot=sorted({x for v in smap.values() for x in v}))
     risk = RiskLimits(**args["risk"])
     exch = SimExchange(latency_ms=args["latency_ms"], fees=Fees(), queue_frac=args.get("queue_frac", 1.0))
     t0 = time.time()
     # 1-minute candle feeds (coinbase backfill) need a longer freshness window than live/1s feeds.
     stale = 90 if any(("coinbase" in x or x.endswith("_1m")) for v in smap.values() for x in v) and not recorded else 5
-    eng = Engine(strat, source, exch, risk=risk, timer_ms=args["timer_ms"], has_book=recorded,
+    eng = Engine(strat, source, exch, risk=risk, timer_ms=args["timer_ms"], has_book=has_book,
                  spot_stale_s=stale, start_ts=int(start.timestamp() * 1e9),
                  timeline_s=args.get("timeline_s") or None, spot_map=smap,
                  sizer=parse_sizing(args.get("sizing"), args.get("max_frac", DEFAULT_MAX_FRAC)), cash=args.get("bankroll", 1000.0),
-                 synthetic_depth={s: d for s in args["series"] if (d := book_depth(s))} if not recorded else None)
+                 synthetic_depth={s: d for s in args["series"] if (d := book_depth(s))} if not has_book else None)
     eng.run()
     summary = summarize(eng)
     summary["wall_s"] = round(time.time() - t0, 1)
@@ -111,7 +112,7 @@ def main(argv=None):
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("strategy")
     p.add_argument("--series", nargs="+", default=["KXBTC15M"])
-    p.add_argument("--source", choices=["recorded", "backfill"], default="recorded")
+    p.add_argument("--source", choices=["recorded", "backfill", "books"], default="recorded")
     p.add_argument("--start", help="UTC ISO time (default: --hours before --end)")
     p.add_argument("--end", help="UTC ISO time (default: now)")
     p.add_argument("--hours", type=float, default=24)
