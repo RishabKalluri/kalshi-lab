@@ -12,6 +12,13 @@ for u in kalshi-nightly kalshi-data-pull; do systemctl is-active --quiet $u && b
 # one-off downloads: systemd-run --unit=kalshi-data-<name> ...
 systemctl list-units --type=service --state=active --no-legend 'kalshi-data-*' | grep -q . && busy="$busy data-jobs"
 [ -n "$(who)" ] && busy="$busy ssh"
+# a scheduled batch or download starts within 45 min (the trading server wakes us at 00:20 for 00:30/00:45): stay up.
+# Without this, a machine left running from the day stopped itself at 00:26 and skipped the night's work.
+for t in kalshi-nightly kalshi-agents; do
+  nxt=$(systemctl show $t.timer -p NextElapseUSecRealtime --value 2>/dev/null)
+  [ -n "$nxt" ] && [ $(( $(date -d "$nxt" +%s 2>/dev/null || echo 0) - $(date +%s) )) -lt 2700 ] \
+    && [ $(( $(date -d "$nxt" +%s 2>/dev/null || echo 0) - $(date +%s) )) -gt 0 ] && busy="$busy $t-soon"
+done
 if [ -n "$busy" ]; then rm -f $STATE; exit 0; fi
 [ -f $STATE ] || date +%s > $STATE
 if [ $(( $(date +%s) - $(cat $STATE) )) -ge 1800 ]; then
