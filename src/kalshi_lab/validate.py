@@ -205,8 +205,10 @@ def pooled_card(run_dirs: list[Path], n_boot: int = 2000) -> dict | None:
     ms = []
     for d in run_dirs:
         if (d / "markets.csv").exists():
-            m = pd.read_csv(d / "markets.csv", parse_dates=["settle_time"])
-            ms.append(m[m.fills > 0])
+            m = pd.read_csv(d / "markets.csv")
+            # unsettled at the window's end (e.g. a game still open at the month boundary): not a result yet
+            m["settle_time"] = pd.to_datetime(m.settle_time, errors="coerce", utc=True)
+            ms.append(m[(m.fills > 0) & m.settle_time.notna()])
     if not ms:
         return None
     t = pd.concat(ms)
