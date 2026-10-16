@@ -3,7 +3,7 @@
 
 Applies only when KALSHI_AGENT_RUN is set (an agent run's folder); the laptop and interactive sessions are unaffected.
 Blocks a stop while the agent's test jobs are queued or running, before it has written done.json, or when done.json says
-"exhausted" with more than EXHAUSTED_AFTER minutes left (agents gave up after 37 min once their brief's ideas died),
+"exhausted" or "needs_user" with more than EXHAUSTED_AFTER minutes left (agents gave up after 7-37 min),
 unless less than WRAP_UP minutes are left before its deadline.
 """
 
@@ -48,6 +48,11 @@ def main():
             reason = json.loads(done.read_text()).get("reason", "")
         except ValueError:
             pass
+    if reason == "needs_user" and left > EXHAUSTED_AFTER:  # overnight agents quit after 7-9 minutes this way
+        block(f"done.json says needs_user, but you have {left / 60:.1f} h left. Keep the request in report.md's "
+              "## Requests; the user reads it in the morning. Until then, work on the best idea that uses data you have: "
+              "variations of strategies that passed (derived_from), untaken IDEAS.md items, or your own, and take at "
+              "least one through the pipeline. Remove or update done.json when you're done.")
     if reason == "exhausted" and left > EXHAUSTED_AFTER:
         block(f"done.json says exhausted, but you have {left / 60:.1f} h left. Your brief is where you start, not where you "
               "stop: its ideas are dead, so take the next most promising idea from strategies/IDEAS.md (untaken) or your "

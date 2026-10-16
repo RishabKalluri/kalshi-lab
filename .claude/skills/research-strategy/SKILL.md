@@ -29,8 +29,8 @@ applies, with the differences below.
   - `exhausted`: you seriously tried at least 4 distinct hypotheses (each with real research and pipeline runs) and
     none survived, or your budgets are used up. Only in your last 90 minutes: **your brief is where you start, not
     where you stop.** When its ideas are dead, move to the next most promising idea (IDEAS.md or your own, any theme).
-  - `needs_user`: everything worth trying next needs data or infrastructure only the user can provide; the report's
-    `## Requests` section says exactly what and why. Prefer working on something else that has data first.
+  - `needs_user`: only in your last 90 minutes, like `exhausted`. Before then, put the request in `## Requests` and
+    keep working on ideas that have data (variations of strategies that passed, IDEAS.md, your own).
   In the last 15 minutes you may stop without done.json once the report is complete.
 
 ## Pick ideas worth the time
