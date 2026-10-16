@@ -110,7 +110,7 @@ class SimExchange:
         o.filled += q
         if o.remaining <= 1e-9:
             o.status = "filled"
-        return Fill(ts, o.id, o.ticker, o.side, px, q, self.fees(px, q, maker), maker, o.tag)
+        return Fill(ts, o.id, o.ticker, o.side, px, q, self.fees(px, q, maker, o.ticker), maker, o.tag)
 
     def on_delta(self, d: BookDelta, book: Book):
         key = (d.ticker, d.side, d.price)

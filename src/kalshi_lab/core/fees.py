@@ -11,7 +11,7 @@ class Fees:
         self.taker_rate = taker_rate * multiplier
         self.maker_rate = maker_rate * multiplier
 
-    def __call__(self, price_mills: int, qty: float, maker: bool) -> float:
+    def __call__(self, price_mills: int, qty: float, maker: bool, ticker: str | None = None) -> float:
         rate = self.maker_rate if maker else self.taker_rate
         if rate == 0:
             return 0.0
@@ -23,3 +23,21 @@ class Fees:
         mult = float(series_row.get("fee_multiplier", 1))
         maker = 0.0175 if series_row.get("fee_type") == "quadratic_with_maker_fees" else 0.0
         return cls(maker_rate=maker, multiplier=mult)
+
+
+class SeriesFees:
+    """Each market's fee schedule by its series (recorder/config.py MARKETS: fee_type, fee_multiplier); `default` for
+    series not listed (crypto 15M: quadratic, takers only)."""
+
+    def __init__(self, default: Fees | None = None):
+        self.default = default or Fees()
+        self.by_series: dict[str, Fees] = {}
+
+    def __call__(self, price_mills: int, qty: float, maker: bool, ticker: str | None = None) -> float:
+        series = ticker.split("-")[0] if ticker else ""
+        f = self.by_series.get(series)
+        if f is None:
+            from ..recorder.config import MARKETS
+            m = MARKETS.get(series)
+            f = self.by_series[series] = Fees.for_series(m) if m and "fee_type" in m else self.default
+        return f(price_mills, qty, maker)

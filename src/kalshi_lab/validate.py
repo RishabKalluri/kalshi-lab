@@ -48,6 +48,13 @@ def backfill_days(series: list[str]) -> list[str]:
     return sorted(set.intersection(*sets)) if sets and all(sets) else []
 
 
+def books_last_day(series: list[str], before: datetime) -> datetime | None:
+    """The last close-date folder of historical order books (any of `series`) before `before`."""
+    days = {p.name for s in series for p in (BACKFILL / "books" / s).glob("*") if p.is_dir() and any(p.iterdir())}
+    days = sorted(d for d in days if d < before.strftime("%Y-%m-%d"))
+    return datetime.fromisoformat(days[-1]).replace(tzinfo=UTC) if days else None
+
+
 def recorded_range(series: list[str]) -> tuple[datetime, datetime] | None:
     files = sorted(f for s in series for f in (DATA / "kalshi_ws" / s).glob("*/*.jsonl.zst"))
     if not files:
@@ -116,6 +123,15 @@ def plan(stage: str, series: list[str], fits: bool = False, min_train: int = 2, 
         first = max(first, FIRST)
     data_end = datetime.fromisoformat(days[-1]).replace(tzinfo=UTC) + timedelta(days=1)
     dev_end = min(LOCKBOX_START, data_end)  # everything before the lockbox
+    if source == "books" and stage in ("smoke", "quick"):
+        # Long-lived markets (weather, sports) may have nothing live in the hours before the lockbox (weather closes at
+        # 05:00 UTC; no NBA/NHL in late August): end the short stages where the last pre-lockbox markets close instead.
+        last = books_last_day(series, dev_end)
+        if last is not None:
+            end = min(dev_end, last + timedelta(hours=4))
+            span = timedelta(hours=6) if stage == "smoke" else timedelta(days=3)
+            name = "smoke" if stage == "smoke" else "quick-books"
+            return [dict(name=name, source=source, start=end - span, end=end, fit_until=end - span)]
     if stage == "smoke":
         # Mechanics only: the last 6 hours of development data (long enough for ~1h warm-ups).
         runs.append(dict(name="smoke", source=source, start=dev_end - timedelta(hours=6), end=dev_end,
@@ -152,6 +168,8 @@ def run_backtest(strategy: str, series: list[str], params: list[str], r: dict, o
     cmd = [sys.executable, "-m", "kalshi_lab", "backtest", strategy, "--series", *series, "--source", r["source"],
            "--start", r["start"].isoformat(), "--end", r["end"].isoformat(), "--out", str(out),
            "--latency-ms", str(r.get("latency_ms", 150)), "--workers", "1"]
+    if r["source"] == "books":  # many long-lived markets open at once: the 5 s chart timeline alone needs >6 GB/month
+        cmd += ["--timeline-s", "0"]
     for p in params:
         cmd += ["-p", p]
     log(f"  [{i}/{n}] {datetime.now(UTC):%Y-%m-%dT%H:%M:%S} running {r['name']}: {r['source']} "

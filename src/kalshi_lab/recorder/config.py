@@ -17,6 +17,8 @@
   lookahead_s    subscribe to markets closing within this many seconds (default 1800, for 15-minute series)
   needs_strike   wait for floor_strike on discovery (default True; bracket markets may never have one)
   settle_poll_s  min seconds between settlement checks per closed market (default: every discovery poll)
+  fee_type, fee_multiplier   the series' Kalshi fee schedule (GET /series/<s>), used by backtests and paper
+                 (core/fees.py SeriesFees); omitted = quadratic, takers only (the crypto 15M series)
 
 Backfill of Kalshi trades works for any series without an entry (no spot), e.g. KXBTC / KXBTCD ladders.
 """
@@ -60,16 +62,19 @@ WEATHER = ["KXRAIN", "KXHIGHLAX", "KXHIGHMIA", "KXHIGHNY", "KXHIGHCHI", "KXHIGHA
 # book_depth 25 is a conservative placeholder until a few days of recorded books give the real p25.
 for _s in WEATHER:
     MARKETS[_s] = dict(live_spot=[], settlement="nws", record=False, lookahead_s=3 * 86400, needs_strike=False,
-                       settle_poll_s=600, book_depth=25)
+                       settle_poll_s=600, book_depth=25, fee_type="quadratic", fee_multiplier=1)
 
 # Sports game winners (Oct 13 2026): backfill only, for the in-game longshot-fade POC (sports_breaks screen: takers
 # buying NBA/NHL sides under 20c lose 5-7c). No books recorded yet; book_depth is a conservative placeholder.
 # Books recorded from Oct 13 2026 (kalshi-recorder-sports) for maker research: pre-game and break quoting. Game markets
 # list up to ~2 weeks ahead (close_time is a backstop; they settle when the game ends).
 SPORTS = ["KXNFLGAME", "KXNFLTOTAL", "KXNCAAFGAME", "KXNBAGAME", "KXNHLGAME", "KXMLBGAME", "KXEPLGAME"]
+# Fee schedules from GET /series (Oct 13 2026): all charge makers (quadratic_with_maker_fees); MLB at half rate.
+SPORTS_FEE_MULT = {"KXMLBGAME": 0.5}
 for _s in SPORTS:
     MARKETS[_s] = dict(live_spot=[], settlement="game", record=False, lookahead_s=16 * 86400, needs_strike=False,
-                       settle_poll_s=600, book_depth=50)
+                       settle_poll_s=600, book_depth=50, fee_type="quadratic_with_maker_fees",
+                       fee_multiplier=SPORTS_FEE_MULT.get(_s, 1))
 
 # XRP 15M (Oct 13 2026): xrp-volfav passed its lockbox; recorded in its own unit (spot feeds + books) so paper has
 # warm-up history and books without restarting the main crypto recorder.

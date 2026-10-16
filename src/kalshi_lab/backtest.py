@@ -21,7 +21,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from .core.fees import Fees
+from .core.fees import Fees, SeriesFees
 from .core.risk import RiskLimits
 from .data.source import BackfillSource, BooksSource, RecordedSource
 from .engine import Engine
@@ -87,7 +87,7 @@ def run_one(args: dict) -> dict:
     src_cls = {"recorded": RecordedSource, "books": BooksSource}.get(args["source"], BackfillSource)
     source = src_cls(args["series"], start, end, spot=sorted({x for v in smap.values() for x in v}))
     risk = RiskLimits(**args["risk"])
-    exch = SimExchange(latency_ms=args["latency_ms"], fees=Fees(), queue_frac=args.get("queue_frac", 1.0))
+    exch = SimExchange(latency_ms=args["latency_ms"], fees=SeriesFees(), queue_frac=args.get("queue_frac", 1.0))
     t0 = time.time()
     # 1-minute candle feeds (coinbase backfill) need a longer freshness window than live/1s feeds.
     stale = 90 if any(("coinbase" in x or x.endswith("_1m")) for v in smap.values() for x in v) and not recorded else 5
