@@ -1,0 +1,24 @@
+{
+  "slug": "bell-pool",
+  "name": "Scheduled Bell Pool",
+  "series": [
+    "KXETH15M",
+    "KXBTC15M"
+  ],
+  "derived_from": "us-hours-vol",
+  "class": "BellUnderdog",
+  "status": "developing",
+  "description": "Kalshi's 15-minute crypto prices under-react to two scheduled volatility jumps tied to traditional markets opening: the 9:30 ET US stock market open (weekdays) and the Sunday 6 pm ET CME futures reopen. In those windows, a few minutes in, buy whichever side is currently losing (ETH and BTC); pooling both bells gives the sample size neither had alone.",
+  "hypothesis": "Scheduled TradFi venue openings are vol steps (9:30 ET: +1.03 log vs month mean; Sunday 18:00 ET: +0.9) that Kalshi's trailing-vol pricing misses (implied vol ~0.25-0.3 log low), so the underdog is cheap. Losers: favourite buyers and bots using trailing vol without a clock prior. Rule is us-hours-vol v2 unchanged, plus the Sunday bell, ETH+BTC fixed in advance (SOL excluded: it prices both bells, research -0.5c and +0.7c). Mon-Thu 18:00 excluded (weak: ETH +5c se 4.5, BTC -0.7c). Wrong if the pooled full walk-forward CI isn't above 0, or <60% of months positive, or the Sunday bell pulls the pool down.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Smoke+quick, then full 1/3 (queue directly if quick has no trades).",
+  "paper_params": [
+    "slip_c=1"
+  ]
+}

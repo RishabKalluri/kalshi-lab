@@ -38,7 +38,6 @@ runs as a separate paper trader beside it.
 | 5 | 10-13 | capacity: replayed recorded books Sep 29–Oct 12 through v2, book at decision and +150 ms (605 would-be orders; no P&L) | calibration | depth on the buy side median 92 at the touch, 569 within +1¢, 1,145 within +2¢. IOC slippage vs size (+2¢ limit): 100 ct 0.28¢, 200 ct 0.44¢, 500 ct 0.67¢, 1,000 ct 0.94¢. ~48 signals/day on ~29 markets (1.65/market). Cleared levels rarely refill within 5 s | capacity is far above live size (~3 ct). Use +2¢ limit from ~100 ct; assume later checkpoints in the same market fill ≥1¢ worse |
 | 6 | 10-14 | paper vs v1 paper, Oct 12 22:40 - Oct 14 03:00 (~28h) | paper | v2 22 markets, 203 ct, +$28.17 (+13.9¢/ct); v1 15 markets, 143 ct, +$19.08 (+13.3¢); shared 14 markets +14.3¢; v2-only 8 markets +12.6¢ | +47% markets as calibrated; extra trades too few to judge |
 | 7 | 10-14 | live: replaces v1 in tmux live-eth-volfav ($1,000, 1%/order, rv_scale=1.02, slip_c=1) | live | started 03:05 UTC, flat at switch | user chose to switch before the planned 10-day check |
-| 8 | 10-14 | monthly refit routine (research/refit_live.py, 1st of month; S3 -> models-pull -> hot reload); first forced refit on all markets to Oct 14 | refit | 27,592 markets (was 23,922 to Sep 29); threshold 1.426 -> 1.399; rv betas 0.49/0.14/0.16 | same expanding-window refit the walk-forward validated |
 
 ## Learnings
 - **Calibrate live-vs-backtest inputs over weeks, not one day.** One partial day gave 1.09; two weeks give 1.02.
@@ -47,6 +46,5 @@ runs as a separate paper trader beside it.
   ~570 within 1¢ at signal times), so backfill tests understate capacity; they don't test the edge at large size.
 
 ## Current status
-- Model: refit monthly (1st, UTC) by research/refit_live.py; live/paper read ~/kalshi-data/models/eth-volfav2/ (params/ is the fallback and the backtest model).
 - Stage: **live** since Oct 14 03:05 UTC ($1,000, 1%/order, rv_scale=1.02, slip_c=1, stop-loss $200; tmux `live-eth-volfav`). Paper continues beside it; eth-volfav (v1) paper is the comparison for the extra trades.
 - Next: compare v2's extra trades vs v1 paper (~150 orders, ~Oct 22-26). If they lose clearly, move live back to v1 (user's OK). rv_scale re-check after 2 more weeks of recordings.

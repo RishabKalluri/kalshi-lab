@@ -1,0 +1,22 @@
+{
+  "slug": "sports-tails",
+  "name": "Sports extremes maker",
+  "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+  ],
+  "derived_from": "pregame-maker",
+  "class": "SportsTails",
+  "status": "developing",
+  "description": "Post-only bids on heavy favourites (bid >= 90c) and offers on longshots (ask <= 10c) in NBA and NHL game-winner markets, from 6 h before the estimated start through the game (cancelled at settlement). At the extremes the maker fee is ~0.14c against a 0.5c half-spread, and quotes are pulled when the mid moves 2c in 5 min (comebacks).",
+  "hypothesis": "Takers who buy cheap longshots / sell near-certain favourites pay the 1c tick, which is 5-10% of the price there; the maker fee at the extremes is only 0.14c, so unlike mid-price quoting (pregame-maker: markout 0.25c < fee 0.44c) the spread is not eaten by the fee. Adverse selection comes from comebacks; the price-momentum pull is the protection. Wrong if the walk-forward pooled CI (net of maker fee) is <= 0, or the lockbox loses. Prior check: pooled Jan-May ad-hoc engine runs +1.5c/contract net of the exact maker fee.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-16",
+  "next": "Blocked on infra: the pipeline's full died (very likely OOM: 13 GB/month of engine timeline vs 6 GB sandbox, 3 months in parallel). After the engine opts out of timeline sampling for books runs (research/infra_requests.md) rerun full (the quick record 'rejected at quick' is mechanical: no games Aug 29-Sep 1); lockbox only if promising. Net-of-maker-fee ad hoc: +1.37c, CI +0.03..+2.65.",
+  "source": "books"
+}

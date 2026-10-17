@@ -1,0 +1,24 @@
+{
+  "slug": "bell-alts",
+  "name": "9:30 Bell Underdog on XRP+DOGE",
+  "series": [
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "us-hours-vol",
+  "class": "OpenUnderdog",
+  "status": "parked",
+  "description": "us-hours-vol v2 unchanged on XRP and DOGE: in the 15-minute window that starts at the 9:30 ET US stock market open, buy whichever side is currently losing, because Kalshi prices the window off the calm pre-open minutes and under-expects the opening-bell vol jump. XRP and DOGE add independent markets to an idea that was sample-limited on ETH+BTC.",
+  "hypothesis": "Crypto intraday vol is shaped by US market hours (profile follows NY time across DST; the 9:30 ET window has ~2x the vol of 9:15). Kalshi's 15-minute price prices the remaining move off recent, calm pre-open vol, so in the 9:30 window implied vol is too low and the underdog is cheap. Losers: favourite buyers and quoting bots using trailing vol without a time-of-day prior. Wrong if: the underdog at next real fills after fee loses in either half of development data, the weekend/holiday 9:30 placebo shows the same, or the walk-forward months are mostly negative. Rule fixed in advance from us-hours-vol v2 (slots 09:30, underdog 10-45c, max_spread 60 mills); no tuning on XRP/DOGE. Sample: ~140 + ~115 weekday windows.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-14",
+  "next": "Full 1/3 inconclusive (+4.18c, CI -3.54..+12.49, 171 mkts, 4/6 months). Same size as us-hours-vol (+4.3c ETH+BTC) and bell-pool's ETH+BTC test. Two sample-limited folders agree on ~+4c; if bell-pool turns promising, consider adding XRP/DOGE to it rather than a separate lockbox. No tuning done.",
+  "paper_params": [
+    "slip_c=1"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "slug": "pregame-maker",
+  "name": "Pregame maker",
+  "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+  ],
+  "derived_from": "",
+  "class": "PregameMaker",
+  "status": "rejected",
+  "description": "Posts two-sided post-only quotes at the touch on NBA/NHL game-winner markets from a few hours before the game until ~8 minutes before the estimated start, then cancels everything. Earns the spread retail takers pay while information arrives slowly pre-game; pulls a side after fast mid moves and caps net exposure per game.",
+  "hypothesis": "Pre-game takers pay the spread and prices are calibrated, so a maker joining the touch earns (half-spread - maker fee 0.0175p(1-p)) minus adverse selection from slow news. Proven wrong if net-of-maker-fee pnl per contract has CI <= 0: the 1c tick leaves only ~0.06c at 50c, so the edge can only be in the price tails (cheap maker fee) or thin/wide-spread hours.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-15",
+  "next": "Rejected: mid-price touch quoting nets -0.09c/contract (CI -1.04..+0.84, 928 games Jan-Mar) after the 0.44c maker fee. Extremes-only variant continues in strategies/sports-tails.",
+  "source": "books"
+}

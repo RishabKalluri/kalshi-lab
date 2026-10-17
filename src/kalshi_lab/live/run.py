@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 
 from ..backtest import load_strategy, parse_params
-from ..core.fees import Fees
+from ..core.fees import SeriesFees
 from ..core.risk import RiskLimits
 from ..engine import Engine
 from ..report import print_summary, save, summarize
@@ -98,7 +98,7 @@ def main(argv=None, mode: str = "paper"):
         from .exchange import KalshiExchange
         exch = KalshiExchange(dry_run=a.dry_run)
     else:
-        exch = SimExchange(latency_ms=a.latency_ms, fees=Fees())
+        exch = SimExchange(latency_ms=a.latency_ms, fees=SeriesFees())  # per-series fee schedule, as in backtests
 
     strat = load_strategy(a.strategy)(**parse_params(a.param))
     risk = RiskLimits(max_position=a.max_position, max_order_qty=a.max_order_qty, max_loss=a.max_loss)

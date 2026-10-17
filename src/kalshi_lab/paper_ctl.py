@@ -19,7 +19,7 @@ CONF = ROOT / "deploy" / "paper"
 HOST = "kalshi"
 
 
-MAX_PAPER = 4  # concurrent paper traders: the server is small and must keep recording smoothly
+MAX_PAPER = 6  # concurrent paper traders: the server is small and must keep recording smoothly (weather ones are light)
 
 
 def _entry(slug: str) -> dict:

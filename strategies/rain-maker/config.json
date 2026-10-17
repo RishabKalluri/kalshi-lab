@@ -1,0 +1,21 @@
+{
+  "slug": "rain-maker",
+  "name": "Rain maker (real books)",
+  "series": [
+    "KXRAIN"
+  ],
+  "derived_from": "rain-no",
+  "class": "RainMaker",
+  "status": "paper_candidate",
+  "description": "Rests a post-only offer of YES (= sells NO-side exposure; no maker fee on weather) at the best ask on KXRAIN city-days in the last 6 h before the close when the YES bid is 10-90c, up to 40 contracts short per market, held to settlement. Retail buys the YES lottery ticket (rain-no found YES takers lose 7-17c/ct); a maker collects the ask instead of paying the bid.",
+  "hypothesis": "rain-no (taker, trade-synthesized book) earns +14.1c dev / +4.5c lockbox. On the REAL recorded books for the same dev days (Jul 16-Aug 31, ad hoc engine runs, fixed 10 contracts) the taker rule nets +9.6c/ct (CI +4.5..+14.2, 210 mkts, 42 days) and a post-only offer at the touch nets +16.75c/ct (CI +8.5..+23.1, 181 mkts, 6,298 contracts, 37/42 days, Jul +29.9 Aug +13.0). Counterparty: retail buying YES at the ask on a forecast PoP. Wrong if the walk-forward CI (pooled, city-day clusters) <= 0, the 2x-latency run loses, or the Sep 1+ lockbox loses (autumn frontal rain, informed YES buyers once rain has started).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "Passed the lockbox (weak): +5.84c/ct, CI -0.26..+12.01, 139 mkts (dev full +16.78c, CI +9.8..+23.3). Recorded books Oct 13-16: -7.1c on 17 mkts. Next: user decides paper; paper on KXRAIN recorded books checks the queue fills at the ask; audit before live.",
+  "source": "books"
+}

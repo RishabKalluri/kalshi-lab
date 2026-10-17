@@ -1,0 +1,21 @@
+{
+  "slug": "nhl-quiet",
+  "name": "NHL quiet-window maker",
+  "series": [
+    "KXNHLGAME"
+  ],
+  "derived_from": "pregame-maker",
+  "class": "NhlQuiet",
+  "status": "rejected",
+  "description": "Post-only quotes at the touch on NHL game-winner markets only in the news-free stretches: from 3 h before the estimated start to 8 min before it, and inside the two intermissions (fixed windows after the start estimate). Cancelled during play. Earns the spread plus the loss of uninformed retail takers (NHL takers lose ~1.5c pre-game and ~1.6c in intermissions vs 0.3c live).",
+  "hypothesis": "Away from the action NHL flow is mostly retail: takers lose 1.5-1.6c/contract pre-game and in intermissions (event-clustered CI excludes 0 for intermissions) but only 0.3c in live play, and short-horizon markouts are ~0, so a maker at the touch is not picked off. Maker fee is 0.44c at 50c, so net edge ~1c if the taker losses are real. Wrong if the walk-forward pooled CI (net of maker fee) is <= 0 or the lockbox loses. NBA takers lose nothing anywhere, so NBA is excluded.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-16",
+  "next": "Rejected at ad hoc engine runs (books, Jan 7-Apr 30, 611 games): net -2.06c/contract, CI -3.52..-0.63; intermission fills -3.5/-4.9c. No pipeline run (CI entirely below 0). Taker losses in NHL quiet windows (-1.5c) do not reach a back-of-queue maker.",
+  "source": "books"
+}

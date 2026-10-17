@@ -1,0 +1,20 @@
+{
+  "slug": "sol-gbm",
+  "name": "SOL residual GBM",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Research-only folder: SOL residual GBM, perp lead, perp basis screens (all no net edge).",
+  "hypothesis": "A walk-forward GBM on spot/vol/flow/clock features beats the SOL market price after fees. It did not (Brier 0.1174 vs 0.1180; net -0.5..-1.2c).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-14",
+  "next": "none"
+}

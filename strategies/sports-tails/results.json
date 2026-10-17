@@ -1,0 +1,367 @@
+{
+ "runs": [
+  {
+   "stage": "quick",
+   "job": "sports-tails-1016-011438",
+   "started": "2026-10-16T01:14:44.029448+00:00",
+   "finished": "2026-10-16T01:14:44.415820+00:00",
+   "git": "78a6f3f+dirty",
+   "code": "313b0d8266e8f8c9",
+   "code_v": 2,
+   "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+   ],
+   "derived_from": "pregame-maker",
+   "params": [],
+   "note": "quick on the off-season window (no games): permission/mechanics check after chmod g+w",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-29T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "rejected at quick",
+   "gate": "no trades in the quick stage",
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "94070a68ad034015cac41d95535d5d39f92d3686c246e3a26afb9d5b19509d40",
+   "hash": "30a668697eca55207bb53ae21cd0413a78418813e632806c62798914461ae496"
+  },
+  {
+   "stage": "smoke",
+   "job": "sports-tails-1016-035454",
+   "started": "2026-10-16T03:56:40.225160+00:00",
+   "finished": "2026-10-16T03:56:43.806123+00:00",
+   "git": "f2ef70b+dirty",
+   "code": "2bcd8b9d03b06409",
+   "code_v": 2,
+   "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+   ],
+   "derived_from": "pregame-maker",
+   "params": [],
+   "note": "rerun after infra fixes: per-series maker fees in the engine, no chart timeline on books runs, quick window on the last pre-lockbox games",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-06-14T22:00:00+00:00",
+     "2026-06-15T04:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 6.08,
+     "contracts": 100.0,
+     "markets": 1,
+     "fees": 0.12,
+     "pnl_per_contract_c": 6.08,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "30a668697eca55207bb53ae21cd0413a78418813e632806c62798914461ae496",
+   "hash": "6aee999c6cf42744d406cdf8a7e24ca8687e820975f138165c40c18b2d64c3d7"
+  },
+  {
+   "stage": "quick",
+   "job": "sports-tails-1016-035454",
+   "started": "2026-10-16T03:56:49.563969+00:00",
+   "finished": "2026-10-16T03:56:56.946236+00:00",
+   "git": "f2ef70b+dirty",
+   "code": "2bcd8b9d03b06409",
+   "code_v": 2,
+   "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+   ],
+   "derived_from": "pregame-maker",
+   "params": [],
+   "note": "rerun after infra fixes: per-series maker fees in the engine, no chart timeline on books runs, quick window on the last pre-lockbox games",
+   "iteration": 1,
+   "windows": {
+    "quick-books": [
+     "2026-06-12T04:00:00+00:00",
+     "2026-06-15T04:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-books": {
+     "pnl": 11.98,
+     "contracts": 200.0,
+     "markets": 2,
+     "fees": 0.22,
+     "pnl_per_contract_c": 5.99,
+     "t_stat": 66.56,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "6aee999c6cf42744d406cdf8a7e24ca8687e820975f138165c40c18b2d64c3d7",
+   "hash": "3e3ddc1bb0b0868dd72f47169d2976d79b8e4ec587bff6b6c2419224584c5309"
+  },
+  {
+   "stage": "full",
+   "job": "sports-tails-1016-042742",
+   "started": "2026-10-16T04:27:48.293741+00:00",
+   "finished": "2026-10-16T04:41:13.845195+00:00",
+   "git": "bf3cfed+dirty",
+   "code": "2bcd8b9d03b06409",
+   "code_v": 2,
+   "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+   ],
+   "derived_from": "pregame-maker",
+   "params": [],
+   "note": "rerun full after pooled_card fix (unsettled markets at window end)",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-01": [
+     "2026-01-07T00:00:00+00:00",
+     "2026-02-01T00:00:00+00:00"
+    ],
+    "wf-2026-02": [
+     "2026-02-01T00:00:00+00:00",
+     "2026-03-01T00:00:00+00:00"
+    ],
+    "wf-2026-03": [
+     "2026-03-01T00:00:00+00:00",
+     "2026-04-01T00:00:00+00:00"
+    ],
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-01": {
+     "pnl": 724.85,
+     "contracts": 42695.0,
+     "markets": 481,
+     "fees": 61.17,
+     "pnl_per_contract_c": 1.698,
+     "t_stat": 1.75,
+     "max_drawdown": 281.63,
+     "rejects": 0,
+     "ci95_c": [
+      -0.326,
+      3.536
+     ],
+     "days_positive": "15/24"
+    },
+    "wf-2026-02": {
+     "pnl": 101.43,
+     "contracts": 25645.0,
+     "markets": 279,
+     "fees": 36.22,
+     "pnl_per_contract_c": 0.396,
+     "t_stat": 0.28,
+     "max_drawdown": 402.91,
+     "rejects": 0,
+     "ci95_c": [
+      -2.611,
+      2.991
+     ],
+     "days_positive": "14/21"
+    },
+    "wf-2026-03": {
+     "pnl": 1475.88,
+     "contracts": 44976.0,
+     "markets": 505,
+     "fees": 63.07,
+     "pnl_per_contract_c": 3.281,
+     "t_stat": 4.41,
+     "max_drawdown": 314.93,
+     "rejects": 0,
+     "ci95_c": [
+      1.799,
+      4.675
+     ],
+     "days_positive": "24/30"
+    },
+    "wf-2026-04": {
+     "pnl": -15.92,
+     "contracts": 39596.52,
+     "markets": 441,
+     "fees": 54.22,
+     "pnl_per_contract_c": -0.04,
+     "t_stat": -0.04,
+     "max_drawdown": 746.32,
+     "rejects": 0,
+     "ci95_c": [
+      -2.349,
+      2.16
+     ],
+     "days_positive": "18/30"
+    },
+    "wf-2026-05": {
+     "pnl": 151.47,
+     "contracts": 8474.93,
+     "markets": 84,
+     "fees": 12.18,
+     "pnl_per_contract_c": 1.787,
+     "t_stat": 0.78,
+     "max_drawdown": 324.11,
+     "rejects": 0,
+     "ci95_c": [
+      -3.03,
+      5.837
+     ],
+     "days_positive": "21/23"
+    },
+    "wf-2026-06": {
+     "pnl": -225.91,
+     "contracts": 1132.96,
+     "markets": 11,
+     "fees": 1.58,
+     "pnl_per_contract_c": -19.94,
+     "t_stat": -1.44,
+     "max_drawdown": 265.68,
+     "rejects": 0,
+     "ci95_c": [
+      -47.468,
+      5.108
+     ],
+     "days_positive": "6/8"
+    },
+    "wf-2026-07": {
+     "pnl": 0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    },
+    "wf-2026-08": {
+     "pnl": 0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    },
+    "lat2x-2026-06": {
+     "pnl": -227.49,
+     "contracts": 1130.44,
+     "markets": 11,
+     "fees": 1.57,
+     "pnl_per_contract_c": -20.124,
+     "t_stat": -1.46,
+     "max_drawdown": 267.18,
+     "rejects": 0,
+     "ci95_c": [
+      -47.471,
+      4.955
+     ],
+     "days_positive": "6/8"
+    },
+    "lat2x-2026-07": {
+     "pnl": 0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    },
+    "lat2x-2026-08": {
+     "pnl": 0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    },
+    "POOLED": {
+     "pnl": 2211.8,
+     "contracts": 161529.40999999997,
+     "markets": 1801,
+     "pnl_per_contract_c": 1.369,
+     "ci95_c": [
+      0.364,
+      2.356
+     ],
+     "days_positive": "98/136",
+     "max_drawdown": 832.51
+    },
+    "POOLED-lat2x": {
+     "pnl": -227.49,
+     "contracts": 1130.44,
+     "markets": 11,
+     "pnl_per_contract_c": -20.124,
+     "ci95_c": [
+      -47.471,
+      4.955
+     ],
+     "days_positive": "6/8",
+     "max_drawdown": 267.18
+    }
+   },
+   "verdict": "inconclusive",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "3e3ddc1bb0b0868dd72f47169d2976d79b8e4ec587bff6b6c2419224584c5309",
+   "hash": "600fdc1be4d64c090248e251b3c6524b50438e423736eda16a5c0bd3e8fd7d33"
+  }
+ ]
+}

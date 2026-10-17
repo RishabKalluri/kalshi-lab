@@ -53,6 +53,6 @@ Newest last. Every pipeline run gets a line; every change gets a reason.
 - Live composite vs Binance rv: SOL 1.11, ETH 1.01 (Oct 1–7). ETH paper traders use rv_scale=1.09; worth re-checking.
 
 ## Current status
-- Stage: **parked** Oct 13: paper paused to free a slot for xrp-volfav (strong lockbox pass). Paper Oct 7-13: -$22.84 on 16 fills (0.5%/order, slip_c=1, rv_scale=1.11) on a weak lockbox pass. Full 1/3 used (promising); lockbox spent (pass).
-- Next (if resumed): ~2 weeks of paper to check fills at the open on SOL's thinner books; then `kalshi-lab audit sol-midrev` and
+- Stage: **paper trading** (since Oct 7; 0.5%/order, slip_c=1, rv_scale=1.11). Full 1/3 used (promising); lockbox spent (pass).
+- Next: ~2 weeks of paper to check fills at the open on SOL's thinner books; then `kalshi-lab audit sol-midrev` and
   the user's OK. Given the weak lockbox, a live trial (if any) should be small.

@@ -1,0 +1,1 @@
+{"slug":"macro-bell","name":"Macro release windows","series":"KXSOL15M","status":"rejected","description":"Research-only: macro releases and holidays as vol bells on 15m crypto markets.","hypothesis":"Event-day 8:30 ET windows have a vol step the market doesn't price.","derived_from":"us-hours-vol","next":"none","created":"2026-10-17"}

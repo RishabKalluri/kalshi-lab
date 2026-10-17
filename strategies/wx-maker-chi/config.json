@@ -1,0 +1,26 @@
+{
+  "slug": "wx-maker-chi",
+  "name": "Weather Maker CHI",
+  "series": [
+    "KXHIGHCHI"
+  ],
+  "derived_from": "wx-maker",
+  "class": "WxMaker",
+  "status": "rejected",
+  "description": "wx-maker v3 (ask-only, 2c behind the touch, 20-50c brackets) moved unchanged to Chicago; no tuning.",
+  "hypothesis": "Same as wx-maker: sell-side maker quotes on daily-high brackets earn the longshot premium net of adverse selection. Out-of-sample city for the NY-run rule. Wrong if CI includes 0 / months mostly negative.",
+  "params": [
+    "sides=ask",
+    "back=2",
+    "min_mid=200",
+    "max_mid=500"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-16",
+  "next": "none",
+  "source": "books"
+}

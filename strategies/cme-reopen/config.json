@@ -1,0 +1,25 @@
+{
+  "slug": "cme-reopen",
+  "name": "CME Sunday Reopen Bell",
+  "series": [
+    "KXETH15M",
+    "KXBTC15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "us-hours-vol",
+  "class": "ReopenUnderdog",
+  "status": "developing",
+  "description": "When CME crypto futures reopen at 6 pm New York time on Sunday after the weekend, crypto gets much more volatile, but the Kalshi price in that 15-minute window still prices the calm weekend. So the side that's currently losing is more likely to come back than its price says; a few minutes into the window, buy that underdog on ETH, BTC and SOL.",
+  "hypothesis": "us-hours-vol's 9:30 ET bell mechanism on a weekly clock: the Sunday 18:00 ET CME reopen is a vol step (ETH research: +0.87 log vs month mean) that Kalshi underprices (log iv/rv_fut 0.00 vs 0.23 normally). Losers: favourite buyers and quoting bots using trailing weekend vol. Rule copied unchanged from us-hours-vol (checkpoints 600-240 s, underdog 10-45c, spread <= 6c) on ETH, BTC, SOL fixed in advance. Wrong if the full walk-forward isn't positive or months are mostly negative; sample is ~1 market per coin per week, so a CI > 0 is unlikely even if real.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Full 1/3 (job cme-reopen-1013-020724) was running when the session ended: read its verdict in results.json. Promising -> lockbox; inconclusive -> likely sample-limited (~1 market/coin/week), see NOTES.",
+  "paper_params": [
+    "slip_c=1"
+  ]
+}

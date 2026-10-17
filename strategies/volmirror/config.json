@@ -1,0 +1,24 @@
+{
+  "slug": "volmirror",
+  "name": "VolMirror: underdog when implied vol is low",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "volfav-pool",
+  "class": "VolMirror",
+  "status": "developing",
+  "description": "The mirror of VolFavorite: late in a 15-minute window (4, 3 or 2 minutes left), when the market's implied vol is in the lowest 5% of the coin's history relative to a HAR forecast from recent realized vol, buy the cheap (under 30c) underdog. The market is pricing too calm a regime, so long shots are underpriced.",
+  "hypothesis": "Dev-data screen (research/s1.py, walk-forward HAR): underdog edge falls monotonically as the implied/forecast ratio rises, the mirror of volfav. Level is positive only in the bottom 5% at h=120-240s with underdog under 30c: +1.64c/market (se 0.54, 5245 markets, 6/8 months, 4/5 coins; SOL negative). Other horizons (300-480, 600-840) ~0, so the horizon window is a weaker, partly post-hoc choice. Wrong if the walk-forward isn't promising or the edge vanishes against book depth on thin underdog books. Same family as volfav-pool (shares its lockbox history).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-15",
+  "next": "Full job volmirror-1015-160940 (1 of 3 full tests) was still running at the agent's deadline: read its verdict in results.json. Lockbox only if promising; the lockbox is shared with the volfav-pool family. If inconclusive, check per-coin cards (SOL was negative in research)."
+}

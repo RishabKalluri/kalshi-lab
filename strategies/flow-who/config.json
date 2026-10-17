@@ -1,0 +1,15 @@
+{
+  "slug": "flow-who",
+  "name": "Flow-Who",
+  "series": ["KXBTC15M", "KXETH15M", "KXSOL15M"],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Classify big in-window and 30-second spot moves by order flow (perp vs spot, largest print, trade count, one-sidedness) into forced (reverting) vs informed (persisting) and trade the Kalshi favourite or underdog accordingly.",
+  "hypothesis": "Kalshi prices forced and informed moves the same way, so forced moves overshoot and informed ones persist. Wrong if the flow split does not separate reverting from persisting at the next real Kalshi fill after fees.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {"full_tests": 3, "lockbox_runs": 1},
+  "created": "2026-10-13",
+  "next": "Rejected at research (no pipeline run, no budget used). Only revisit with live book/liquidation data."
+}

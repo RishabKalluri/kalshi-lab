@@ -1,0 +1,15 @@
+{
+  "slug": "mention-no",
+  "name": "Mention NO (retail overpays 'will he say X')",
+  "series": ["KXTRUMPMENTION"],
+  "derived_from": "",
+  "class": "",
+  "status": "parked",
+  "description": "Sells YES (buys NO, taker) on 'What will Donald Trump say during <event>?' word markets when the YES bid is 10-90c, shortly after the market starts trading, and holds to settlement. Retail buys the YES lottery ticket on words that are said only ~36% of the time.",
+  "hypothesis": "On the 150-market backfill sample (86 events, Jan-Aug 2026) the first YES price of a mention market is 14c too high at 10-90c (outcome rate 36% vs mean price ~50%; t=3.2 clustered by event, both halves negative), and a taker selling YES at the proven bid nets +6.5c after fees (t~1.7, 133 markets). Counterparty: retail buying the headline word. Wrong if the full-history walk-forward CI (net of fees) <= 0 or the lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {"full_tests": 3, "lockbox_runs": 1},
+  "created": "2026-10-17",
+  "next": "BLOCKED on data/infra: needs the full KXTRUMPMENTION history downloaded (backfill holds a 150-market sample) and KXTRUMPMENTION added to MARKETS in src/kalshi_lab/recorder/config.py (agents cannot edit recorder/). Then write strategy.py (sell YES at the bid once the market has traded, 10-90c, one entry per market) and run smoke/quick/full."
+}

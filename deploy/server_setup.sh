@@ -107,7 +107,7 @@ WantedBy=timers.target
 UNIT
 # The research server's worker pushes results into ~/lab-inbox with a key that can write nothing else (rrsync);
 # research-merge copies them into this repo for the dashboard, never touching paper/live strategies or results.
-mkdir -p ~/lab-inbox ~/.ssh
+mkdir -p ~/lab-inbox/results ~/lab-inbox/strategies ~/.ssh  # rsync creates no parent folders
 KEY="command=\"/usr/bin/rrsync -wo $HOME/lab-inbox\",restrict $(cat deploy/research/worker.pub)"
 grep -qF "$(cut -d' ' -f2 deploy/research/worker.pub)" ~/.ssh/authorized_keys 2>/dev/null || echo "$KEY" >> ~/.ssh/authorized_keys
 sudo tee /etc/systemd/system/kalshi-research-merge.service >/dev/null <<UNIT

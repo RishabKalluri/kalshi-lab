@@ -1,0 +1,20 @@
+{
+  "slug": "rain-no",
+  "name": "Rain NO (retail overpays for rain)",
+  "series": [
+    "KXRAIN"
+  ],
+  "derived_from": "",
+  "class": "RainNo",
+  "status": "paper_candidate",
+  "description": "Buys NO (taker, IOC at the YES bid) on KXRAIN 'will it rain in <city> on <date>' markets when the YES bid is 5-60c, 2.5-30 h before the close, one entry per city-day, held to settlement. Retail prices the forecast chance of rain, but the market resolves on measurable (>0.00 in) precipitation at the NWS station.",
+  "hypothesis": "Takers buying YES at 10-90c on rain markets lost 7-17c/contract and NO takers earned +6-20c on 42 development days (35 of 42 days positive); markets priced 10-60% realised 1-20% rain. Counterparty: retail buying YES on a weather-forecast chance of rain; mechanism: trace/point-gauge resolution plus forecast PoP anchoring. Wrong if the walk-forward pooled CI (net of taker fees) is <= 0, or the Sep 1 - Oct 12 lockbox (autumn frontal rain) loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-16",
+  "next": "Passed the lockbox (Sep 1-Oct 12): +4.5c/contract, CI -2.1..+12.3, 117 markets, 27/39 days (dev full +14.1c, CI +7.0..+20.9). Next: paper trading on the recorded KXRAIN books (Oct 13 on) to check real bids/depth at ~6 h before the close; the backtest used a book synthesized from trades (depth 25). User decides paper/live."
+}

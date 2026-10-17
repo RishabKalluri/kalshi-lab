@@ -1,0 +1,21 @@
+{
+  "slug": "wx-fav-bid",
+  "name": "Weather favourite bid",
+  "series": [
+    "KXHIGHNY"
+  ],
+  "derived_from": "wx-maker",
+  "class": "WxFavBid",
+  "status": "parked",
+  "description": "Rests a post-only bid (no maker fee on weather) on the highest-priced bracket of each KXHIGH city-day, 12-34 h before the close, and holds to settlement. Early in the day the bracket ladder is too wide: the favourite wins more often than its mid implies.",
+  "hypothesis": "Dev trades at fixed hours before close (10 cities, 335 days): the favourite bracket's outcome rate beats its mid by +3.5c at 24h (se 0.95; +2.1 at 30h, +2.2 at 18h, -0.6 at 12h; positive in 9 of 11 months and 10/10 cities at 24h) and ranks 2-6 are 1.4-2.5c overpriced; implied variance of the ladder is ~1.4x realized squared error. A taker pays spread+fee ~ the edge (+0.5c net at the ask), a maker pays no fee. Counterparty: retail spreading bets across neighbouring brackets. Wrong if fills are adversely selected (wx-maker bids on 5-50c brackets lost ~3c/ct) so the pooled CI of PnL per city-day is <= 0.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "Parked: ad hoc 10-city Jan-Aug: favourite bid 26-40h +0.70c/ct (CI -1.18..+2.82), neighbour offers -1.11c/ct. Pipeline books source cannot hold multi-city months; revisit when it can.",
+  "source": "books"
+}

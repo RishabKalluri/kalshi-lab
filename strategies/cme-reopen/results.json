@@ -1,0 +1,135 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "cme-reopen-1013-020434",
+   "started": "2026-10-13T02:04:36.205408+00:00",
+   "finished": "2026-10-13T02:04:48.691086+00:00",
+   "git": "f31cfa7+dirty",
+   "code": "b60b5c97894f6180",
+   "code_v": 2,
+   "series": [
+    "KXETH15M",
+    "KXBTC15M",
+    "KXSOL15M"
+   ],
+   "derived_from": "us-hours-vol",
+   "params": [],
+   "note": "v1: us-hours-vol rule on Sunday 18:00 ET window, ETH/BTC/SOL",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-19T18:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "failed",
+   "gate": "no fills in the smoke window (strategy may never trade, or the window is too short)",
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "",
+   "hash": "dc550dd4da0a1f5c9d8fefca8ec02f3a4609de18d55009480bcae28a34708a21"
+  },
+  {
+   "stage": "smoke",
+   "job": "cme-reopen-1013-020521",
+   "started": "2026-10-13T02:05:23.719354+00:00",
+   "finished": "2026-10-13T02:05:36.159022+00:00",
+   "git": "f31cfa7+dirty",
+   "code": "b60b5c97894f6180",
+   "code_v": 2,
+   "series": [
+    "KXETH15M",
+    "KXBTC15M",
+    "KXSOL15M"
+   ],
+   "derived_from": "us-hours-vol",
+   "params": [],
+   "note": "v1 mechanics: slots widened to Wed 14:00-20:45 ET (smoke window has no Sunday 18:00)",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-19T18:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": -88.57,
+     "contracts": 1814.0,
+     "markets": 64,
+     "fees": 23.25,
+     "pnl_per_contract_c": -4.883,
+     "t_stat": -0.87,
+     "max_drawdown": 156.78,
+     "rejects": 0,
+     "ci95_c": [
+      -15.361,
+      6.341
+     ],
+     "days_positive": "0/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "dc550dd4da0a1f5c9d8fefca8ec02f3a4609de18d55009480bcae28a34708a21",
+   "hash": "1fe059b995277682d63a11caa1e66ff21034155c060490b35b3ee5c25bdea6ba"
+  },
+  {
+   "stage": "quick",
+   "job": "cme-reopen-1013-020555",
+   "started": "2026-10-13T02:05:56.644092+00:00",
+   "finished": "2026-10-13T02:06:58.235645+00:00",
+   "git": "f31cfa7+dirty",
+   "code": "b60b5c97894f6180",
+   "code_v": 2,
+   "series": [
+    "KXETH15M",
+    "KXBTC15M",
+    "KXSOL15M"
+   ],
+   "derived_from": "us-hours-vol",
+   "params": [],
+   "note": "v1: Sunday 18:00 ET reopen underdog, us-hours-vol rule unchanged, ETH/BTC/SOL",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-17T00:00:00+00:00",
+     "2026-08-20T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "rejected at quick",
+   "gate": "no trades in the quick stage",
+   "crashed": false,
+   "lockbox_start": "2026-08-20T00:00:00+00:00",
+   "prev": "1fe059b995277682d63a11caa1e66ff21034155c060490b35b3ee5c25bdea6ba",
+   "hash": "844bb242cc6dd2e48fb1248bbb56fa683cc01b35cd201e2bf882c2d7979c0ce4"
+  }
+ ]
+}

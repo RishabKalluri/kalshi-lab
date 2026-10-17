@@ -1,0 +1,20 @@
+{
+  "slug": "flow-vol",
+  "name": "Flow-Vol",
+  "series": [
+    "KXBTC15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "FlowVol",
+  "status": "rejected",
+  "description": "Like eth-volfav (buy the favourite late in the window when the market's implied volatility is high relative to a forecast), but the forecast also uses per-second order flow (Binance spot and OKX perp volume, trade counts, largest trade) so it can tell volatility that is about to fade from volatility that will persist.",
+  "hypothesis": "Volume and trade intensity lead volatility, and Kalshi's implied vol is anchored on price-based realized vol. Where flow is quiet the market's vol is too high and the favourite is cheap; where flow is hot the HAR-only signal fires falsely. Research (BTC, ETH, SOL walk-forward): flow adds +0.02 OOS R2 and the flow-model top-decile favourite earned +1.0c BTC / +1.6c ETH vs HAR-only; HAR-only-but-not-flow rows lost -1.4c (BTC) and -2.1c (SOL). Wrong if: the full walk-forward CI is not above 0 or the edge is concentrated in <60% of months.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "none: BTC lockbox failed (-4.17c, CI [-5.84,-2.32]); do not retry"
+}

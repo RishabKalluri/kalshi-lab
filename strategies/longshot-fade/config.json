@@ -1,0 +1,21 @@
+{
+  "slug": "longshot-fade",
+  "name": "Longshot fade",
+  "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Taker strategy for NBA/NHL game-winner markets: during the game, at fixed checks, buy the favourite (= NO on the longshot) when a side trades below a price threshold. Tested whether retail overpays for comeback tickets.",
+  "hypothesis": "Brief lead: takers buying sides under 20c in games lose 5-7c/contract. Idea: retail overpays for longshots so the favourite is underpriced late in games. Wrong if buying the favourite at the ask (gross of nothing, net of spread+fee) has CI<=0 over full dev history, clustered by game.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Rejected at research on 2,772 dev games (4 screens, none net-positive). Not piped: no screen beat spread+fee."
+}

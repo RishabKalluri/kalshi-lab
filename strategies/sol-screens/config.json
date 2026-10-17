@@ -1,0 +1,20 @@
+{
+  "slug": "sol-screens",
+  "name": "SOL screens (research only)",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-midrev",
+  "class": "",
+  "status": "rejected",
+  "description": "Research-only folder: a battery of SOL 15-minute screens (multi-hour trend, generalized models, Kalshi-price moves, cross-asset vol, basis, calibration). No strategy was built; none cleared costs.",
+  "hypothesis": "SOL's Kalshi 15m market has a taker-exploitable mispricing beyond the known last-window reversal. Wrong if no screen nets > 0 after fees in both halves of development data (Jan-Aug 2026).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-16",
+  "next": "Nothing on taker side. Revisit maker quoting on SOL once recorded books become development data (Nov 1 2026)."
+}

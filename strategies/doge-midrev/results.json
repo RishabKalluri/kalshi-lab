@@ -1,0 +1,386 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "doge-midrev-1014-152118",
+   "started": "2026-10-14T15:21:22.247710+00:00",
+   "finished": "2026-10-14T15:21:23.128368+00:00",
+   "git": "c8a7cee+dirty",
+   "code": "e56159e4c68550e5",
+   "code_v": 2,
+   "series": [
+    "KXDOGE15M"
+   ],
+   "derived_from": "eth-midrev",
+   "params": [],
+   "note": "v1 unchanged port of sol-midrev",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-31T18:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "failed",
+   "gate": "no fills in the smoke window (strategy may never trade, or the window is too short)",
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "90e733b8fc2a3036f34493ea8d12796749b2e5311b0ef4349c914be5f647badb",
+   "hash": "830b1ccd92d61480fab7c37be6cee9462ca41556f98b82349e9b7c9bac16a7fc"
+  },
+  {
+   "stage": "quick",
+   "job": "doge-midrev-1014-154722",
+   "started": "2026-10-14T15:47:27.531854+00:00",
+   "finished": "2026-10-14T15:47:34.132758+00:00",
+   "git": "c8a7cee+dirty",
+   "code": "e56159e4c68550e5",
+   "code_v": 2,
+   "series": [
+    "KXDOGE15M"
+   ],
+   "derived_from": "eth-midrev",
+   "params": [],
+   "note": "v1 unchanged port; ad-hoc Jun1-20 43 mkts +56$",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-29T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 26.29,
+     "contracts": 93.0,
+     "markets": 7,
+     "fees": 1.54,
+     "pnl_per_contract_c": 28.269,
+     "t_stat": 1.99,
+     "max_drawdown": 6.99,
+     "rejects": 0,
+     "ci95_c": [
+      -1.286,
+      48.468
+     ],
+     "days_positive": "2/3"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "830b1ccd92d61480fab7c37be6cee9462ca41556f98b82349e9b7c9bac16a7fc",
+   "hash": "31adc87001fb70fca5f4dee49affaa8752bd543d8a6b092240dd01b08c0b6178"
+  },
+  {
+   "stage": "full",
+   "job": "doge-midrev-1014-154742",
+   "started": "2026-10-14T15:47:47.537562+00:00",
+   "finished": "2026-10-14T16:05:08.668945+00:00",
+   "git": "c8a7cee+dirty",
+   "code": "e56159e4c68550e5",
+   "code_v": 2,
+   "series": [
+    "KXDOGE15M"
+   ],
+   "derived_from": "eth-midrev",
+   "params": [],
+   "note": "v1 unchanged port, full 1/3",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-03": [
+     "2026-03-18T00:00:00+00:00",
+     "2026-04-01T00:00:00+00:00"
+    ],
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-03": {
+     "pnl": 29.17,
+     "contracts": 261.0,
+     "markets": 20,
+     "fees": 4.31,
+     "pnl_per_contract_c": 11.176,
+     "t_stat": 1.08,
+     "max_drawdown": 18.29,
+     "rejects": 0,
+     "ci95_c": [
+      -9.365,
+      29.89
+     ],
+     "days_positive": "9/12"
+    },
+    "wf-2026-04": {
+     "pnl": -1.54,
+     "contracts": 447.0,
+     "markets": 34,
+     "fees": 7.53,
+     "pnl_per_contract_c": -0.345,
+     "t_stat": -0.04,
+     "max_drawdown": 28.99,
+     "rejects": 0,
+     "ci95_c": [
+      -15.892,
+      14.591
+     ],
+     "days_positive": "11/20"
+    },
+    "wf-2026-05": {
+     "pnl": 2.65,
+     "contracts": 800.0,
+     "markets": 59,
+     "fees": 13.35,
+     "pnl_per_contract_c": 0.331,
+     "t_stat": 0.05,
+     "max_drawdown": 39.43,
+     "rejects": 0,
+     "ci95_c": [
+      -11.481,
+      12.452
+     ],
+     "days_positive": "11/25"
+    },
+    "wf-2026-06": {
+     "pnl": 109.04,
+     "contracts": 1127.0,
+     "markets": 80,
+     "fees": 19.19,
+     "pnl_per_contract_c": 9.675,
+     "t_stat": 1.83,
+     "max_drawdown": 36.45,
+     "rejects": 0,
+     "ci95_c": [
+      -0.724,
+      20.385
+     ],
+     "days_positive": "19/27"
+    },
+    "wf-2026-07": {
+     "pnl": 125.5,
+     "contracts": 901.0,
+     "markets": 61,
+     "fees": 15.4,
+     "pnl_per_contract_c": 13.929,
+     "t_stat": 2.16,
+     "max_drawdown": 34.64,
+     "rejects": 0,
+     "ci95_c": [
+      1.157,
+      25.71
+     ],
+     "days_positive": "17/25"
+    },
+    "wf-2026-08": {
+     "pnl": 11.14,
+     "contracts": 780.0,
+     "markets": 55,
+     "fees": 13.2,
+     "pnl_per_contract_c": 1.428,
+     "t_stat": 0.21,
+     "max_drawdown": 38.52,
+     "rejects": 0,
+     "ci95_c": [
+      -11.78,
+      14.3
+     ],
+     "days_positive": "15/25"
+    },
+    "lat2x-2026-06": {
+     "pnl": 123.36,
+     "contracts": 1101.0,
+     "markets": 79,
+     "fees": 18.76,
+     "pnl_per_contract_c": 11.204,
+     "t_stat": 2.12,
+     "max_drawdown": 31.89,
+     "rejects": 0,
+     "ci95_c": [
+      0.706,
+      21.542
+     ],
+     "days_positive": "19/27"
+    },
+    "lat2x-2026-07": {
+     "pnl": 128.99,
+     "contracts": 874.0,
+     "markets": 59,
+     "fees": 14.95,
+     "pnl_per_contract_c": 14.759,
+     "t_stat": 2.27,
+     "max_drawdown": 34.18,
+     "rejects": 0,
+     "ci95_c": [
+      1.965,
+      27.053
+     ],
+     "days_positive": "17/24"
+    },
+    "lat2x-2026-08": {
+     "pnl": 4.23,
+     "contracts": 763.0,
+     "markets": 54,
+     "fees": 12.91,
+     "pnl_per_contract_c": 0.554,
+     "t_stat": 0.08,
+     "max_drawdown": 39.18,
+     "rejects": 0,
+     "ci95_c": [
+      -12.538,
+      13.829
+     ],
+     "days_positive": "13/24"
+    },
+    "POOLED": {
+     "pnl": 275.96,
+     "contracts": 4316.0,
+     "markets": 309,
+     "pnl_per_contract_c": 6.394,
+     "ci95_c": [
+      1.102,
+      11.876
+     ],
+     "days_positive": "82/134",
+     "max_drawdown": 48.98
+    },
+    "POOLED-lat2x": {
+     "pnl": 256.58,
+     "contracts": 2738.0,
+     "markets": 192,
+     "pnl_per_contract_c": 9.371,
+     "ci95_c": [
+      2.406,
+      16.189
+     ],
+     "days_positive": "49/75",
+     "max_drawdown": 39.18
+    }
+   },
+   "verdict": "promising",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "31adc87001fb70fca5f4dee49affaa8752bd543d8a6b092240dd01b08c0b6178",
+   "hash": "199c0135845d878b4d33ba4b21ad6d9e3ad4054458ba0724d5c82990a3ad8c23"
+  },
+  {
+   "stage": "lockbox",
+   "job": "doge-midrev-1014-160523",
+   "started": "2026-10-14T16:05:27.755030+00:00",
+   "finished": "2026-10-14T16:10:41.346942+00:00",
+   "git": "c8a7cee+dirty",
+   "code": "e56159e4c68550e5",
+   "code_v": 2,
+   "series": [
+    "KXDOGE15M"
+   ],
+   "derived_from": "eth-midrev",
+   "params": [],
+   "note": "v1 unchanged, after promising full (+6.4c CI +1.1..11.9)",
+   "iteration": 2,
+   "windows": {
+    "lockbox-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ],
+    "lockbox-2026-10": [
+     "2026-10-01T00:00:00+00:00",
+     "2026-10-15T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "lockbox-2026-09": {
+     "pnl": -15.79,
+     "contracts": 820.0,
+     "markets": 57,
+     "fees": 13.92,
+     "pnl_per_contract_c": -1.926,
+     "t_stat": -0.27,
+     "max_drawdown": 71.67,
+     "rejects": 0,
+     "ci95_c": [
+      -15.192,
+      11.588
+     ],
+     "days_positive": "12/28"
+    },
+    "lockbox-2026-10": {
+     "pnl": -39.56,
+     "contracts": 364.0,
+     "markets": 27,
+     "fees": 6.21,
+     "pnl_per_contract_c": -10.868,
+     "t_stat": -1.19,
+     "max_drawdown": 76.07,
+     "rejects": 0,
+     "ci95_c": [
+      -28.381,
+      6.702
+     ],
+     "days_positive": "4/11"
+    },
+    "POOLED": {
+     "pnl": -55.35,
+     "contracts": 1184.0,
+     "markets": 84,
+     "pnl_per_contract_c": -4.675,
+     "ci95_c": [
+      -15.814,
+      6.394
+     ],
+     "days_positive": "16/39",
+     "max_drawdown": 76.07
+    }
+   },
+   "verdict": "fail",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "199c0135845d878b4d33ba4b21ad6d9e3ad4054458ba0724d5c82990a3ad8c23",
+   "hash": "db676fbf786871a8d091c140317e0c90cc56542b4274720c546926f141865598"
+  }
+ ]
+}

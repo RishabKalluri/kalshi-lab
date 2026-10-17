@@ -1,0 +1,24 @@
+{
+  "slug": "wx-bracket-fade",
+  "name": "Weather bracket fade",
+  "series": [
+    "KXHIGHNY",
+    "KXHIGHLAX",
+    "KXHIGHMIA",
+    "KXHIGHCHI",
+    "KXHIGHAUS"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "parked",
+  "description": "Screen for a forecast-vs-price taker strategy on daily-high weather brackets (NWP forecasts, longshot bias, intraday lock-in/nowcast). No taker edge found; parked until recorded books allow a maker version.",
+  "hypothesis": "Retail overpays for cheap brackets vs forecast-implied probability; a taker on the other side earns it. Refuted in screening: market mid beats free NWP forecasts, and the longshot bias (~1.5c) is smaller than spread + fee.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Maker version (post-only quotes on cheap brackets) once recorded weather books exist (recording since 2026-10-13); no taker pipeline run was justified."
+}

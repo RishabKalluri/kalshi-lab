@@ -1,0 +1,20 @@
+{
+  "slug": "eth-volfav-wide",
+  "name": "ETH VolFavorite wide (top 40%)",
+  "series": [
+    "KXETH15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "VolFavorite",
+  "status": "developing",
+  "description": "ETH VolFavorite v2 with a looser entry bar: buy the favourite late in the window when implied vol is in the top 40% of its ratio to the forecast, instead of the top 30%. More trades, each a little weaker.",
+  "hypothesis": "eth-volfav2 enters only on the top 30% of implied/forecast vol ratios (+2.2c/ct walk-forward). Signals in the next band (30-40%) are weaker but, if ETH's market overprices vol broadly, still worth more than the ~1.3c taker fee; lowering the bar to the top 40% should then add total dollars even as c/contract falls. Wrong if total PnL over the walk-forward is not higher than eth-volfav2's, or the added band's own trades are flat or negative after fees.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-14",
+  "next": "full walk-forward; compare total PnL and the added band vs eth-volfav2; lockbox (Sep 1+) if it adds money."
+}

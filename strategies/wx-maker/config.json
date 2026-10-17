@@ -1,0 +1,27 @@
+{
+  "slug": "wx-maker",
+  "name": "Weather Maker",
+  "series": [
+    "KXHIGHNY",
+    "KXHIGHLAX",
+    "KXHIGHMIA",
+    "KXHIGHCHI",
+    "KXHIGHAUS"
+  ],
+  "derived_from": "",
+  "class": "WxMaker",
+  "status": "parked",
+  "description": "Post-only quotes (join the touch) on KXHIGH daily-high brackets priced 5-50c, before a local-time cutoff, pulled after fast mid moves, with per-city-day exposure caps. Earns the spread retail pays; weather has no maker fees.",
+  "hypothesis": "Takers lose 0.3-1.6c/ct on weather (cheap brackets worst) and prices are about right vs forecasts, so the spread is the money. Counterparty: retail takers paying 2-3c spreads. Wrong if markouts after fills (adverse selection from forecast/obs updates) exceed the half-spread captured, or if CI of PnL per city-day clusters includes 0.",
+  "params": [
+    "sides=ask"
+  ],
+  "sizing": "pct:0.5",
+  "source": "books",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-15",
+  "next": "Needs 5-city full tests (sandbox memory) and a better adverse-selection filter (forecast/obs-driven pulling); NY-only v3 inconclusive (+0.88c/ct CI [-4.4,6.3])."
+}

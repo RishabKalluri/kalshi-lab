@@ -1,0 +1,24 @@
+{
+  "slug": "sol-volrev",
+  "name": "SOL volume-confirmed reversal",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "eth-overreact",
+  "class": "ReversalOpen",
+  "status": "paper_candidate",
+  "description": "SOL: right after a 15-minute window opens, if the previous window moved more than 1.25 sigma on Binance volume more than twice the usual for that quarter-hour slot, buy the reversal side. Heavy-volume moves are forced flow (liquidations, stop runs) that unwinds; thin-volume moves persist.",
+  "hypothesis": "The z1 open-reversal edge has decayed to ~+0.5c overall on all coins, but dev screens show it persists after heavy-volume moves (relv>2 +4.1c, >3 +5.7c; low-volume moves ~0; top tercile positive in 5/7 months). Forced flow overshoots and unwinds; Kalshi's open price ignores volume. Losers: takers treating the new window as a coin flip. Wrong if the walk-forward CI <= 0, or the lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "Lockbox pass (weak). Before paper: needs a live Binance SOL volume stream (flow isn't streamed by the recorder); rv_scale 1.11 as sol-midrev. Overlaps sol-midrev/eth-overreact trades (same family), so count as one piece of evidence.",
+  "paper_params": [
+    "rv_scale=1.11",
+    "slip_c=1"
+  ]
+}

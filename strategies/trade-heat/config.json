@@ -1,0 +1,15 @@
+{
+  "slug": "trade-heat",
+  "name": "Kalshi activity / path screens",
+  "series": ["KXBTC15M", "KXETH15M", "KXSOL15M", "KXXRP15M", "KXDOGE15M"],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Research-only folder: five dev-data screens on the 5-coin 15m dataset (Kalshi trade activity, mid-price flips, previous-window surprise, within-hour reversal, weekend favourite bias). None cleared costs; no pipeline run.",
+  "hypothesis": "Retail-driven features of the Kalshi market itself (trade count so far, chop in the mid, previous upset, hour-so-far move) predict where favourites/underdogs are mispriced. Wrong if net taker edge by feature bucket is not stable positive in both halves.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {"full_tests": 3, "lockbox_runs": 1},
+  "created": "2026-10-16",
+  "next": "Nothing: all screens dead. See NOTES.md."
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "btc-lead",
+  "name": "BTC Lead",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "",
+  "class": "",
+  "status": "rejected",
+  "description": "Trade ETH/SOL 15-minute markets on fresh BTC spot moves before their quotes reprice.",
+  "hypothesis": "ETH/SOL Kalshi quotes lag BTC; wrong if the ETH/SOL spot continuation after a BTC move, in cents of Kalshi price, is below fee + spread.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-13",
+  "next": "Rejected at research (no pipeline run). Only revisit with sub-second spot/book data."
+}

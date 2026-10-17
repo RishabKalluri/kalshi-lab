@@ -12,10 +12,6 @@ ETH's 15-minute market overprices short-horizon vol and the BTC market does not;
 ## Iteration log
 | # | date | change | stage | result | learning |
 |---|------|--------|-------|--------|----------|
-| 1 | 10-13 | port of eth-volfav2 with price-relative fit filter (as xrp-volfav) | fit | betas 0.50/0.18/0.23, threshold 1.22 | |
-| 2 | 10-13 | smoke + quick | quick | smoke −33¢/ct (6 mkts); quick −7.4¢/ct (57 mkts, CI −18.7..+3.5) | passed the gate (not clearly negative) |
-| 3 | 10-13 | full walk-forward May–Aug 19 | full | **inconclusive**: pooled +0.57¢/ct, CI −0.45..+1.57, 3,157 markets; months +0.72/+1.08/−1.32/+0.21; 2× latency +0.44 | at most a small edge on DOGE; not enough to justify the lockbox. 2 full tests left |
 
 ## Current status
-- Stage: **parked** (full test inconclusive, +0.57¢/ct). Lockbox for KXDOGE15M untouched.
-- Next, if revisited: more history (DOGE has only May–Aug development months) or a DOGE-specific reason to change one thing.
+- Stage: developing. Backfill book_depth for KXDOGE15M is a placeholder (13, SOL's) until books are recorded.

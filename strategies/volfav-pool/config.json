@@ -1,0 +1,24 @@
+{
+  "slug": "volfav-pool",
+  "name": "VolFavorite pooled (5 coins)",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "PooledVolFavorite",
+  "status": "developing",
+  "description": "eth-volfav's method on all five 15-minute crypto markets (BTC, ETH, SOL, XRP, DOGE) with one rule: late in the window, if the market's implied volatility is far above a per-coin forecast from recent realized vol, buy the winning side. The entry bar is the same percentile of each coin's own history (top 15% weekdays, top 40% weekends), so it trades far more markets than the ETH-only strategy.",
+  "hypothesis": "Kalshi's 15-minute crypto markets price short-horizon vol too high after volatile stretches, in every coin, not just ETH; takers on the other side pay for reversals that rarely happen. Development-data decomposition (research/): edge rises monotonically with the implied/forecast ratio percentile in all 5 coins (BTC included, smaller), is ~2x larger on weekends (Sat/Sun UTC, 8/8 months positive), and hour-of-day and price band show no stable pattern. Pooling the five coins gives ~2,600 markets/month at roughly +1c/contract in research fills. Wrong if the walk-forward is not promising (CI>0, >=60% months positive, positive at 2x latency), or per-contract edge falls under ~+0.5c once the book is walked, or the lockbox (Sep 1+) loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-14",
+  "next": "Full test volfav-pool-1014-155317 was still running when the agent's time ended (3.5 h per month run). Read its verdict in results.json; lockbox only if promising. See NOTES.md."
+}

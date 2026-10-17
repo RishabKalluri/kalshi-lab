@@ -16,3 +16,8 @@ research/data/
 results/*
 !results/_ledger/
 *.lock
+
+# agents' intermediate research data (rebuildable from their scripts)
+strategies/*/research/**/*.parquet
+strategies/*/research/*.parquet
+strategies/flow-vol/params/flow_feats_*.parquet
