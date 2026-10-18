@@ -1,0 +1,53 @@
+{
+ "runs": [
+  {
+   "stage": "quick",
+   "job": "wx-modal-1017-220953",
+   "started": "2026-10-17T22:09:55.333141+00:00",
+   "finished": "2026-10-17T22:09:57.324827+00:00",
+   "git": "1c2b003+dirty",
+   "code": "8bd7014a99bd1aa3",
+   "code_v": 2,
+   "series": [
+    "KXHIGHNY",
+    "KXHIGHAUS",
+    "KXHIGHCHI",
+    "KXHIGHLAX",
+    "KXHIGHMIA",
+    "KXHIGHTATL",
+    "KXHIGHTBOS",
+    "KXHIGHTDAL",
+    "KXHIGHTHOU",
+    "KXHIGHTPHX"
+   ],
+   "derived_from": null,
+   "params": [],
+   "note": "v1 modal bracket taker 24-36h (retry after perms)",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-29T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "rejected at quick",
+   "gate": "no trades in the quick stage",
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "12a849bbda1ee7ea39bc9e319b71120c24eb08e5497ca1e648cd4bd579f9f6c4",
+   "hash": "0954ad433f252b3f4471689228452fccff1e2f0258ddf2bceb9c563d2d200992"
+  }
+ ]
+}

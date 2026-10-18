@@ -1,0 +1,20 @@
+{
+  "slug": "eur-bracket",
+  "name": "EUR/USD bracket fair value",
+  "series": [
+    "KXEURUSD"
+  ],
+  "derived_from": "",
+  "class": "EurBracket",
+  "status": "developing",
+  "description": "Buys or sells YES on Kalshi's EUR/USD 'open price between a and b at 10am ET' brackets when a lognormal model around the current EUR/USD price (hourly-open bars, trailing 120-bar vol) disagrees with the quote by 10c or more, taker IOC, one entry per market, held to settlement.",
+  "hypothesis": "Thin FX brackets are priced by inattentive retail, not by a spot-vol model. Screen on the 150-market backfill sample (Jan-Aug 2026, trade-print prices): model side nets +35.7c/contract net of fees on 61 markets, day-clustered t about 5.4, both halves and all months positive, both sides. Wrong if the engine run (quotes synthesized from trades, so spread is paid) is flat, or the effect shrinks to nothing once only provable quotes are traded. Honest limit: the sample is 150 markets, so only ~8-13 can trade; the pipeline can't prove it, it can only show whether the sign survives. Live needs a real-time EUR/USD feed; spot here is Yahoo hourly opens (research only).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "smoke/quick -> full 1/3. Expect <15 trades: inconclusive at best. The real test needs the full KXEURUSD history (request in the agent report)."
+}

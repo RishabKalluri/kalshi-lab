@@ -1,0 +1,131 @@
+{
+ "runs": [
+  {
+   "stage": "full",
+   "job": "totals-over-1017-221544",
+   "started": "2026-10-17T22:15:50.434943+00:00",
+   "finished": "2026-10-17T22:15:53.548102+00:00",
+   "git": "1c2b003+dirty",
+   "code": "b212e0d5be40dc06",
+   "code_v": 2,
+   "series": [
+    "KXNBATOTAL",
+    "KXMLBTOTAL"
+   ],
+   "derived_from": "mention-no",
+   "params": [],
+   "note": "v1 buy over at proven ask within 6h of first trade, NBA+MLB sample",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-04": {
+     "pnl": -2.47,
+     "contracts": 256.0,
+     "markets": 23,
+     "fees": 3.98,
+     "pnl_per_contract_c": -0.965,
+     "t_stat": -0.08,
+     "max_drawdown": 30.64,
+     "rejects": 0,
+     "ci95_c": [
+      -21.579,
+      22.906
+     ],
+     "days_positive": "6/13"
+    },
+    "wf-2026-05": {
+     "pnl": -11.01,
+     "contracts": 241.0,
+     "markets": 17,
+     "fees": 3.9,
+     "pnl_per_contract_c": -4.568,
+     "t_stat": -0.39,
+     "max_drawdown": 40.51,
+     "rejects": 0,
+     "ci95_c": [
+      -24.965,
+      19.558
+     ],
+     "days_positive": "5/10"
+    },
+    "lat2x-2026-04": {
+     "pnl": -2.47,
+     "contracts": 256.0,
+     "markets": 23,
+     "fees": 3.98,
+     "pnl_per_contract_c": -0.965,
+     "t_stat": -0.08,
+     "max_drawdown": 30.64,
+     "rejects": 0,
+     "ci95_c": [
+      -21.579,
+      22.906
+     ],
+     "days_positive": "6/13"
+    },
+    "lat2x-2026-05": {
+     "pnl": -11.01,
+     "contracts": 241.0,
+     "markets": 17,
+     "fees": 3.9,
+     "pnl_per_contract_c": -4.568,
+     "t_stat": -0.39,
+     "max_drawdown": 40.51,
+     "rejects": 0,
+     "ci95_c": [
+      -24.965,
+      19.558
+     ],
+     "days_positive": "5/10"
+    },
+    "POOLED": {
+     "pnl": -13.48,
+     "contracts": 497.0,
+     "markets": 40,
+     "pnl_per_contract_c": -2.712,
+     "ci95_c": [
+      -17.711,
+      13.842
+     ],
+     "days_positive": "11/23",
+     "max_drawdown": 66.41
+    },
+    "POOLED-lat2x": {
+     "pnl": -13.48,
+     "contracts": 497.0,
+     "markets": 40,
+     "pnl_per_contract_c": -2.712,
+     "ci95_c": [
+      -17.711,
+      13.842
+     ],
+     "days_positive": "11/23",
+     "max_drawdown": 66.41
+    }
+   },
+   "verdict": "reject",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "",
+   "hash": "9d8d40f62248f96f4a7e2d325cf58063e1940c8b200c49129e2eba868b844206"
+  }
+ ]
+}

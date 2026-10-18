@@ -1,0 +1,20 @@
+{
+  "slug": "sol-flowrev",
+  "name": "SOL aligned-flow reversal",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-volrev",
+  "class": "ReversalOpen",
+  "status": "developing",
+  "description": "SOL: right after a 15-minute window opens, if the previous window moved more than 1.25 sigma and Binance taker flow in that window was one-sided in the direction of the move (net buy-sell share >= 0.25), buy the reversal side. One-sided aggressive flow behind a big move is forced/impatient flow that overshoots; two-sided or passive moves persist.",
+  "hypothesis": "Dev screen (research dataset, SOL, top-decile |strike move| in rv units, mid 30-70c, next real fill after fee): reversal edge by tercile of the prior window's signed Binance taker imbalance aligned with the move: Jan-Apr +0.4/+3.8/+11.0c, May-Aug +2.2/-2.9/+5.7c; threshold curve >0.05 +3.8c, >0.2 +5.8c, >0.3 +7.1c (n=231), late-era (May-Aug) >0.3 +6.0c (n=123); top tercile positive in 6/7 months. Mechanism: one-sided aggressor flow = forced liquidations / momentum chasers who overpay, the opening quote ignores it. Losers: opening takers. Caveats: threshold 0.25 picked after seeing the dose curve (post hoc), flow-who (ETH/BTC/SOL, |z|>1.5, 30 s shocks) found one-sidedness uninformative, same family as sol-volrev (counts as one piece of evidence), paper/live need a live Binance flow stream. Wrong if: full CI<=0, <60% months positive, 2x latency loses, last 3 months flat, or lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-18",
+  "next": "smoke/quick/full"
+}

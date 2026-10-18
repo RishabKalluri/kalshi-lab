@@ -1,0 +1,20 @@
+{
+  "slug": "mention-sell",
+  "name": "Mention words: sell YES",
+  "series": [
+    "KXTRUMPMENTION"
+  ],
+  "derived_from": "mention-no",
+  "class": "MentionSell",
+  "status": "parked",
+  "description": "Taker: buys NO at the proven YES bid (10-90c) within 3 h of a Trump-mention word market's first trade, one entry per market, held to settlement.",
+  "hypothesis": "Opening YES prices on mention-word markets are ~14c too high (36% said vs ~50c); sell-YES at the proven bid nets +6.5c (t~1.7) on the 150-market sample. Wrong if the walk-forward CI <= 0. Sample-limited: ~130 markets, no lockbox data (history ends Aug 17).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "v2 (max_age 1h) full 2/3 PROMISING +23.4c (CI +3.8..+40.8, 37 mkts) but sample-only, tuned after v1, no lockbox data. Needs full KXTRUMPMENTION download + MARKETS entry, then rerun full + lockbox."
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "sol-overreact",
+  "name": "SOL plain open reversal",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "eth-overreact",
+  "class": "ReversalOpen",
+  "status": "rejected",
+  "description": "SOL: right after a 15-minute window opens, if the previous window moved more than 1.25 of its usual standard deviations, buy the reversal side (taker, hold to settlement). Plain version of sol-volrev/sol-midrev without their volume or last-5-minute filters, so it trades about 3x as often and needs no flow stream.",
+  "hypothesis": "Short-horizon crypto returns reverse after big moves (sign autocorrelation -0.02..-0.09 every month), Kalshi's opening quote treats the window as a coin flip. Screens say the edge decayed on all coins in May-Aug, but ad hoc engine runs of the plain rule on 2-week SOL windows (Feb-Aug) net +0.6..+7c/ct after fees, so the question is whether the plain rule on SOL alone (never run through the pipeline) clears CI>0 with enough trades (~170/month). Losers: opening takers/quoters. A post-only entry (maker=1) was tested ad hoc and adds nothing measurable (adverse selection offsets the saved fee). Wrong if: full CI<=0, <60% months positive, 2x latency loses, or lockbox loses.",
+  "params": [
+    "maker=0",
+    "relv_thr=0"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-18",
+  "next": "rejected at lockbox (-0.36c); edge decayed since June"
+}

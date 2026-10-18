@@ -1,0 +1,22 @@
+{
+  "slug": "fav-pool",
+  "name": "Favourite bias, alt coins",
+  "series": [
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "sol-favbias",
+  "class": "FavBias",
+  "status": "developing",
+  "description": "On SOL, XRP and DOGE 15-minute markets, 5-12 minutes before close, buy the favourite (YES or NO) when its price is 90-95c and hold to settlement. Underdog buyers overpay for tails, so the favourite wins slightly more often than its price plus fee implies.",
+  "hypothesis": "Research dataset (dev, next real fills after fee, one trade per market, h 300-720 s, favourite 90-95c): five coins pooled +0.51c/ct over Jan-Aug (n=32.7k) and +0.73c/ct in Jun-Aug (n=15.1k, t~4); positive in Jun-Aug on every coin (SOL +0.83, XRP +0.49, DOGE +1.14, ETH +0.79, BTC +1.50 c) and strongest on the YES-favourite side (+0.86c vs +0.16c). Unlike the Jan-May reversal edges, it did not decay with the 10-30x rise in Kalshi activity. Who loses: retail underdog buyers (lottery tails), so favourites at 90-95c are slightly cheap. Rule fixed in advance = sol-favbias unchanged (lo 900, hi 950, h 300-720), only extended to three alt coins. Wrong if: full CI<=0, <60% months positive, 2x latency loses, or the lockbox loses. Edge is ~0.7c on a ~92c risk, so the book depth (13 contracts on alts in the sim) caps the dollar payoff.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-18",
+  "next": "smoke, quick, full"
+}

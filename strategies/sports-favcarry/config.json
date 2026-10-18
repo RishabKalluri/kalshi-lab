@@ -1,0 +1,21 @@
+{
+  "slug": "sports-favcarry",
+  "name": "In-game favourite carry (taker)",
+  "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+  ],
+  "derived_from": "sports-tails",
+  "class": "SportsFavCarry",
+  "status": "developing",
+  "description": "Taker: once per NBA/NHL game, buy the team whose ask first reaches 95-99c after the estimated start (start + 30 min), hold to settlement. Late favourites at 95-99c win more often than priced.",
+  "hypothesis": "Research on clean NBA/NHL books (one entry per game, ask one minute later): +0.98c/ct, se 0.59, 842 games, 5/6 months positive, 3% of games lost ~95c each. Wrong if the walk-forward CI is <= 0 (likely inconclusive: ~140 games/month at ~1c) or the lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-18",
+  "next": "smoke -> quick -> full; lockbox only if promising."
+}

@@ -1,0 +1,27 @@
+{
+  "slug": "eth-volrev",
+  "name": "ETH+BTC volume-confirmed reversal",
+  "series": [
+    "KXETH15M",
+    "KXBTC15M"
+  ],
+  "derived_from": "sol-volrev",
+  "class": "ReversalOpen",
+  "status": "developing",
+  "description": "sol-volrev's rule moved unchanged to ETH and BTC: right after a 15-minute window opens, if the previous window moved more than 1.25 sigma on Binance volume more than twice the usual for that quarter-hour slot, buy the reversal side.",
+  "hypothesis": "Heavy-volume big moves are forced flow that unwinds; the dev screen on SOL showed it, and an unrun screen on ETH/BTC pointed the same way. Rule, thresholds and sizing fixed from sol-volrev, no tuning on ETH/BTC. Losers: takers treating the new window as a coin flip. Wrong if the full CI <= 0, 2x latency loses, or the lockbox loses. Paper/live needs a live volume stream.",
+  "params": [
+    "relv_thr=3.0"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "v1 full inconclusive +1.52c; v2 relv_thr=3 full queued (dose-response from SOL screen: >3 +5.7c).",
+  "paper_params": [
+    "rv_scale=1.02",
+    "slip_c=1"
+  ]
+}

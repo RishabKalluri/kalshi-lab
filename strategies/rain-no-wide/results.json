@@ -1,0 +1,270 @@
+{
+ "runs": [
+  {
+   "stage": "quick",
+   "job": "rain-no-wide-1017-220625",
+   "started": "2026-10-17T22:06:30.241728+00:00",
+   "finished": "2026-10-17T22:06:30.976511+00:00",
+   "git": "1c2b003+dirty",
+   "code": "a35e076c17f0c867",
+   "code_v": 2,
+   "series": [
+    "KXRAIN"
+   ],
+   "derived_from": "rain-no",
+   "params": [],
+   "note": "resync after folder permission fix (same code)",
+   "iteration": 2,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-29T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 1.26,
+     "contracts": 355.0,
+     "markets": 21,
+     "fees": 5.07,
+     "pnl_per_contract_c": 0.355,
+     "t_stat": 0.03,
+     "max_drawdown": 30.97,
+     "rejects": 0,
+     "ci95_c": [
+      -19.754,
+      20.903
+     ],
+     "days_positive": "1/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "e6a4b44467a1c1903faaf4311c44e31eedccca815b0cad466dd4a1e3a0841974",
+   "hash": "9e8dd138f163adbb7c655b40f13dcee57631cdaffd5c1510f19b6bccd56017e8"
+  },
+  {
+   "stage": "full",
+   "job": "rain-no-wide-1017-220701",
+   "started": "2026-10-17T22:07:05.179010+00:00",
+   "finished": "2026-10-17T22:07:11.005638+00:00",
+   "git": "1c2b003+dirty",
+   "code": "a35e076c17f0c867",
+   "code_v": 2,
+   "series": [
+    "KXRAIN"
+   ],
+   "derived_from": "rain-no",
+   "params": [],
+   "note": "rain-no rule, window 6-30h, bid 10-75c (pre-registered); rerun after folder permission fix",
+   "iteration": 2,
+   "windows": {
+    "wf-2026-07": [
+     "2026-07-16T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-16T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-07": {
+     "pnl": 329.63,
+     "contracts": 1755.0,
+     "markets": 89,
+     "fees": 25.75,
+     "pnl_per_contract_c": 18.782,
+     "t_stat": 3.56,
+     "max_drawdown": 28.84,
+     "rejects": 0,
+     "ci95_c": [
+      8.405,
+      28.424
+     ],
+     "days_positive": "10/11"
+    },
+    "wf-2026-08": {
+     "pnl": 252.77,
+     "contracts": 5638.84,
+     "markets": 320,
+     "fees": 77.27,
+     "pnl_per_contract_c": 4.483,
+     "t_stat": 1.69,
+     "max_drawdown": 79.54,
+     "rejects": 0,
+     "ci95_c": [
+      -0.697,
+      9.427
+     ],
+     "days_positive": "20/30"
+    },
+    "lat2x-2026-07": {
+     "pnl": 329.63,
+     "contracts": 1755.0,
+     "markets": 89,
+     "fees": 25.75,
+     "pnl_per_contract_c": 18.782,
+     "t_stat": 3.56,
+     "max_drawdown": 28.84,
+     "rejects": 0,
+     "ci95_c": [
+      8.405,
+      28.424
+     ],
+     "days_positive": "10/11"
+    },
+    "lat2x-2026-08": {
+     "pnl": 252.77,
+     "contracts": 5638.84,
+     "markets": 320,
+     "fees": 77.27,
+     "pnl_per_contract_c": 4.483,
+     "t_stat": 1.69,
+     "max_drawdown": 79.54,
+     "rejects": 0,
+     "ci95_c": [
+      -0.697,
+      9.427
+     ],
+     "days_positive": "20/30"
+    },
+    "POOLED": {
+     "pnl": 582.4,
+     "contracts": 7393.84,
+     "markets": 409,
+     "pnl_per_contract_c": 7.877,
+     "ci95_c": [
+      3.258,
+      12.413
+     ],
+     "days_positive": "30/41",
+     "max_drawdown": 77.54
+    },
+    "POOLED-lat2x": {
+     "pnl": 582.4,
+     "contracts": 7393.84,
+     "markets": 409,
+     "pnl_per_contract_c": 7.877,
+     "ci95_c": [
+      3.258,
+      12.413
+     ],
+     "days_positive": "30/41",
+     "max_drawdown": 77.54
+    }
+   },
+   "verdict": "promising",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "9e8dd138f163adbb7c655b40f13dcee57631cdaffd5c1510f19b6bccd56017e8",
+   "hash": "edf4a4db330f229b63debc3637286c31bc11e7ef65bb3a16c60d059850231f52"
+  },
+  {
+   "stage": "lockbox",
+   "job": "rain-no-wide-1017-220754",
+   "started": "2026-10-17T22:08:00.414368+00:00",
+   "finished": "2026-10-17T22:11:37.370140+00:00",
+   "git": "1c2b003+dirty",
+   "code": "a35e076c17f0c867",
+   "code_v": 2,
+   "series": [
+    "KXRAIN"
+   ],
+   "derived_from": "rain-no",
+   "params": [],
+   "note": "lockbox after promising full (+7.88c, CI +3.26..+12.41, 409 mkts, Jul +18.8 Aug +4.5)",
+   "iteration": 3,
+   "windows": {
+    "lockbox-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ],
+    "lockbox-2026-10": [
+     "2026-10-01T00:00:00+00:00",
+     "2026-10-13T00:00:00+00:00"
+    ],
+    "lockbox-recorded": [
+     "2026-10-13T02:00:00+00:00",
+     "2026-10-17T21:48:00.413654+00:00"
+    ]
+   },
+   "cards": {
+    "lockbox-2026-09": {
+     "pnl": 46.08,
+     "contracts": 5378.0,
+     "markets": 315,
+     "fees": 71.6,
+     "pnl_per_contract_c": 0.857,
+     "t_stat": 0.34,
+     "max_drawdown": 152.91,
+     "rejects": 0,
+     "ci95_c": [
+      -4.071,
+      5.736
+     ],
+     "days_positive": "14/30"
+    },
+    "lockbox-2026-10": {
+     "pnl": -86.83,
+     "contracts": 1355.0,
+     "markets": 77,
+     "fees": 19.0,
+     "pnl_per_contract_c": -6.408,
+     "t_stat": -1.24,
+     "max_drawdown": 118.56,
+     "rejects": 0,
+     "ci95_c": [
+      -15.999,
+      3.815
+     ],
+     "days_positive": "6/11"
+    },
+    "lockbox-recorded": {
+     "pnl": -41.17,
+     "contracts": 729.7,
+     "markets": 53,
+     "fees": 9.95,
+     "pnl_per_contract_c": -5.642,
+     "t_stat": -0.81,
+     "max_drawdown": 76.35,
+     "rejects": 0,
+     "ci95_c": [
+      -23.095,
+      9.566
+     ],
+     "days_positive": "2/4"
+    },
+    "POOLED": {
+     "pnl": -40.75,
+     "contracts": 6733.0,
+     "markets": 392,
+     "pnl_per_contract_c": -0.605,
+     "ci95_c": [
+      -4.929,
+      3.7
+     ],
+     "days_positive": "20/40",
+     "max_drawdown": 209.81
+    }
+   },
+   "verdict": "fail",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "edf4a4db330f229b63debc3637286c31bc11e7ef65bb3a16c60d059850231f52",
+   "hash": "1539b0858e29503ac2551e11795e669913253f990388cbb8039486b1eae082c2"
+  }
+ ]
+}

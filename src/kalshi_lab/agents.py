@@ -94,10 +94,10 @@ def run_one(brief: str, rdir: Path, deadline: float, engine: str = "claude"):
             if left < 10 * 60 or (attempt and nudge is None):
                 break
             cmd = droid_cmd(brief, meta["session"], nudge)
-        elif left < 10 * 60 or (rdir / "done.json").exists():
-            break
+        elif left < 10 * 60 or (attempt and (nudge := keep_going(env)) is None):
+            break  # the hook's verdict, not just done.json: a session that ends on an early needs_user is resumed
         elif meta["session"]:
-            prompt = ["--resume", meta["session"], "Your session was interrupted. Continue where you left off "
+            prompt = ["--resume", meta["session"], nudge or "Your session was interrupted. Continue where you left off "
                       "(check report.md, your strategy folders and `uv run kalshi-lab jobs`)."]
         else:
             prompt = [f"/research-strategy {brief}"]

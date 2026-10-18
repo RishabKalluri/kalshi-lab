@@ -1,0 +1,20 @@
+{
+  "slug": "rain-no-wide",
+  "name": "Rain NO wide window",
+  "series": [
+    "KXRAIN"
+  ],
+  "derived_from": "rain-no",
+  "class": "RainNoWide",
+  "status": "developing",
+  "description": "rain-no's rule on the earlier part of the market's life: 6-30 h before the close (the evening before to midday), buy NO at the YES bid when a taker hits it and the bid is 10-75c, one entry per city-day. rain-no itself only trades the last 6 h.",
+  "hypothesis": "Same mechanism as rain-no (retail pays for forecast chance of rain; the market resolves on >0.00 in at the station). Dev screen (first trade after h<=18/30, day-clustered): YES overpriced by 7-21c in the 10-75c buckets (n 100-135 per bucket, se 3-6c), same sign at every horizon. Wrong if the walk-forward CI (net of fees) is <=0: earlier quotes are wider and less informed, so the spread may eat it, and the effect could be mostly the late-window information in rain-no. Adds ~2x markets to rain-no's 163 dev entries.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "smoke (--skip-smoke may be needed: weather has no trade in the smoke window) -> quick -> full 1/3."
+}

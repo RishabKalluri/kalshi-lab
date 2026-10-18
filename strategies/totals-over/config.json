@@ -1,0 +1,21 @@
+{
+  "slug": "totals-over",
+  "name": "Totals over taker",
+  "series": [
+    "KXNBATOTAL",
+    "KXMLBTOTAL"
+  ],
+  "derived_from": "mention-no",
+  "class": "TotalsOver",
+  "status": "developing",
+  "description": "Taker: buys YES (over) at the proven ask, 20-80c, within 6 h of the first trade of an NBA/MLB totals market, one per market, held to settlement.",
+  "hypothesis": "Over is underpriced on NBA/MLB totals: fixed-time screen +7.5c / +6.5c gross (se ~4c, both halves positive). Wrong if the walk-forward CI <= 0. Sample-limited: 150 markets per series, no lockbox data.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "full on sample"
+}

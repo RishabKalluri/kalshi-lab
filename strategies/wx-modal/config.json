@@ -1,0 +1,21 @@
+{
+  "slug": "wx-modal",
+  "name": "Weather modal bracket taker",
+  "series": [
+    "KXHIGHNY", "KXHIGHAUS", "KXHIGHCHI", "KXHIGHLAX", "KXHIGHMIA",
+    "KXHIGHTATL", "KXHIGHTBOS", "KXHIGHTDAL", "KXHIGHTHOU", "KXHIGHTPHX"
+  ],
+  "derived_from": "",
+  "class": "WxModal",
+  "status": "developing",
+  "description": "Taker: 24-36 h before the close of a KXHIGH* city-day, buy YES at the ask on the highest-priced bracket (once per event), hold to settlement.",
+  "hypothesis": "Early KXHIGH ladders are too wide (implied variance ~1.4x realised), so the modal bracket wins slightly more than its price: dev screen +0.4..+1.7c/ct net of fee, day-clustered se ~1c. Wrong if the walk-forward pooled CI <= 0 or 2x latency loses; the edge is small so inconclusive is likely.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "smoke skipped (weather); quick then full"
+}

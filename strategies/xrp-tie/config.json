@@ -1,0 +1,20 @@
+{
+  "slug": "xrp-tie",
+  "name": "XRP tie-goes-YES (last minute)",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "",
+  "class": "XrpTie",
+  "status": "developing",
+  "description": "Taker: in the last minute of an XRP 15-minute window, buy YES at the proven ask (10-70c), once per market. XRP rounds strike and settlement to 4 decimals and 'at least' resolves ties YES, which the market ignores in the final minute.",
+  "hypothesis": "XRP15M settles YES on ties (average >= strike) at 4-decimal precision; in the last minute the distribution of the final average is nearly known and discrete, so ties are common and YES is underpriced. Dev takers: YES +10..+14c, NO -16..-24c in the last minute (both halves, 200 days). Wrong if the walk-forward CI <= 0, 2x latency loses, or the lockbox (Sep-Oct) loses; also dies if market makers already price the tie.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "ad hoc check, quick, full"
+}

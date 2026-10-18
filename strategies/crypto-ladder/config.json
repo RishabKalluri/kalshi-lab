@@ -1,0 +1,21 @@
+{
+  "slug": "crypto-ladder",
+  "name": "Crypto hourly ladder fair value",
+  "series": [
+    "KXBTCD",
+    "KXETHD"
+  ],
+  "derived_from": "eur-bracket",
+  "class": "CryptoLadder",
+  "status": "parked",
+  "description": "eur-bracket's rule moved unchanged (edge 100 mills) to Kalshi's hourly BTC and ETH above-X ladders: take the side of a lognormal fair value around the current price (Yahoo hourly opens, trailing 120-bar vol) when it disagrees with a provable quote by >= 10c, held to settlement.",
+  "hypothesis": "Hourly ladders are quoted by thin retail books that don't price off a spot-vol model, as in EUR/USD brackets. Ad hoc engine run on the 150-market samples (edge 100 mills pre-set, Jan 2-Aug 18): KXBTCD 41 markets +10.2c/ct (t 0.97), KXETHD 36 markets +9.2c (t 0.83). Wrong if the pooled walk-forward CI is <= 0. Live needs a spot feed (the recorder has Binance BTC/ETH).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-17",
+  "next": "Full 1/3 inconclusive: +7.84c/ct, CI -6.69..+23.30, 69 markets, 1,045 contracts, 25/57 days positive. Sample-limited (150-market samples of KXBTCD/KXETHD). Needs the full Jan-Aug KXBTCD/KXETHD ladders (thousands of markets) downloaded; then rerun unchanged. No lockbox run (not promising)."
+}

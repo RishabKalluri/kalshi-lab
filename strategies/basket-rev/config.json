@@ -1,0 +1,26 @@
+{
+  "slug": "basket-rev",
+  "name": "Basket-burst open reversal",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "eth-overreact",
+  "class": "ReversalOpen",
+  "status": "developing",
+  "description": "Fade the previous 15-minute window's >1.25 sigma move at the next open, only when the other two of BTC/ETH/SOL moved the same way by >1 sigma (a market-wide burst).",
+  "hypothesis": "btc-midrev H2: BTC-only bursts stick (idiosyncratic news/flow) while basket-wide bursts (macro, liquidation cascades) overshoot and revert: +3.5c on BTC, inconclusive. The plain z1 reversal has decayed to ~0.5c on all coins; the basket filter may isolate the part that persists. Thresholds fixed now (z 1.25, basket_z 1.0, both others). Losers: opening takers treating the window as a coin flip. Wrong if full CI <= 0, 2x latency loses, lockbox loses.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-18",
+  "next": "Full 1/3 (job basket-rev-1018-004746) was still running at the agent deadline; read its verdict in results.json. Lockbox only if promising.",
+  "paper_params": [
+    "rv_scale=1.02",
+    "slip_c=1"
+  ]
+}
