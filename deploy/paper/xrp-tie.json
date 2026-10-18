@@ -1,0 +1,1 @@
+{"strategy": "strategies/xrp-tie/strategy.py", "series": ["KXXRP15M"], "params": [], "sizing": "pct:0.5"}
