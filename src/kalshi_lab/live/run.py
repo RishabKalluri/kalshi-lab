@@ -115,7 +115,10 @@ def main(argv=None, mode: str = "paper"):
     smap = spot_map(a.series)
     eng = LiveEngine(strat, source, exch, risk=risk, timer_ms=a.timer_ms, status_s=a.status_s,
                      kill_file=data_root / "KILL", spot_map=spot_map(a.series), out=out, meta=meta,
-                     sizer=parse_sizing(a.sizing, a.max_frac), cash=a.bankroll, timeline_s=5)
+                     sizer=parse_sizing(a.sizing, a.max_frac), cash=a.bankroll,
+                     # chart samples of every active market: weather/sports series have dozens open at once (rain paper
+                     # traders grew to 660 MB and 30% CPU each in 2 days), so only single-market crypto series keep them
+                     timeline_s=5 if all(smap.get(s) for s in a.series) else 0)
 
     def stop(*_):
         log.info("stopping...")
