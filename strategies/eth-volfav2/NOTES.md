@@ -46,5 +46,5 @@ runs as a separate paper trader beside it.
   ~570 within 1¢ at signal times), so backfill tests understate capacity; they don't test the edge at large size.
 
 ## Current status
-- Stage: **live** since Oct 14 03:05 UTC ($1,000, 1%/order, rv_scale=1.02, slip_c=1, stop-loss $200; tmux `live-eth-volfav`). Paper continues beside it; eth-volfav (v1) paper is the comparison for the extra trades.
-- Next: compare v2's extra trades vs v1 paper (~150 orders, ~Oct 22-26). If they lose clearly, move live back to v1 (user's OK). rv_scale re-check after 2 more weeks of recordings.
+- Stage: **paper** (live moved to eth-volfav-kelly, quarter Kelly, on Oct 21 17:04 UTC). v2 live Oct 14 03:28 - Oct 21 17:04: +$52.32 on 432 fills at 1%/order ($1,000).
+- Model refit monthly (research/refit_live.py); paper reads ~/kalshi-data/models/eth-volfav2/.
