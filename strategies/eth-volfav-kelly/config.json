@@ -1,0 +1,23 @@
+{
+  "slug": "eth-volfav-kelly",
+  "name": "ETH VolFavorite Kelly",
+  "series": [
+    "KXETH15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "VolFavorite",
+  "status": "live",
+  "description": "ETH VolFavorite v2 with quarter-Kelly sizing: each trade's size comes from a calibrated win probability (the market's price plus the share of the model's claimed edge that has shown up in outcomes), so weak signals that don't cover their cost are skipped and strong ones get more.",
+  "hypothesis": "Same edge as eth-volfav. The vol model claims ~10c of edge at signals but ~3.7c shows up (shrink k ~0.35 out of sample), so Kelly on a shrunk probability should both filter out trades whose calibrated edge is below the price paid and size the rest by strength. Walk-forward Feb-Aug from $1,000: quarter Kelly +290% (max drawdown 14.5%) vs 1%/order +101% (23.3%); with k refit monthly on earlier data +251% (14%). Wrong if live per-contract results fall below v2's or drawdowns exceed ~25%.",
+  "params": [
+    "rv_scale=1.02",
+    "slip_c=1"
+  ],
+  "sizing": "kelly:0.25",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-21",
+  "next": "Live at the user's request without paper (Oct 21): kelly:0.25, max-frac 5%, $1,000, rv_scale=1.02, slip_c=1, stop-loss $200. Compare per-contract and drawdown with v2's live record; edge_shrink refits monthly with the model (research/refit_live.py)."
+}

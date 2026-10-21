@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from kalshi_lab.storage import BUCKET, DATA, aws  # noqa: E402
 
-REFIT = {"eth-volfav2": "KXETH15M", "xrp-volfav": "KXXRP15M"}  # slug -> series (the strategies trading these models)
+REFIT = {"eth-volfav2": "KXETH15M", "xrp-volfav": "KXXRP15M", "eth-volfav-kelly": "KXETH15M"}  # slug -> series (the strategies trading these models)
 MAX_THR_CHANGE = 0.20  # relative change in the entry threshold beyond which a human should look first
 
 
