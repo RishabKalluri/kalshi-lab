@@ -43,7 +43,7 @@ See `SYSTEM.md` for how the system fits together and `README.md` for commands.
 - Pipeline: smoke → quick (gate) → full walk-forward over development data (strategies with a `fit()`
   classmethod are refit before each month on earlier data only, budget 3) → lockbox (one run per strategy per monthly period). Paper starts
   after a lockbox pass; live needs enough paper to check execution, a clean audit, and the user's OK.
-- Three places: the **trading server** (`ssh kalshi`, Lightsail: recorder, paper/live, dashboard, hourly S3
+- Three places: the **trading server** (`ssh kalshi`, EC2 m7g.large: recorder, paper/live, NFL paper trading, dashboard, hourly S3
   upload; deploy with `deploy/push.sh kalshi`, paper traders keep running), **S3** (all data,
   `src/kalshi_lab/storage.py`), and the **research server** (`deploy/research.sh start`, `ssh kalshi-research`:
   tests, the official ledger, nightly downloads, strategy agents; deploy with `deploy/research/push.sh`; it stops

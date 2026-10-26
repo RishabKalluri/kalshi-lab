@@ -72,7 +72,7 @@ sudo chown worker:kdata results/_lockbox && sudo chmod 2770 results/_lockbox
 
 # --- the worker pushes results to the trading server's drop folder (its key can write nothing else there)
 sudo -u worker bash -c '[ -f ~/.ssh/id_ed25519 ] || { mkdir -p -m 700 ~/.ssh; ssh-keygen -q -t ed25519 -N "" -C kalshi-research-worker -f ~/.ssh/id_ed25519; }
-printf "Host kalshi-inbox\n  HostName 3.229.34.35\n  User ubuntu\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking accept-new\n" > ~/.ssh/config'
+printf "Host kalshi-inbox\n  HostName 44.219.216.251\n  User ubuntu\n  IdentityFile ~/.ssh/id_ed25519\n  StrictHostKeyChecking accept-new\n" > ~/.ssh/config'
 
 # --- data: development files world-readable, lockbox-dated ones group kdata only (storage.py fix_perms)
 sudo mkdir -p $D/raw $D/backfill $D/logs

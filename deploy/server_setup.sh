@@ -129,6 +129,32 @@ OnUnitActiveSec=2min
 [Install]
 WantedBy=timers.target
 UNIT
+# NFL paper trading (the nfl-q4 repo, deployed separately to /srv/nfl-q4): its production paper trader plus the
+# oos/paper_addon.py add-ons, no orders ever. Daily at 09:15 Eastern; paper_day.sh exits at once on days without games.
+if [ -x /srv/nfl-q4/oos/paper_day.sh ]; then
+  sudo tee /etc/systemd/system/kalshi-nflpaper.service >/dev/null <<UNIT
+[Unit]
+Description=NFL paper trading for today (nfl-q4: production Q4 rule + add-ons; no orders), then settle
+[Service]
+Type=simple
+Nice=5
+User=$USER
+WorkingDirectory=/srv/nfl-q4
+ExecStart=/srv/nfl-q4/oos/paper_day.sh
+StandardOutput=append:/srv/nfl-q4/logs/paper_day.log
+StandardError=append:/srv/nfl-q4/logs/paper_day.log
+UNIT
+  sudo tee /etc/systemd/system/kalshi-nflpaper.timer >/dev/null <<UNIT
+[Unit]
+Description=NFL paper trading, daily (exits on days without games)
+[Timer]
+OnCalendar=*-*-* 09:15:00 America/New_York
+Persistent=true
+[Install]
+WantedBy=timers.target
+UNIT
+  sudo systemctl daemon-reload && sudo systemctl enable --now kalshi-nflpaper.timer
+fi
 # Hourly upload of everything to S3, then delete local recordings older than the keep windows that S3 has
 # (storage.py). Needs ~/.aws/credentials for the kalshi-uploader IAM user (write-only to the bucket, no deletes).
 uv tool install -q awscli

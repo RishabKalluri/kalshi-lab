@@ -18,7 +18,7 @@ flowchart LR
         H[History APIs: Kalshi historical,<br/>Binance 1s, OKX, Coinbase]
     end
 
-    subgraph SRV[Server: AWS Lightsail, Virginia, always on]
+    subgraph SRV[Server: AWS EC2, Virginia, always on]
         REC[Recorder]
         BF[Nightly backfill]
         PAPER[Paper trader<br/>kalshi-paper@eth-volfav]
@@ -51,8 +51,8 @@ flowchart LR
 
 | Machine | Runs | Why there |
 |---|---|---|
-| **Trading server** (`ssh kalshi`, AWS Lightsail, us-east-1, 2 vCPU / 4 GB, ~$24/mo) | recorders (crypto; weather in its own unit), paper + live trading, dashboard, hourly S3 upload | Must run 24/7; light work. Kalshi feed arrives in ~14 ms (vs ~90 ms from home). |
-| **Research server** (`ssh kalshi-research`, EC2, `deploy/research.sh start`; stops itself after 30 idle min) | tests (worker + `kalshi-sandbox`), the official ledger, nightly and one-off downloads (`systemd-run --unit=kalshi-data-<name>` keeps it awake), strategy agents, research screens | CPU-heavy work; agents' code is sandboxed and can't read lockbox data. |
+| **Trading server** (`ssh kalshi`, EC2 m7g.large, us-east-1, 2 full vCPU / 8 GB, static IP 44.219.216.251, ~$66/mo with disk and IP; moved from Lightsail 2026-10-26, whose burst credits ran out) | recorders (crypto; weather, sports and alts in their own units), paper + live trading, NFL paper trading (`kalshi-nflpaper.timer`, /srv/nfl-q4), dashboard, hourly S3 upload | Must run 24/7; light work. Kalshi feed arrives in ~14 ms (vs ~90 ms from home). |
+| **Research server** (`ssh kalshi-research`, EC2 r8g.large, `deploy/research.sh start`; stops itself after 30 idle min) | tests (worker + `kalshi-sandbox`), the official ledger, nightly and one-off downloads (`systemd-run --unit=kalshi-data-<name>` keeps it awake), strategy agents, research screens | CPU-heavy work; agents' code is sandboxed and can't read lockbox data. |
 | **S3** | all data (`src/kalshi_lab/storage.py`) | The copy both servers pull from. |
 | **Laptop** | Claude Code, deploys, the dashboard tunnel | No tests or data jobs. |
 
