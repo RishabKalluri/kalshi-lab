@@ -74,14 +74,16 @@ def check() -> list[str]:
         # a freshly restarted trader hasn't saved yet; give it one save interval
         if age is not None and age > PAPER_STALE_S:
             problems.append(f"paper trader {pid} hasn't saved results for {age / 60:.0f} min")
-    # Live traders run in tmux (no auto-restart, on purpose). Any live log written in the last 2 days means one
+    # Live traders run in tmux or a transient systemd unit (no auto-restart, on purpose). Any live log written in the last 2 days means one
     # should be running: alert if its process is gone, it stopped logging, or it halted (stop-loss / KILL file).
     for lg in sorted((RAW.parent / "logs").glob("live-*.log")):
         age = time.time() - lg.stat().st_mtime
         if age > 2 * 86400:
             continue
         name = lg.stem.removeprefix("live-")
-        alive = subprocess.run(["pgrep", "-f", f"kalshi-lab live strategies/{name}/"], capture_output=True).returncode == 0
+        # the log is named by a shorter slug than a variant's folder (live-eth-volfav.log runs strategies/eth-volfav-kelly/)
+        alive = subprocess.run(["pgrep", "-f", f"kalshi-lab live strategies/{name}(-[^/]*)?/"],
+                               capture_output=True).returncode == 0
         with open(lg, "rb") as fh:
             fh.seek(max(0, lg.stat().st_size - 50000))
             tail = fh.read().decode(errors="replace")
