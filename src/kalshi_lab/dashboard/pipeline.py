@@ -158,14 +158,18 @@ def resolve(c, jobs, papers) -> dict:
     label = status
     if status in ("paper", "live"):
         stage = status
-    if active:
-        label = f"testing: {active.get('stage', '')}" if active["_state"] == "running" else "test queued"
-        if active["_state"] == "running" and active.get("stage") in STAGES:
+    queued = " · test queued" if active and active["_state"] != "running" else ""
+    if active and active["_state"] == "running":
+        label = f"testing: {active.get('stage', '')}"
+        if active.get("stage") in STAGES:
             stage = max(stage, active["stage"], key=STAGES.index)
     elif live_real:
-        label = "LIVE trading (real money)" + (" + paper" if any(p["_running"] and p.get("mode") == "paper" for p in paper) else "")
+        label = ("LIVE trading (real money)" + (" + paper" if any(p["_running"] and p.get("mode") == "paper" for p in paper)
+                                                else "") + queued)
     elif live_paper:
-        label = "paper trading"
+        label = "paper trading" + queued
+    elif active:
+        label = "test queued"
     elif runs:
         last = runs[-1]
         label = f"{status} · last: {last['stage']} {last.get('verdict', '')}"
@@ -448,10 +452,19 @@ def page(T: dict, layout):
     for c, r in resolved:
         best[roots[c["slug"]]] = min(best.get(roots[c["slug"]], 99), order.get(r["stage"], 99))
     resolved.sort(key=lambda x: (best[roots[x[0]["slug"]]], roots[x[0]["slug"]], order.get(x[1]["stage"], 99)))
-    if not resolved:
-        st.info("No active strategies. Start one with the develop-strategy skill.")
-    for c, r in resolved:
-        card(c, r, backfills, T, layout)
+    # Cards only for what is trading or testing right now (live, paper, a running test); the rest is one table.
+    running = [r["live_paper"] is not None or (r["active_job"] or {}).get("_state") == "running" for _, r in resolved]
+    if not any(running):
+        st.info("Nothing is trading or testing right now.")
+    for (c, r), on in zip(resolved, running):
+        if on:
+            card(c, r, backfills, T, layout)
+    idle = [(c, r) for (c, r), on in zip(resolved, running) if not on]
+    if idle:
+        with st.expander(f"Other strategies, not running ({len(idle)})"):
+            st.dataframe(pd.DataFrame([{"strategy": c["name"], "stage": r["stage"], "status": r["status"],
+                                        "markets": ", ".join(c["series"]), "folder": f"strategies/{c['slug']}/"}
+                                       for c, r in idle]), hide_index=True, width="stretch")
     ideas = [e for e in legacy if e.get("stage") not in ("rejected",)]
     if ideas:
         with st.expander(f"Ideas without code yet ({len(ideas)})"):

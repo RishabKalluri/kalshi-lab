@@ -6,7 +6,7 @@
   ],
   "derived_from": "eth-midrev",
   "class": "LateConfirmed",
-  "status": "paper",
+  "status": "paper_candidate",
   "description": "Right after a 15-minute SOL window opens, if the previous window moved a lot (more than 1.5 of its usual standard deviations) and its last 5 minutes also ran hard the same way, buy the side that bets on a reversal. Bursts that run into the 15-minute boundary tend to give some back in the next window, but the Kalshi SOL price at the open treats the window as a coin flip.",
   "hypothesis": "Same mechanism as eth-midrev, moved to SOL with the ETH rule unchanged (L=300 s, |z15|>1.5, |z5|>1.5 same sign, first 1.5 min, mid 30-70c): the burst into a 15-minute boundary (candle-close traders, hedgers of 15-minute binaries) overshoots and reverses, and the thinner KXSOL15M opening quote ignores it even more than ETH's does. Losers: opening takers/quoters pricing the window as a coin flip. Wrong if: the full walk-forward isn't positive with CI > 0 and >=60% of months positive, May-Aug is flat or negative (the decay eth-overreact saw), the 2x-latency run loses, or the lockbox loses.",
   "params": [],
