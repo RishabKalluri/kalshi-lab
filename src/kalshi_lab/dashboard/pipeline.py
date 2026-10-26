@@ -422,8 +422,22 @@ def card(c, r, backfills, T, layout):
             st.markdown(md(c["_notes"]) or "_empty_")
 
 
-def page(T: dict, layout):
-    st.title("Strategies")
+CATEGORIES = {"Crypto & FX": ("KXBTC", "KXETH", "KXSOL", "KXXRP", "KXDOGE", "KXEURUSD", "KXGOLD"),
+              "Sports": ("KXNFL", "KXNBA", "KXMLB", "KXNHL", "KXEPL", "KXNCAA", "KXMLS", "KXUCL"),
+              "Weather": ("KXHIGH", "KXLOW", "KXRAIN", "KXSNOW", "KXTEMP")}
+
+
+def category(series) -> str:
+    """Sidebar section of a strategy or idea, from its first series that matches; else Other."""
+    for s in series or []:
+        for cat, prefixes in CATEGORIES.items():
+            if s.startswith(prefixes):
+                return cat
+    return "Other"
+
+
+def page(T: dict, layout, cat: str = "Crypto & FX"):
+    st.title(cat)
     items = health()
     if items:
         cols = st.columns(len(items))
@@ -443,6 +457,12 @@ def page(T: dict, layout):
                 c2.progress(max(0.0, min(1.0, b["frac"])), text=f"{b['phase']}: {b['detail']}")
                 c3.markdown(f"running {_dur(b['elapsed'])}  \n**{'~' + _dur(b['eta']) + ' left' if b.get('eta') else '—'}**")
     st.divider()
+    if cat == "Sports":
+        from kalshi_lab.dashboard.nfl import section
+        section()
+        st.divider()
+    entries = [c for c in entries if category(c.get("series")) == cat]
+    legacy = [e for e in legacy if category(e.get("series")) == cat]
     active = [c for c in entries if c.get("status") not in ("rejected", "parked")]
     resolved = [(c, resolve(c, jobs, papers)) for c in active]
     order = {s: i for i, s in enumerate(reversed(STAGES))}
@@ -455,7 +475,7 @@ def page(T: dict, layout):
     # Cards only for what is trading or testing right now (live, paper, a running test); the rest is one table.
     running = [r["live_paper"] is not None or (r["active_job"] or {}).get("_state") == "running" for _, r in resolved]
     if not any(running):
-        st.info("Nothing is trading or testing right now.")
+        st.info(f"No {cat.lower()} strategy is trading or testing right now.")
     for (c, r), on in zip(resolved, running):
         if on:
             card(c, r, backfills, T, layout)

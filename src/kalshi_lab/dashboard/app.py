@@ -470,9 +470,11 @@ def runs_page():
     results_panel()
 
 
-def pipeline_page():
-    from kalshi_lab.dashboard.pipeline import page
-    page(T, layout)
+def strategies_page(cat):
+    def show():
+        from kalshi_lab.dashboard.pipeline import page
+        page(T, layout, cat)
+    return show
 
 
 def new_backtest_page():
@@ -498,7 +500,10 @@ def health_banner():
 
 
 health_banner()
-nav = st.navigation([st.Page(pipeline_page, title="Strategies", default=True),
-                     st.Page(runs_page, title="Runs"),
-                     st.Page(new_backtest_page, title="New backtest")])
+nav = st.navigation({"Strategies": [st.Page(strategies_page("Crypto & FX"), title="Crypto & FX", url_path="crypto", default=True),
+                                    st.Page(strategies_page("Sports"), title="Sports", url_path="sports"),
+                                    st.Page(strategies_page("Weather"), title="Weather", url_path="weather"),
+                                    st.Page(strategies_page("Other"), title="Other", url_path="other")],
+                     "Tools": [st.Page(runs_page, title="Runs"),
+                               st.Page(new_backtest_page, title="New backtest")]})
 nav.run()
