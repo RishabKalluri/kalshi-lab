@@ -6,7 +6,7 @@
   ],
   "derived_from": "eth-volfav",
   "class": "VolFavorite",
-  "status": "paper",
+  "status": "paper_candidate",
   "description": "ETH VolFavorite with two execution fixes for live data: realized vol no longer jumps after a price-feed gap, and the live-vs-backtest vol scale is re-measured (v1 used 1.09 from one partial day; a month of recordings says about 1.02). Same signal and model as eth-volfav: buy the favourite late in the window when the market's implied vol is well above a vol forecast.",
   "hypothesis": "Same edge as eth-volfav (ETH's 15-minute market overprices short-horizon vol). v1 trades ~27% less often than its backtest because rv_scale=1.09 overstates live vol, and feed gaps inflate rv for up to 4h. Fixing both should bring live trade frequency and per-contract results in line with the walk-forward. Wrong if paper per-contract results fall clearly below eth-volfav's paper/live results on the trades v1 would not have taken.",
   "params": [],

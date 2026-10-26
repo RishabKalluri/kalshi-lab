@@ -5,7 +5,7 @@
     "KXETH15M"
   ],
   "class": "VolFavorite",
-  "status": "paper",
+  "status": "paper_candidate",
   "description": "On Kalshi's 15-minute ETH up/down markets, a few minutes before close, compare how much the market 'expects' ETH to move (implied volatility, read off the contract price) with how much it will probably move (a forecast from recent price action). When the market expects far more movement than is likely, the side that's currently winning is underpriced, so buy it.",
   "hypothesis": "ETH's 15-minute market overprices short-horizon volatility after volatile stretches (participants anchor on recent moves), so favorites are cheap late in the window. Takers on the other side are paying for reversals that rarely happen. Wrong if: walk-forward months are mostly negative, or the same test works on BTC (would mean a method artifact, not an ETH inefficiency).",
   "params": [],
