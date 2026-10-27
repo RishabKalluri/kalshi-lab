@@ -1,0 +1,1 @@
+{"strategy": "strategies/wkend-rev/strategy.py", "series": ["KXSOL15M", "KXETH15M", "KXBTC15M", "KXXRP15M", "KXDOGE15M"], "params": ["slip_c=1", "rv_scale=1.05"], "sizing": "pct:0.5"}
