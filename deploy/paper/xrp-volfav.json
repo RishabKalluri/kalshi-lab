@@ -1,1 +1,0 @@
-{"strategy": "strategies/xrp-volfav/strategy.py", "series": ["KXXRP15M"], "params": ["rv_scale=1.05", "slip_c=1"], "sizing": "pct:0.5"}

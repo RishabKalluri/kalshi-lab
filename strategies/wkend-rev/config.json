@@ -1,0 +1,28 @@
+{
+  "slug": "wkend-rev",
+  "name": "Weekend Open Reversal (5 coins)",
+  "series": [
+    "KXSOL15M",
+    "KXETH15M",
+    "KXBTC15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "eth-overreact",
+  "class": "WeekendRev",
+  "status": "paper",
+  "description": "On Saturdays and Sundays, right after a 15-minute window opens on SOL, ETH, BTC, XRP or DOGE, if the previous window moved more than 1.25 of its usual standard deviations, buy the side betting on a reversal. Weekend books are thin and retail-driven, so the opening quote ignores the reversal even after weekdays stopped paying.",
+  "hypothesis": "The previous-window reversal (eth-overreact family) has decayed on weekdays since May but the weekend premium is positive on all five coins in both halves (screen above). Thin weekend quoting leaves the reversal side cheap. Losers: weekend opening takers/quoters pricing the window as a coin flip. Wrong if: pooled full CI includes 0, <60% months positive, 2x latency loses, or lockbox loses. Caveat: the weekend split came from screening the same development data (post hoc), so the lockbox is the real test.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-19",
+  "next": "Paper from 2026-10-27 (weekends only; rv_scale=1.05 as a middle value across coins: ETH 1.02, XRP 1.07, SOL 1.11 measured; slip_c=1). Lockbox pass +2.4c/ct (CI -0.6..+5.6, 1,087 markets).",
+  "paper_params": [
+    "slip_c=1",
+    "rv_scale=1.05"
+  ]
+}

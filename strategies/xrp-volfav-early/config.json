@@ -1,0 +1,24 @@
+{
+  "slug": "xrp-volfav-early",
+  "name": "XRP VolFavorite, early checkpoints",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "xrp-volfav",
+  "class": "VolFavorite",
+  "status": "paper",
+  "description": "xrp-volfav with checkpoints only at 480/360/300/240 s before close (threshold refit on those horizons).",
+  "hypothesis": "Late (<=180 s) buyers are informed (xrp-tie: late takers win 73-86%), so late asks are adverse; the volfav mispricing is retail overpaying earlier in the window. DEV-INFORMED: a research screen (agent run 20261021-0057-1) showed XRP 60-180 s checkpoints at -0.2..-1.5c and 240-480 s at +1.4..+2.2c. Wrong if full walk-forward is not better than xrp-volfav's +1.33c, or lockbox loses. Family lockbox evidence counts with xrp-volfav.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-21",
+  "next": "Paper from 2026-10-27 (rv_scale=1.07 measured Oct 14-25: Binance vs live composite, 203 clean hours, IQR 1.03-1.11; slip_c=1, 0.5%/order). Audit running. Live candidate: small ($300) with stop rules after ~2 weeks of paper if fills match the backtest.",
+  "paper_params": [
+    "rv_scale=1.07",
+    "slip_c=1"
+  ]
+}
