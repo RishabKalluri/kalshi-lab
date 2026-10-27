@@ -362,6 +362,16 @@ def main(argv=None):
     cls = load_strategy(spec)
     fits = callable(getattr(cls, "fit", None))
     runs = plan(a.stage, series, fits=fits, source=cfg.get("source", "backfill"))
+    if a.audit and folder:  # re-run the recorded windows, not today's (later data would change the cards)
+        from .strategy_dir import ledger_runs
+        rec = next((r for r in reversed(ledger_runs(folder.name)) if r.get("stage") == a.stage and not r.get("crashed")), None)
+        win = (rec or {}).get("windows") or {}
+        if win:
+            runs = [dict(r, start=datetime.fromisoformat(win[r["name"]][0]), end=datetime.fromisoformat(win[r["name"]][1]))
+                    for r in runs if r["name"] in win]
+            missing = set(win) - {r["name"] for r in runs}
+            if missing:
+                log(f"  audit: recorded windows not in today's plan: {sorted(missing)}")
     if not runs:
         log(f"no data for {series} to run the {a.stage} stage")
         sys.exit(2)
