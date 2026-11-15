@@ -27,7 +27,12 @@ KEEP_SPOT_DAYS = 30
 
 
 def aws() -> str:
-    return shutil.which("aws") or str(Path("~/.local/bin/aws").expanduser())
+    if found := shutil.which("aws"):
+        return found
+    fallback = Path("~/.local/bin/aws").expanduser()
+    if fallback.exists():
+        return str(fallback)
+    raise RuntimeError("aws CLI not found on PATH or at ~/.local/bin/aws")
 
 
 def sync(src: str, dst: str, *extra: str) -> int:
@@ -51,7 +56,7 @@ def _s3_sizes(prefix: str) -> dict[str, int]:
                           "--query", "Contents[].[Key,Size]", "--output", "text"], capture_output=True, text=True)
     if out.returncode != 0:
         raise RuntimeError(f"listing s3://{BUCKET}/{prefix} failed: {out.stderr.strip()}")
-    return {k: int(v) for k, v in (ln.split("\t") for ln in out.stdout.splitlines() if "\t" in ln)}
+    return {k: int(v) for k, v in (ln.rsplit("\t", 1) for ln in out.stdout.splitlines() if "\t" in ln)}
 
 
 def trim(dry_run: bool = False) -> tuple[int, int]:
@@ -139,7 +144,7 @@ def push(argv=None):
     for d in a.dirs:
         if (DATA / d).is_dir():
             rc |= sync(f"{DATA}/{d}/", f"s3://{BUCKET}/{d}/")
-    msg = f"uploaded in {(datetime.now() - t0).seconds}s"
+    msg = f"uploaded in {int((datetime.now() - t0).total_seconds())}s"
     if rc:
         print(f"{t0:%F %T} {msg} WITH ERRORS (rc={rc}); not trimming", flush=True)
         raise SystemExit(rc)
