@@ -1,0 +1,20 @@
+{
+  "slug": "nba-q4-state",
+  "name": "NBA Q4 state model taker",
+  "series": [
+    "KXNBAGAME"
+  ],
+  "derived_from": "",
+  "class": "NbaQ4State",
+  "status": "parked",
+  "description": "Taker on NBA game-winner markets at Q4 stoppages (300/180/120/60 s left): a gradient-boosted win-probability model (score diff, seconds left, ESPN pregame spread, possession, pace; trained on 2017-2024 seasons of ESPN play-by-play) is compared with the Kalshi ask/bid; buy YES or NO when model edge after fee is >= 2c. Research only: needs a live play-by-play feed, so the engine pipeline can't run it.",
+  "hypothesis": "Kalshi NBA winner prices underuse the state (lead, time, possession, pace, spread) at late-Q4 stoppages; a state model trained on 8 seasons of play-by-play finds mispricings of 2c+ after fees. Wrong if realized c/contract on games not used to pick the rule has a CI that includes 0.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-22",
+  "next": "Full 2/3 inconclusive (edge>=4c): +3.18c CI +0.03..+6.65, 581 mkts, 6/9 months positive (Feb, Mar negative). One full test left; needs live PBP feed + forward 2026-27 data before more tests."
+}

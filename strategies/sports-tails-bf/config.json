@@ -1,0 +1,22 @@
+{
+  "slug": "sports-tails-bf",
+  "name": "Sports extremes maker, trades-source",
+  "series": [
+    "KXNBAGAME",
+    "KXNHLGAME"
+  ],
+  "derived_from": "sports-tails",
+  "class": "SportsTails",
+  "status": "developing",
+  "description": "sports-tails' extremes carry (post-only bids on >=90c favourites, offers on <=10c longshots, NBA/NHL game winners, through the game) run on the trades-only backfill source instead of recorded books, so the walk-forward covers Oct 2025-Sep 2026 (game months incl. Oct-Dec 2025) and the 2x-latency run lands on months with games. The strategy code is sports-tails' unchanged.",
+  "hypothesis": "Same mechanism as sports-tails: takers who buy cheap longshots / sell near-certain favourites pay the 1c tick (5-10% of the price) while the maker fee there is ~0.14c; adverse selection is comebacks. Written before the run: sports-tails' book-source full test gave +1.37c (CI +0.36..+2.36, 1,801 mkts) but could not pass the gate (empty summer months in the latency run, budget used up). An out-of-period trade-print proxy for Oct-Dec 2025 gave +0.8..+1.1c/ct per month (game-clustered se ~1c). Wrong if the pooled walk-forward CI is <= 0, months with games are mostly negative, 2x latency loses, or the lockbox loses. Caveat: the synthetic trades-only book (best bid = last taker sell, ask = last taker buy, depth 50) is a rougher fill model than real books.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-06",
+  "next": "ad hoc Oct-Dec 2025 first, then smoke/quick/full.",
+  "source": "backfill"
+}

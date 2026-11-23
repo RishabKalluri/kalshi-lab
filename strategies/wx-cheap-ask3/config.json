@@ -1,0 +1,30 @@
+{
+  "slug": "wx-cheap-ask3",
+  "name": "KXHIGH cheap-bracket offers, ATL/BOS/HOU/PHX",
+  "series": [
+    "KXHIGHTATL",
+    "KXHIGHTBOS",
+    "KXHIGHTHOU",
+    "KXHIGHTPHX"
+  ],
+  "derived_from": "wx-cheap-ask",
+  "class": "WxMaker",
+  "status": "developing",
+  "description": "wx-cheap-ask rule unchanged (offers on cheap KXHIGH brackets, mid 2-10c, until 13:00 local) on Atlanta, Boston, Houston, Phoenix (the remaining four cities; data from Feb 2026).",
+  "hypothesis": "Same as wx-cheap-ask/wx-cheap-ask2: retail lottery buyers of cheap daily-high brackets lose 1-2c/ct; a resting offer collects it fee-free. Parent +1.00c (NY/CHI/MIA), sibling +0.59c (AUS/LAX/DAL, inconclusive). Wrong if pooled full CI <= 0. Params fixed in advance; independent-market replication.",
+  "params": [
+    "sides=ask",
+    "min_mid=20",
+    "max_mid=100",
+    "min_spread=10",
+    "cutoff_h=13"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-24",
+  "next": "quick -> full 1/3",
+  "source": "books"
+}

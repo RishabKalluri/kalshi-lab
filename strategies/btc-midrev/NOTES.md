@@ -83,3 +83,7 @@ Newest last. Every pipeline run gets a line; every change gets a reason.
   best BTC version of the boundary reversal, but its edge faded to ~0 in Jun–Jul, so a lockbox now would mostly test noise.
 - If revisited: rerun full on the same code once a few more months of development data exist (lockbox moved forward
   deliberately), to see whether Aug's +3.3¢ was a recovery or noise. Run it while the laptop is on power.
+
+## Run 20261102-0055-1: more development months
+Parked next step was "revisit only with more development months". The lockbox rolled to Oct 1, so September is now development data. Code and params unchanged; full 2/3 reruns the walk-forward with Sep added (reason stated from the lockbox calendar, not from results).
+- 2026-11-02 run 20261102-0055-1: full 2/3 (job btc-midrev-1102-013917) queued, unchanged code, Sep added to dev; read results.json.

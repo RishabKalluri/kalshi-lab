@@ -17,6 +17,6 @@
     "lockbox_runs": 1
   },
   "created": "2026-10-16",
-  "next": "Blocked on infra: the pipeline's full died (very likely OOM: 13 GB/month of engine timeline vs 6 GB sandbox, 3 months in parallel). After the engine opts out of timeline sampling for books runs (research/infra_requests.md) rerun full (the quick record 'rejected at quick' is mechanical: no games Aug 29-Sep 1); lockbox only if promising. Net-of-maker-fee ad hoc: +1.37c, CI +0.03..+2.65.",
+  "next": "Full 1/3 inconclusive (mechanical): +1.37c/ct, CI +0.36..+2.36, 1,801 mkts, 4/6 game-months positive; lat2x only ran on empty summer months. Needs a decision on the latency gate (or Oct-Nov games as dev data). No lockbox yet.",
   "source": "books"
 }

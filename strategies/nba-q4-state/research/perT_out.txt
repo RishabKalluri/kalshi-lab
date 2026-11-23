@@ -1,0 +1,8 @@
+dev HGB T=720: trades 197 games 197 realized -1.86c CI [-7.72,4.00] expected 6.56c  vol60 median 9068
+dev blend T=720: trades 68 games 68 realized -9.21c CI [-20.20,1.07] expected 3.21c  vol60 median 9068
+dev HGB T=480: trades 162 games 162 realized 2.53c CI [-3.65,8.89] expected 7.33c  vol60 median 15900
+dev blend T=480: trades 71 games 71 realized -7.66c CI [-17.58,1.75] expected 3.35c  vol60 median 15900
+test HGB T=720: trades 301 games 301 realized 2.68c CI [-1.77,7.15] expected 9.20c  vol60 median 15783
+test blend T=720: trades 134 games 134 realized 4.39c CI [-2.40,10.85] expected 3.44c  vol60 median 15783
+test HGB T=480: trades 238 games 238 realized 3.81c CI [-1.38,8.90] expected 7.88c  vol60 median 22656
+test blend T=480: trades 91 games 91 realized 4.49c CI [-3.95,12.23] expected 3.45c  vol60 median 22656

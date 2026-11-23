@@ -1,0 +1,21 @@
+{
+  "slug": "btc-ladder-rv",
+  "name": "BTC range vs ladder relative value",
+  "series": [
+    "KXBTC",
+    "KXBTCD"
+  ],
+  "derived_from": "crypto-ladder",
+  "class": "LadderRV",
+  "status": "developing",
+  "description": "Buys or sells YES in Kalshi's thin hourly BTC range markets when a print proves a quote at least 8c away from the fair value implied by the liquid KXBTCD above/below ladder of the same hour (P(>lo)-P(>hi) from provable ladder mids). Held to settlement.",
+  "hypothesis": "Both markets settle on the same 60s BRTI average; the ladder is quoted by market makers, the ranges by thin retail books. Research on Sep 22-29 (first full ladder days that are development data): ladder-implied fair has a lower Brier than range prices (0.1620 vs 0.1655); taking range prints that sit >=8c from fair nets +13c/ct (event-clustered se 6, 6,613 prints, 153 hours), >=5c +5c (se 3.4), >=3c +2c. Other side: retail range takers/quoters not tied to the ladder. Wrong if the engine (provable-quote fills, 150 ms, depth) removes it or the CI is <=0. Caveats: 8 days only, one regime, and no ladder data exists after Sep 29, so no lockbox run is possible until Oct+ ladders are downloaded.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-02",
+  "next": "Smoke, quick, full. Lockbox impossible until KXBTC/KXBTCD Oct+ is downloaded (request)."
+}

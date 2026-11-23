@@ -1,0 +1,30 @@
+{
+  "slug": "wx-cheap-ask-c",
+  "name": "KXHIGH cheap-bracket offers, HOU/ATL/BOS/PHX",
+  "series": [
+    "KXHIGHTHOU",
+    "KXHIGHTATL",
+    "KXHIGHTBOS",
+    "KXHIGHTPHX"
+  ],
+  "derived_from": "wx-cheap-ask",
+  "class": "WxMaker",
+  "status": "developing",
+  "description": "wx-cheap-ask's rule unchanged on the four remaining KXHIGH cities (Houston, Atlanta, Boston, Phoenix); parent NY/CHI/MIA full +1.00c, sibling AUS/LAX/DAL full +0.59c.",
+  "hypothesis": "Same as wx-cheap-ask: retail YES buyers overpay on cheap brackets; a resting offer earns ~1c/ct. Wrong if pooled full CI <= 0 or <60% months positive. Independent-market replication, no tuning (Phoenix/Houston have shorter history: ~200 dev days).",
+  "params": [
+    "sides=ask",
+    "min_mid=20",
+    "max_mid=100",
+    "min_spread=10",
+    "cutoff_h=13"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-24",
+  "next": "quick, full 1/3 with -p params; lockbox only if promising.",
+  "source": "books"
+}

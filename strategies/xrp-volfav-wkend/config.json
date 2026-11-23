@@ -1,0 +1,20 @@
+{
+  "slug": "xrp-volfav-wkend",
+  "name": "XRP VolFavorite early, weekends",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "xrp-volfav-early",
+  "class": "VolFavorite",
+  "status": "developing",
+  "description": "xrp-volfav-early (checkpoints 480-240 s) traded only on windows closing Saturday/Sunday UTC; model and threshold refit on all XRP history as in the parent.",
+  "hypothesis": "volfav-pool's development research found the edge about twice as large on weekends in all five coins (thinner retail-dominated books, less professional vol pricing). Rule fixed in advance from that earlier finding, not from xrp-volfav-early's results. Wrong if the weekend-only pooled CI <= 0 or the edge is not larger than the parent's +2.10c. Same family and held-out days as xrp-volfav-early.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-24",
+  "next": "quick -> full 1/3"
+}

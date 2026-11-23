@@ -1,0 +1,20 @@
+{
+  "slug": "nba-prefav",
+  "name": "NBA pre-game heavy favourite",
+  "series": [
+    "KXNBAGAME"
+  ],
+  "derived_from": "",
+  "class": "NbaPreFav",
+  "status": "developing",
+  "description": "Taker buy of the NBA game-winner side whose ask is 90-96c, 12-30 h before the expected end of the game (trigger: a taker buy print), one entry per game, held to settlement.",
+  "hypothesis": "Heavy NBA favourites are underpriced pre-game (favourite-longshot bias): +4-5c after fee in trade-print screen (t=11.7, both halves), +2..+6c on recorded asks. Counterparty: retail backing underdogs/parlays. Wrong if walk-forward CI <= 0. Known limit: ~10 games/month so the CI will be wide; window read off the screen.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-22",
+  "next": "quick, full"
+}

@@ -1,0 +1,29 @@
+{
+  "slug": "wx-cheap-ask2",
+  "name": "KXHIGH cheap-bracket offers, other cities",
+  "series": [
+    "KXHIGHAUS",
+    "KXHIGHLAX",
+    "KXHIGHTDAL"
+  ],
+  "derived_from": "wx-cheap-ask",
+  "class": "WxMaker",
+  "status": "developing",
+  "description": "wx-cheap-ask's rule unchanged (offers only on cheap KXHIGH brackets mid 2-10c until 13:00 local) on three cities it never saw: Austin, Los Angeles, Dallas.",
+  "hypothesis": "Retail YES buyers of cheap daily-high brackets lose 1-2c/ct in all cities (trade-print grid, 10 cities); the wx-cheap-ask rule (NY/CHI/MIA: full +1.00c CI +0.09..+1.93, lockbox weak pass) should earn the same on other cities with no tuning. Wrong if the pooled full CI <= 0 or fewer than 60% of months positive; independent-market replication, not new evidence on the same markets. Counterparty: retail lottery buyers.",
+  "params": [
+    "sides=ask",
+    "min_mid=20",
+    "max_mid=100",
+    "min_spread=10",
+    "cutoff_h=13"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-24",
+  "next": "smoke -> quick -> full 1/3, parameters fixed in advance",
+  "source": "books"
+}

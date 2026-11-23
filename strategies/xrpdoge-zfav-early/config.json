@@ -1,0 +1,21 @@
+{
+  "slug": "xrpdoge-zfav-early",
+  "name": "XRP+DOGE zfav maker, early window",
+  "series": [
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "sol-zfav-early",
+  "class": "ZFavEarly",
+  "status": "developing",
+  "description": "sol-zfav-early's rule unchanged on XRP and DOGE: post-only bid one tick inside the spread on the side spot is >=1.5 sigma past the strike, 540..300 s before close, repriced every 30 s, held to settlement.",
+  "hypothesis": "Late maker fills are adversely selected (sol-zfav-early diagnosis: <200 s left -2.4c, 350-430 s +2.5c). The same should hold on XRP and DOGE, whose zfav makers (+1.4c, +2.1c on 420..150 s) have the same structure, so moving the window earlier should lift them. Rule and params fixed in advance, no tuning. Wrong if full pooled CI <=0, <60% months positive, 2x latency negative, or result is below the parents' windows.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-08",
+  "next": "Full 1/3 promising +1.98c (CI +1.51..+2.45, 9,592 mkts, 145/197 days). Lockbox job queued at the agent deadline: read results.json. Pass -> paper_candidate (same family as the other zfav members, one piece of evidence); fail -> rejected."
+}

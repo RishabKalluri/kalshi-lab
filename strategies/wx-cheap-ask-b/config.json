@@ -1,0 +1,29 @@
+{
+  "slug": "wx-cheap-ask-b",
+  "name": "KXHIGH cheap-bracket offers, AUS/LAX/DAL",
+  "series": [
+    "KXHIGHAUS",
+    "KXHIGHLAX",
+    "KXHIGHTDAL"
+  ],
+  "derived_from": "wx-cheap-ask",
+  "class": "WxMaker",
+  "status": "developing",
+  "description": "wx-cheap-ask's rule unchanged (offers only on cheap KXHIGH brackets, mid 2-10c, until 13:00 local) on three cities the parent never ran: Austin, Los Angeles, Dallas. A replication on new markets, no tuning.",
+  "hypothesis": "Retail YES buyers of cheap daily-high brackets overpay 1-2c in every city, so a resting offer earns about 1c/ct without maker fees, if adverse selection stays smaller. The parent earned +1.0c (CI +0.09..+1.93, 8/8 months) on NY/CHI/MIA. Wrong if the pooled CI is <= 0 on these three cities.",
+  "params": [
+    "sides=ask",
+    "min_mid=20",
+    "max_mid=100",
+    "min_spread=10",
+    "cutoff_h=13"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-24",
+  "next": "smoke (--skip-smoke fails for weather: use --skip-smoke), quick, full 1/3 with -p params; lockbox only if promising.",
+  "source": "books"
+}

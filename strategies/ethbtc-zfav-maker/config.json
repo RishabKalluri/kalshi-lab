@@ -1,0 +1,21 @@
+{
+  "slug": "ethbtc-zfav-maker",
+  "name": "ETH+BTC spot-confirmed favourite, maker entry",
+  "series": [
+    "KXETH15M",
+    "KXBTC15M"
+  ],
+  "derived_from": "sol-zfav-maker",
+  "class": "ZFavMaker",
+  "status": "developing",
+  "description": "sol-zfav-maker's rule unchanged on ETH and BTC: post-only one tick inside the spread on the favourite's side when spot is >=1.5 sigma (15-min realized vol) past the strike, 420..150 s to close, repriced every 30 s, held to settlement.",
+  "hypothesis": "The zfav maker rule earns +1.2c (SOL), +1.4c (XRP), +2.1c (DOGE), stronger on thinner markets. BTC/ETH are the most efficient markets so the prior is weak (~30%), but btc-zfav's taker rule (z>=2, tau 600-480) passed with +2.2c, so confirmed favourites are underpriced there too and a maker saves fee+spread. Rule and parameters fixed in advance, no tuning. Wrong if full CI <=0, <60% months positive or 2x latency negative.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-07",
+  "next": "Full 1/3 promising +0.89c (CI +0.58..+1.21, 30,129 mkts, 192/291 days). Lockbox job ethbtc-zfav-maker-1107-050220 was running at run end: read results.json; pass -> paper_candidate after audit, fail -> rejected."
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "btc-zfav",
+  "name": "Spot-confirmed favourite",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M"
+  ],
+  "derived_from": "sol-favbias",
+  "class": "ZFav",
+  "status": "developing",
+  "description": "Buys the favourite (YES or NO) once per market 8-10 minutes before close, only when spot is at least 2 sigma (15-min realized vol) past the strike. Spot-confirmed favourites win more often than the ~92c price implies.",
+  "hypothesis": "Kalshi prices 8-10 min favourites off a flatter vol/noise assumption; when spot is >2 sigma from the strike the true win rate (~95%) beats the ask (~92c) by 2-3c after fees (BTC research +2.6c, se 0.7, 924 trades, 8/9 months; ETH positive). Other side: favourite-longshot payers. Wrong if the engine (150 ms, 13-contract depth) removes it, <60% months positive, or SOL-style decay (edge fading over months) shows.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-29",
+  "next": "Lockbox job btc-zfav-1030-005801 (queued 2026-10-30 00:58 UTC by run 20261030-0057-1, code unchanged since promising full 1/3) was still running at that run's deadline (>6 h; shared queue). Read results.json: pass -> status paper_candidate (after kalshi-lab audit); fail -> rejected. Do not rerun the lockbox."
+}

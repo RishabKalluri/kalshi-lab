@@ -1,0 +1,451 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "wx-cheap-ask-1022-022703",
+   "started": "2026-10-22T02:27:07.578315+00:00",
+   "finished": "2026-10-22T02:27:13.522119+00:00",
+   "git": "d2a9497+dirty",
+   "code": "486b94b27bac65fb",
+   "code_v": 2,
+   "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHMIA"
+   ],
+   "derived_from": "wx-maker",
+   "params": [],
+   "note": "smoke",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-30T22:00:00+00:00",
+     "2026-08-31T04:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "failed",
+   "gate": "no fills in the smoke window (strategy may never trade, or the window is too short)",
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "",
+   "hash": "223a23903c74d93e3ffd134ebf5cca9d099214658af36ce60456df2c6d29aa91"
+  },
+  {
+   "stage": "quick",
+   "job": "wx-cheap-ask-1022-022750",
+   "started": "2026-10-22T02:27:52.130247+00:00",
+   "finished": "2026-10-22T02:28:34.444367+00:00",
+   "git": "d2a9497+dirty",
+   "code": "486b94b27bac65fb",
+   "code_v": 2,
+   "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHMIA"
+   ],
+   "derived_from": "wx-maker",
+   "params": [],
+   "note": "v1 quick",
+   "iteration": 1,
+   "windows": {
+    "quick-books": [
+     "2026-08-28T04:00:00+00:00",
+     "2026-08-31T04:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-books": {
+     "pnl": -29.46,
+     "contracts": 1799.7,
+     "markets": 15,
+     "fees": 0.0,
+     "pnl_per_contract_c": -1.637,
+     "t_stat": -0.28,
+     "max_drawdown": 99.28,
+     "rejects": 0,
+     "ci95_c": [
+      -21.75,
+      7.347
+     ],
+     "days_positive": "1/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "223a23903c74d93e3ffd134ebf5cca9d099214658af36ce60456df2c6d29aa91",
+   "hash": "28acd4242b107fe87b5a10a7aca71c916e851f3b46bdb95ee90d491685601ef5"
+  },
+  {
+   "stage": "full",
+   "job": "wx-cheap-ask-1022-022855",
+   "started": "2026-10-22T02:29:02.112612+00:00",
+   "finished": "2026-10-22T03:40:43.060372+00:00",
+   "git": "d2a9497+dirty",
+   "code": "486b94b27bac65fb",
+   "code_v": 2,
+   "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHMIA"
+   ],
+   "derived_from": "wx-maker",
+   "params": [],
+   "note": "full 1/3: offers only, mid 20-100, to 13:00 local, NY/CHI/MIA",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-01": [
+     "2026-01-07T00:00:00+00:00",
+     "2026-02-01T00:00:00+00:00"
+    ],
+    "wf-2026-02": [
+     "2026-02-01T00:00:00+00:00",
+     "2026-03-01T00:00:00+00:00"
+    ],
+    "wf-2026-03": [
+     "2026-03-01T00:00:00+00:00",
+     "2026-04-01T00:00:00+00:00"
+    ],
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-01": {
+     "pnl": 461.76,
+     "contracts": 21682.0,
+     "markets": 292,
+     "fees": 0.0,
+     "pnl_per_contract_c": 2.13,
+     "t_stat": 1.86,
+     "max_drawdown": 241.03,
+     "rejects": 0,
+     "ci95_c": [
+      -0.319,
+      4.465
+     ],
+     "days_positive": "18/23"
+    },
+    "wf-2026-02": {
+     "pnl": 284.71,
+     "contracts": 22268.0,
+     "markets": 278,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.279,
+     "t_stat": 0.91,
+     "max_drawdown": 259.86,
+     "rejects": 0,
+     "ci95_c": [
+      -1.792,
+      3.909
+     ],
+     "days_positive": "18/27"
+    },
+    "wf-2026-03": {
+     "pnl": 137.13,
+     "contracts": 24403.0,
+     "markets": 316,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.562,
+     "t_stat": 0.41,
+     "max_drawdown": 434.9,
+     "rejects": 0,
+     "ci95_c": [
+      -2.352,
+      3.116
+     ],
+     "days_positive": "16/28"
+    },
+    "wf-2026-04": {
+     "pnl": 394.11,
+     "contracts": 24505.73,
+     "markets": 321,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.608,
+     "t_stat": 1.35,
+     "max_drawdown": 190.9,
+     "rejects": 0,
+     "ci95_c": [
+      -0.966,
+      3.834
+     ],
+     "days_positive": "18/28"
+    },
+    "wf-2026-05": {
+     "pnl": 61.02,
+     "contracts": 25992.99,
+     "markets": 328,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.235,
+     "t_stat": 0.18,
+     "max_drawdown": 512.02,
+     "rejects": 0,
+     "ci95_c": [
+      -2.579,
+      2.616
+     ],
+     "days_positive": "17/30"
+    },
+    "wf-2026-06": {
+     "pnl": 299.94,
+     "contracts": 23544.49,
+     "markets": 298,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.274,
+     "t_stat": 0.96,
+     "max_drawdown": 176.88,
+     "rejects": 0,
+     "ci95_c": [
+      -1.572,
+      3.72
+     ],
+     "days_positive": "19/29"
+    },
+    "wf-2026-07": {
+     "pnl": 96.51,
+     "contracts": 25370.53,
+     "markets": 329,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.38,
+     "t_stat": 0.28,
+     "max_drawdown": 291.11,
+     "rejects": 0,
+     "ci95_c": [
+      -2.508,
+      3.004
+     ],
+     "days_positive": "15/30"
+    },
+    "wf-2026-08": {
+     "pnl": 77.54,
+     "contracts": 19910.4,
+     "markets": 279,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.389,
+     "t_stat": 0.25,
+     "max_drawdown": 339.66,
+     "rejects": 0,
+     "ci95_c": [
+      -2.799,
+      3.176
+     ],
+     "days_positive": "20/30"
+    },
+    "lat2x-2026-06": {
+     "pnl": 289.34,
+     "contracts": 23490.46,
+     "markets": 300,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.232,
+     "t_stat": 0.92,
+     "max_drawdown": 176.88,
+     "rejects": 0,
+     "ci95_c": [
+      -1.675,
+      3.861
+     ],
+     "days_positive": "19/29"
+    },
+    "lat2x-2026-07": {
+     "pnl": 106.71,
+     "contracts": 25341.96,
+     "markets": 329,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.421,
+     "t_stat": 0.31,
+     "max_drawdown": 288.66,
+     "rejects": 0,
+     "ci95_c": [
+      -2.454,
+      3.045
+     ],
+     "days_positive": "15/30"
+    },
+    "lat2x-2026-08": {
+     "pnl": 75.01,
+     "contracts": 19922.01,
+     "markets": 279,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.377,
+     "t_stat": 0.24,
+     "max_drawdown": 338.78,
+     "rejects": 0,
+     "ci95_c": [
+      -2.83,
+      3.146
+     ],
+     "days_positive": "20/30"
+    },
+    "POOLED": {
+     "pnl": 1812.71,
+     "contracts": 181583.11,
+     "markets": 2441,
+     "pnl_per_contract_c": 0.998,
+     "ci95_c": [
+      0.089,
+      1.929
+     ],
+     "days_positive": "141/225",
+     "max_drawdown": 505.33
+    },
+    "POOLED-lat2x": {
+     "pnl": 471.07,
+     "contracts": 66941.98999999999,
+     "markets": 908,
+     "pnl_per_contract_c": 0.704,
+     "ci95_c": [
+      -0.9,
+      2.344
+     ],
+     "days_positive": "54/89",
+     "max_drawdown": 338.78
+    }
+   },
+   "verdict": "promising",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "28acd4242b107fe87b5a10a7aca71c916e851f3b46bdb95ee90d491685601ef5",
+   "hash": "4e910cda65e29441dbc278b037b7fb3c275a7e1bedf6570147404bd026f79254"
+  },
+  {
+   "stage": "lockbox",
+   "job": "wx-cheap-ask-1022-034105",
+   "started": "2026-10-22T03:41:07.887331+00:00",
+   "finished": "2026-10-22T03:56:45.478936+00:00",
+   "git": "d2a9497+dirty",
+   "code": "486b94b27bac65fb",
+   "code_v": 2,
+   "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHMIA"
+   ],
+   "derived_from": "wx-maker",
+   "params": [],
+   "note": "lockbox after promising full (+1.00c, CI +0.09..+1.93, 8/8 months)",
+   "iteration": 2,
+   "windows": {
+    "lockbox-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ],
+    "lockbox-2026-10": [
+     "2026-10-01T00:00:00+00:00",
+     "2026-10-13T00:00:00+00:00"
+    ],
+    "lockbox-recorded": [
+     "2026-10-13T02:00:00+00:00",
+     "2026-10-22T03:21:07.552840+00:00"
+    ]
+   },
+   "cards": {
+    "lockbox-2026-09": {
+     "pnl": -8.6,
+     "contracts": 23853.5,
+     "markets": 298,
+     "fees": 0.0,
+     "pnl_per_contract_c": -0.036,
+     "t_stat": -0.02,
+     "max_drawdown": 459.86,
+     "rejects": 0,
+     "ci95_c": [
+      -3.078,
+      2.714
+     ],
+     "days_positive": "18/29"
+    },
+    "lockbox-2026-10": {
+     "pnl": 199.49,
+     "contracts": 7089.74,
+     "markets": 91,
+     "fees": 0.0,
+     "pnl_per_contract_c": 2.814,
+     "t_stat": 1.59,
+     "max_drawdown": 138.86,
+     "rejects": 0,
+     "ci95_c": [
+      -0.973,
+      5.853
+     ],
+     "days_positive": "10/11"
+    },
+    "lockbox-recorded": {
+     "pnl": 141.01,
+     "contracts": 5049.34,
+     "markets": 58,
+     "fees": 0.0,
+     "pnl_per_contract_c": 2.793,
+     "t_stat": 1.82,
+     "max_drawdown": 67.04,
+     "rejects": 0,
+     "ci95_c": [
+      -0.809,
+      6.03
+     ],
+     "days_positive": "5/6"
+    },
+    "POOLED": {
+     "pnl": 190.88,
+     "contracts": 29666.33,
+     "markets": 389,
+     "pnl_per_contract_c": 0.643,
+     "ci95_c": [
+      -1.841,
+      2.836
+     ],
+     "days_positive": "28/40",
+     "max_drawdown": 511.23
+    }
+   },
+   "verdict": "pass",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "4e910cda65e29441dbc278b037b7fb3c275a7e1bedf6570147404bd026f79254",
+   "hash": "d802d9e3d0988b236dbd3e7c601e99d0e82421f189149631c239270aacdb067a"
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+{
+  "slug": "sol-zfav-cheap",
+  "name": "SOL cheap spot-confirmed favourite, maker",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav-early",
+  "class": "ZFavEarly",
+  "status": "developing",
+  "description": "sol-zfav-early's post-only favourite bid (SOL spot >=1.5 sigma past the strike, 540..300 s to close), but only when the favourite costs 90c or less. Spot confirmation is worth most where the market is least convinced, so the per-contract edge should be largest in this cheap band.",
+  "hypothesis": "In every walk-forward fill set of the zfav maker family the edge per contract falls with the favourite's price: SOL early 8.1c at <=90c vs 0.9c at 95-97c; SOL parent 6.8c vs 0.6c; XRP 4.6c vs 0.9c; DOGE 5.3c vs 1.5c; ETH+BTC 1.4c vs 0.7c (dev months, engine fills). Mechanism: when the quote is far below the spot-implied probability the market has not absorbed the confirmation yet, and the sellers who hit a bid there are the nervous ones; near 97c the fee-free spread is already competed. Wrong if the full walk-forward at <=90c is below +3c/contract or its CI includes 0, or the edge is concentrated in 1-2 months. Disclosure: the 90c cut was picked after looking at dev fills by price band (4 coins, so replication across coins is the guard); lockbox is the clean test.",
+  "params": [
+    "max_px=900"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-08",
+  "next": "smoke -> quick -> full"
+}

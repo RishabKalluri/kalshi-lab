@@ -1,0 +1,29 @@
+{
+  "slug": "wx-cheap-no",
+  "name": "KXHIGH cheap-bracket NO",
+  "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHLAX",
+    "KXHIGHMIA",
+    "KXHIGHAUS",
+    "KXHIGHTDAL",
+    "KXHIGHTPHX",
+    "KXHIGHTHOU",
+    "KXHIGHTATL",
+    "KXHIGHTBOS"
+  ],
+  "derived_from": "",
+  "class": "WxCheapNo",
+  "status": "developing",
+  "description": "Buys NO (IOC at the YES bid, trigger = taker sell print) on KXHIGH brackets whose YES bid is 2-12c, 18-36 h before the local-midnight close; one entry per bracket, held to settlement.",
+  "hypothesis": "A day ahead the ladder is too wide (implied variance ~1.4x realized), so far brackets priced 2-12c win less than priced. Dev trade screen: +0.9c/ct net (se 0.35-0.6) at 18-36 h, ~0 or negative at other times. Counterparty: retail buying lottery brackets. Wrong if walk-forward CI <= 0, <60% months positive, or lockbox loses. Risk: screen used proven bids but 18-36 h window was read off the screen table (not blind).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-22",
+  "next": "quick, full"
+}

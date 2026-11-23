@@ -1,0 +1,17 @@
+TEST games 808
+LL by T on test: kalshi vs hgb
+60 808 0.1607 0.1606
+120 808 0.186 0.1872
+180 808 0.2166 0.2218
+300 808 0.2412 0.2472
+480 808 0.2741 0.2787
+720 808 0.3275 0.3353
+TEST PRIMARY rule R (T 300-60): trades 670 games 322 realized 4.82c CI [0.60,8.65] expected 6.89c  vol60 median 12366
+  T=300: trades 192 games 192 realized 3.56c CI [-2.07,8.55] expected 7.72c  vol60 median 21579
+  T=180: trades 172 games 172 realized 3.87c CI [-2.34,10.31] expected 6.62c  vol60 median 17269
+  T=120: trades 167 games 167 realized 5.81c CI [-0.06,11.43] expected 7.03c  vol60 median 8695
+  T=60: trades 139 games 139 realized 6.54c CI [0.15,12.55] expected 5.92c  vol60 median 3194
+TEST all six T: trades 1209 games 462 realized 4.09c CI [0.66,7.60] expected 7.66c  vol60 median 15384
+TEST R fill<=20s: trades 664 games 320 realized 4.67c CI [0.48,8.85] expected 6.88c  vol60 median 12366
+TEST blend B all T: trades 484 games 252 realized 6.78c CI [1.50,11.53] expected 3.43c  vol60 median 15384
+TEST blend B T300-60: trades 259 games 158 realized 8.82c CI [3.10,14.40] expected 3.42c  vol60 median 12366

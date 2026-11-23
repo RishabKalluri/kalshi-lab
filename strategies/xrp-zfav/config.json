@@ -1,0 +1,20 @@
+{
+  "slug": "xrp-zfav",
+  "name": "XRP late spot-confirmed favourite",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "sol-zfav",
+  "class": "ZFav",
+  "status": "developing",
+  "description": "Buys the XRP favourite (YES or NO) once per market with 4-6 minutes left, only when spot is at least 1.5 sigma (15-min realized vol) past the strike. sol-zfav's rule moved unchanged to XRP; held to settlement.",
+  "hypothesis": "XRP 15m favourites at tau 240-360 s with spot >=1.5 sigma beyond the strike win more often than their ask implies. Dev screen (Feb-Aug, taker next fills net of fee, research dataset, no tuning): tau 360 +2.54c (626 trades, se 0.41, 7/7 months), 300 +1.41c (588, 6/7), 240 +1.56c (388, 6/7). Other side: flat-vol quoters / favourite-longshot payers. Wrong if engine depth/latency erase it, <60% months positive, 2x latency negative, or it decays like SOL (+3.1 -> +0.7c in the lockbox). DOGE was screened and is negative (-1c), not traded.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-31",
+  "next": "smoke -> quick -> full 1/3"
+}

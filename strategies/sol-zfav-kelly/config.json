@@ -1,0 +1,20 @@
+{
+  "slug": "sol-zfav-kelly",
+  "name": "SOL zfav maker, gap-proportional Kelly",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav-early",
+  "class": "ZFavKelly",
+  "status": "developing",
+  "description": "sol-zfav-early's post-only favourite bid (SOL spot past the strike, 540..300 s to close), entered and sized by the gap between the spot-implied probability Phi(z) and the bid price, with quarter-Kelly sizing on a half-shrunk probability. Money goes where spot confirmation is least priced in (cheap favourites) instead of equally onto 97c fills.",
+  "hypothesis": "The zfav maker family's edge per contract falls with the favourite's price (SOL early +8c at <=90c vs +0.9c at 95-97c; also XRP, DOGE, ETH+BTC), which is what a Phi(z)-price gap predicts. Trading only when Phi(z)-px >= 3c (z>=1.0) and sizing by Kelly on prob = px + 0.5*gap should raise the contract-weighted edge over the flat-size parent (+2.27c dev) and cut the weak 95-97c fills. Wrong if the full walk-forward per-contract result is below the parent's, or the low-z (1.0-1.5) cheap fills are adversely selected (check by z band). Parameters k=0.5, gmin=0.03, kelly:0.25 fixed before any test.",
+  "params": [],
+  "sizing": "kelly:0.25",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-10",
+  "next": "Full 1/3 promising +4.09c (CI +2.9..+5.3, 2,998 mkts, 8/9 months, 2x lat +4.33c). Lockbox job sol-zfav-kelly-1110-050337 still running at the agent's deadline: read results.json; pass -> paper_candidate (same family as the zfav makers, one piece of evidence). Needs audit before live."
+}

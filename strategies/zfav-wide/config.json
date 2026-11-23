@@ -1,0 +1,24 @@
+{
+  "slug": "zfav-wide",
+  "name": "Spot-confirmed favourite, wide price range",
+  "series": [
+    "KXBTC15M",
+    "KXETH15M",
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "btc-zfav",
+  "class": "ZFavWide",
+  "status": "developing",
+  "description": "Once per 15-minute market on BTC/ETH/SOL/XRP/DOGE, buys the favourite (YES or NO) at 120-480 s before close when spot is at least 2.5 sigma (15-min realized vol, basis-corrected) past the strike and the ask is at most 98.5c; held to settlement. btc-zfav's rule with a higher z, a higher price cap and more checkpoints, so it trades many more markets.",
+  "hypothesis": "Late favourites are priced as if less settled than they are: Kalshi quoters under-weight how far spot is from the strike in vol units, and the gap is worth more than the taker fee even at 95-98c where the fee is tiny. Other side: sellers of near-certain contracts and flat-vol quoters. Dev screen (research dataset, Dec-Aug, taker next fills net of fee, one entry per market at the earliest qualifying checkpoint, z>=2.5, ask<=98.5c): 9,563 entries (35/day), +1.34c (se 0.13), 9/9 months, every coin positive (BTC 1.26, ETH 1.12, SOL 2.27, XRP 1.84, DOGE 1.82). Parameters fixed from this screen before any pipeline run. Wrong if the engine's depth/latency/fees erase it, <60% months positive, 2x latency negative, or it decays like sol-zfav in the lockbox. Rare losses cost ~98c each (about 1.7% of entries), so it is a thin-edge/fat-left-tail shape.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-01",
+  "next": "Full 1/3 (job zfav-wide-1101-011311) was still running at the agent's deadline (~6 h, five coins on a shared worker). Read results.json; if promising, run the lockbox (same family/held-out months as the zfav members)."
+}

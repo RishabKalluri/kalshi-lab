@@ -1,0 +1,20 @@
+{
+  "slug": "sol-fairmaker",
+  "name": "SOL fair-value protected maker",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav-maker",
+  "class": "FairMaker",
+  "status": "developing",
+  "description": "Rests post-only quotes on both sides of KXSOL15M between 600 s and 120 s to close, each at least `margin` cents better than a spot-vol fair value (Phi of spot-minus-strike over 15-minute realized vol), re-priced every 15 s. Generalises sol-zfav-maker from confirmed favourites to every z, with the margin as protection against adverse selection.",
+  "hypothesis": "sol-zfav-maker earns about +1.3c as a maker on |z|>=1.5 favourites, so resting quotes priced off a spot fair value should earn the margin whenever a slower or less informed taker hits them. Wrong if fills are adversely selected (the maker tests spreadmk, volfav-maker, dog-seller lost 0.5-2c) so that PnL per contract stays <= 0 at margins of 1-3c, or the fill rate collapses at large margins.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-05",
+  "next": "ad hoc dev windows, then smoke/quick"
+}

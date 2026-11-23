@@ -21,3 +21,5 @@ results/*
 strategies/*/research/**/*.parquet
 strategies/*/research/*.parquet
 strategies/flow-vol/params/flow_feats_*.parquet
+strategies/*/research/data/
+strategies/*/research/**/*.pkl

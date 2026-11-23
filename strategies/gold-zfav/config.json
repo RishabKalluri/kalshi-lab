@@ -1,0 +1,20 @@
+{
+  "slug": "gold-zfav",
+  "name": "Gold late spot-confirmed favourite",
+  "series": [
+    "KXGOLD15M"
+  ],
+  "derived_from": "xrp-zfav",
+  "class": "GoldZFav",
+  "status": "developing",
+  "description": "Buys the gold 15m favourite once per market with 4-6 minutes left when OKX gold spot has moved at least 1.5 sigma (15-min realized vol) from its level at the open, i.e. past the strike. xrp-zfav's rule moved unchanged to a new market, with the basis taken at the open because gold settles on a single 1-minute print.",
+  "hypothesis": "Same favourite-longshot under-pricing of settled 15m markets as the crypto zfav family. Dev screen (research dataset, Aug 30-Sep 30 only, 2,281 markets, taker next fills net of fee, no tuning, rule fixed in advance): z>=1.5 at tau 360/300/240 gives +1.5/+0.2/+0.5c (se 0.9/0.8/0.7), i.e. ~+0.75c pooled, only one month of data. Wrong if the full is not promising (likely: 1 month), 2x latency loses, or the lockbox (October, recorded books) loses. Risk: OKX swap vs Pyth settlement basis (~$1).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-02",
+  "next": ""
+}

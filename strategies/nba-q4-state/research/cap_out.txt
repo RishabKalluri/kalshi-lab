@@ -1,0 +1,16 @@
+dev p_hgb cap 25 trades 468 avg contracts 19.7 total $ 646 weighted c/ct 7.01
+dev p_hgb cap 50 trades 468 avg contracts 33.2 total $ 1161 weighted c/ct 7.47
+dev p_hgb cap 100 trades 468 avg contracts 53.0 total $ 1898 weighted c/ct 7.66
+dev p_hgb cap 200 trades 468 avg contracts 80.3 total $ 3067 weighted c/ct 8.16
+dev p_bl cap 25 trades 188 avg contracts 19.0 total $ 82 weighted c/ct 2.3
+dev p_bl cap 50 trades 188 avg contracts 32.0 total $ 120 weighted c/ct 1.99
+dev p_bl cap 100 trades 188 avg contracts 52.2 total $ 214 weighted c/ct 2.19
+dev p_bl cap 200 trades 188 avg contracts 81.2 total $ 483 weighted c/ct 3.17
+test p_hgb cap 25 trades 670 avg contracts 19.0 total $ 666 weighted c/ct 5.22
+test p_hgb cap 50 trades 670 avg contracts 32.3 total $ 1258 weighted c/ct 5.82
+test p_hgb cap 100 trades 670 avg contracts 51.0 total $ 2153 weighted c/ct 6.29
+test p_hgb cap 200 trades 670 avg contracts 74.2 total $ 3478 weighted c/ct 6.99
+test p_bl cap 25 trades 259 avg contracts 18.0 total $ 488 weighted c/ct 10.48
+test p_bl cap 50 trades 259 avg contracts 30.5 total $ 898 weighted c/ct 11.36
+test p_bl cap 100 trades 259 avg contracts 48.6 total $ 1578 weighted c/ct 12.53
+test p_bl cap 200 trades 259 avg contracts 70.6 total $ 2472 weighted c/ct 13.52

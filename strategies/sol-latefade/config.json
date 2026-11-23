@@ -1,0 +1,20 @@
+{
+  "slug": "sol-latefade",
+  "name": "SOL Late-Window Fade",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-midrev",
+  "class": "LateFade",
+  "status": "developing",
+  "description": "After a 15-minute SOL window whose move was large (over 1.25 of its usual standard deviations), buy the reversal side 2-4 minutes before the next window closes. The screen shows Kalshi's thin SOL quotes still lean the wrong way late in the window, after the spot has begun to revert.",
+  "hypothesis": "sol-midrev's signal (large previous-window move reverses) acts on the whole next window, not only at the open: thin SOL quotes late in the window stay anchored to the continuing trend, so the reversal side is cheap at h=120-240 s. Screen: SOL fade +4..+8c at h 120-240 (mid-based y-mid +8.2c at 180, se 2.5), ETH ~+1, DOGE +5, BTC/XRP ~0; thinner coin = bigger. Losers: late takers/quoters extrapolating the window's path. Wrong if: full walk-forward CI includes 0 or <60% months positive, the effect is Jan-Apr only (like the open reversal), 2x latency loses, or lockbox loses. Note: only SOL looked positive among five coins, so selection risk is real; the pipeline and lockbox decide.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-19",
+  "next": "smoke, quick, full 1/3"
+}

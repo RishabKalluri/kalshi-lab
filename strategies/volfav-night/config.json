@@ -1,0 +1,23 @@
+{
+  "slug": "volfav-night",
+  "name": "VolFavorite night hours (4 coins)",
+  "series": [
+    "KXETH15M",
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "volfav-pool",
+  "class": "NightVolFavorite",
+  "status": "developing",
+  "description": "volfav-pool's rule unchanged (buy the favourite late in the window when implied vol is far above a per-coin HAR forecast; entry bar = per-coin percentile, monthly refit) on ETH, SOL, XRP and DOGE, but only for windows closing 00:00-11:59 UTC, when the US is asleep and Kalshi's 15-minute books are thinnest.",
+  "hypothesis": "Per-hour splits of the finished development full tests of doge/xrp/sol/eth volfav (and volfav-pool) show the edge concentrated in 00-11 UTC closes: pooled four-coin +2.07c/ct (6,577 mkts) vs +0.57c (6,409) for 12-23 UTC, with night above day in each of May-Aug. Mechanism: thin Asian/European-night retail flow prices vol off trailing swings; US-hours windows contain scheduled vol events (9:30 bell, macro releases, equity-hours flow) that the HAR forecast, built for continuity, misses, so the favourite is cheap only at night. Chosen after looking at dev results of those runs (disclosed: dev-informed), so only the lockbox is a clean test; the filter is a single threshold fixed at the half-day boundary, not tuned. Wrong if: pooled full CI includes 0, <60% of months positive, 2x latency not positive, or the lockbox loses (family volfav-pool/sol-volfav already failed the lockbox; a pass here is weak evidence).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-25",
+  "next": "Full 1/3 job volfav-night-1025-011038 was running at session end; read results.json. Lockbox only if promising (dev-informed hour cut, disclosed)."
+}

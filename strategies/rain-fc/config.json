@@ -1,0 +1,20 @@
+{
+  "slug": "rain-fc",
+  "name": "Rain NO on dry forecasts",
+  "series": [
+    "KXRAIN"
+  ],
+  "derived_from": "rain-no",
+  "class": "RainForecastNo",
+  "status": "developing",
+  "description": "rain-no's rule (taker NO at the YES bid in the last 6 h before the local-midnight close, YES bid 10-90c) restricted to city-days where the day-ahead Open-Meteo forecast (previous_day1) has <=0.1 mm of rain left before the close. Retail keeps YES near 25-30% even when the forecast is dry.",
+  "hypothesis": "On 42 development days, KXRAIN markets with no forecast rain left at the 6 h mark were priced ~25% and resolved YES 11.6% (n=198); with forecast rain the price was about right. So the rain-no edge lives in dry-forecast markets and wet-forecast entries only dilute or lose. Counterparty: retail anchoring on a 'chance of rain' floor. Wrong if the full CI <= 0, 2x latency loses, the lockbox (Sep 1+) loses, or it adds nothing over rain-no's unfiltered +14c.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-20",
+  "next": "smoke, quick, full 1/3 (6 h window, identical to rain-no plus the filter)"
+}

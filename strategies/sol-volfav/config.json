@@ -1,0 +1,20 @@
+{
+  "slug": "sol-volfav",
+  "name": "SOL VolFavorite",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "eth-volfav",
+  "class": "VolFavorite",
+  "status": "developing",
+  "description": "eth-volfav2 code applied unchanged to SOL (same rule as xrp-volfav): buy the winning side late in the window when implied vol is far above the forecast; model and threshold refit monthly on SOL history.",
+  "hypothesis": "Thinner, more retail 15m markets misprice vol (ETH, XRP passed; BTC efficient). SOL was only tested inside the 5-coin pool (which failed its lockbox, driven by BTC's inefficiency dilution) and with a different vomma model. Wrong if the full walk-forward is flat/negative, 2x latency loses, or the lockbox loses. No tuning on SOL.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-21",
+  "next": "smoke -> quick -> full -> lockbox if promising"
+}

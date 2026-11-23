@@ -1,0 +1,386 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "xrp-volfav-wkend-1024-030018",
+   "started": "2026-10-24T03:00:21.616350+00:00",
+   "finished": "2026-10-24T03:00:22.926116+00:00",
+   "git": "d2a9497+dirty",
+   "code": "552966e9ce74dc7e",
+   "code_v": 2,
+   "series": [
+    "KXXRP15M"
+   ],
+   "derived_from": "xrp-volfav-early",
+   "params": [],
+   "note": "smoke",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-08-31T18:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 0.0,
+     "contracts": 0,
+     "markets": 0,
+     "fees": 0.0,
+     "pnl_per_contract_c": null,
+     "t_stat": null,
+     "max_drawdown": 0.0,
+     "rejects": 0
+    }
+   },
+   "verdict": "failed",
+   "gate": "no fills in the smoke window (strategy may never trade, or the window is too short)",
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "",
+   "hash": "34be9742804ebc6fcdfa3b16a285310903dbacf0e0c0f205b795e8f03445b5cc"
+  },
+  {
+   "stage": "quick",
+   "job": "xrp-volfav-wkend-1024-030048",
+   "started": "2026-10-24T03:00:51.622369+00:00",
+   "finished": "2026-10-24T03:01:01.702714+00:00",
+   "git": "d2a9497+dirty",
+   "code": "552966e9ce74dc7e",
+   "code_v": 2,
+   "series": [
+    "KXXRP15M"
+   ],
+   "derived_from": "xrp-volfav-early",
+   "params": [],
+   "note": "quick",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-08-29T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": 28.02,
+     "contracts": 2323.0,
+     "markets": 108,
+     "fees": 20.05,
+     "pnl_per_contract_c": 1.206,
+     "t_stat": 0.42,
+     "max_drawdown": 46.34,
+     "rejects": 0,
+     "ci95_c": [
+      -4.415,
+      6.628
+     ],
+     "days_positive": "1/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "34be9742804ebc6fcdfa3b16a285310903dbacf0e0c0f205b795e8f03445b5cc",
+   "hash": "62abce68bcd8203a51b21c6ddc96b5cab6de10483d374c5c72247f84aa1514d9"
+  },
+  {
+   "stage": "full",
+   "job": "xrp-volfav-wkend-1024-030125",
+   "started": "2026-10-24T03:01:26.948902+00:00",
+   "finished": "2026-10-24T03:27:41.520712+00:00",
+   "git": "d2a9497+dirty",
+   "code": "552966e9ce74dc7e",
+   "code_v": 2,
+   "series": [
+    "KXXRP15M"
+   ],
+   "derived_from": "xrp-volfav-early",
+   "params": [],
+   "note": "full 1/3: xrp-volfav-early weekends only (rule fixed from volfav-pool dev finding)",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-04": {
+     "pnl": 26.67,
+     "contracts": 2875.0,
+     "markets": 193,
+     "fees": 25.12,
+     "pnl_per_contract_c": 0.928,
+     "t_stat": 0.39,
+     "max_drawdown": 44.4,
+     "rejects": 0,
+     "ci95_c": [
+      -3.994,
+      5.343
+     ],
+     "days_positive": "4/8"
+    },
+    "wf-2026-05": {
+     "pnl": 326.6,
+     "contracts": 6095.0,
+     "markets": 360,
+     "fees": 51.35,
+     "pnl_per_contract_c": 5.358,
+     "t_stat": 3.62,
+     "max_drawdown": 74.86,
+     "rejects": 0,
+     "ci95_c": [
+      2.509,
+      8.112
+     ],
+     "days_positive": "9/10"
+    },
+    "wf-2026-06": {
+     "pnl": 30.5,
+     "contracts": 3357.0,
+     "markets": 203,
+     "fees": 31.28,
+     "pnl_per_contract_c": 0.909,
+     "t_stat": 0.35,
+     "max_drawdown": 105.11,
+     "rejects": 0,
+     "ci95_c": [
+      -4.143,
+      5.756
+     ],
+     "days_positive": "4/8"
+    },
+    "wf-2026-07": {
+     "pnl": 47.64,
+     "contracts": 1167.0,
+     "markets": 83,
+     "fees": 12.43,
+     "pnl_per_contract_c": 4.082,
+     "t_stat": 1.05,
+     "max_drawdown": 25.09,
+     "rejects": 0,
+     "ci95_c": [
+      -3.289,
+      11.054
+     ],
+     "days_positive": "7/9"
+    },
+    "wf-2026-08": {
+     "pnl": 62.36,
+     "contracts": 5901.0,
+     "markets": 274,
+     "fees": 53.48,
+     "pnl_per_contract_c": 1.057,
+     "t_stat": 0.55,
+     "max_drawdown": 91.21,
+     "rejects": 0,
+     "ci95_c": [
+      -2.961,
+      4.737
+     ],
+     "days_positive": "6/10"
+    },
+    "lat2x-2026-06": {
+     "pnl": 38.31,
+     "contracts": 3306.0,
+     "markets": 199,
+     "fees": 30.89,
+     "pnl_per_contract_c": 1.159,
+     "t_stat": 0.45,
+     "max_drawdown": 97.6,
+     "rejects": 0,
+     "ci95_c": [
+      -4.086,
+      6.069
+     ],
+     "days_positive": "4/8"
+    },
+    "lat2x-2026-07": {
+     "pnl": 48.56,
+     "contracts": 1107.0,
+     "markets": 79,
+     "fees": 11.82,
+     "pnl_per_contract_c": 4.387,
+     "t_stat": 1.1,
+     "max_drawdown": 25.78,
+     "rejects": 0,
+     "ci95_c": [
+      -3.586,
+      11.367
+     ],
+     "days_positive": "7/9"
+    },
+    "lat2x-2026-08": {
+     "pnl": 112.55,
+     "contracts": 5579.0,
+     "markets": 265,
+     "fees": 50.79,
+     "pnl_per_contract_c": 2.017,
+     "t_stat": 1.05,
+     "max_drawdown": 82.08,
+     "rejects": 0,
+     "ci95_c": [
+      -1.812,
+      5.613
+     ],
+     "days_positive": "6/10"
+    },
+    "POOLED": {
+     "pnl": 493.78,
+     "contracts": 19395.0,
+     "markets": 1113,
+     "pnl_per_contract_c": 2.546,
+     "ci95_c": [
+      0.553,
+      4.411
+     ],
+     "days_positive": "29/44",
+     "max_drawdown": 126.44
+    },
+    "POOLED-lat2x": {
+     "pnl": 199.42,
+     "contracts": 9992.0,
+     "markets": 543,
+     "pnl_per_contract_c": 1.996,
+     "ci95_c": [
+      -0.786,
+      4.821
+     ],
+     "days_positive": "16/26",
+     "max_drawdown": 118.16
+    }
+   },
+   "verdict": "promising",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "62abce68bcd8203a51b21c6ddc96b5cab6de10483d374c5c72247f84aa1514d9",
+   "hash": "6521cbbcf14d92eb9864e15c8dcfb6a83b52fcc97b4668ec2d30a9408dde6a46"
+  },
+  {
+   "stage": "lockbox",
+   "job": "xrp-volfav-wkend-1024-032814",
+   "started": "2026-10-24T03:28:16.843278+00:00",
+   "finished": "2026-10-24T03:41:29.385914+00:00",
+   "git": "d2a9497+dirty",
+   "code": "552966e9ce74dc7e",
+   "code_v": 2,
+   "series": [
+    "KXXRP15M"
+   ],
+   "derived_from": "xrp-volfav-early",
+   "params": [],
+   "note": "lockbox 1/1 after promising full (+2.55c, CI +0.55..4.41, 5/5 months); same family/days as xrp-volfav-early",
+   "iteration": 2,
+   "windows": {
+    "lockbox-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ],
+    "lockbox-2026-10": [
+     "2026-10-01T00:00:00+00:00",
+     "2026-10-25T00:00:00+00:00"
+    ],
+    "lockbox-recorded": [
+     "2026-10-13T19:00:00+00:00",
+     "2026-10-24T03:08:16.666111+00:00"
+    ]
+   },
+   "cards": {
+    "lockbox-2026-09": {
+     "pnl": 73.09,
+     "contracts": 4285.0,
+     "markets": 257,
+     "fees": 38.47,
+     "pnl_per_contract_c": 1.706,
+     "t_stat": 0.83,
+     "max_drawdown": 128.77,
+     "rejects": 0,
+     "ci95_c": [
+      -2.437,
+      5.457
+     ],
+     "days_positive": "5/8"
+    },
+    "lockbox-2026-10": {
+     "pnl": 163.33,
+     "contracts": 3301.0,
+     "markets": 183,
+     "fees": 30.21,
+     "pnl_per_contract_c": 4.948,
+     "t_stat": 2.23,
+     "max_drawdown": 48.46,
+     "rejects": 0,
+     "ci95_c": [
+      0.321,
+      8.821
+     ],
+     "days_positive": "5/6"
+    },
+    "lockbox-recorded": {
+     "pnl": 56.91,
+     "contracts": 940.39,
+     "markets": 54,
+     "fees": 10.2,
+     "pnl_per_contract_c": 6.052,
+     "t_stat": 1.25,
+     "max_drawdown": 37.32,
+     "rejects": 0,
+     "ci95_c": [
+      -3.581,
+      14.269
+     ],
+     "days_positive": "3/3"
+    },
+    "POOLED": {
+     "pnl": 236.42,
+     "contracts": 7586.0,
+     "markets": 440,
+     "pnl_per_contract_c": 3.117,
+     "ci95_c": [
+      -0.037,
+      5.975
+     ],
+     "days_positive": "10/14",
+     "max_drawdown": 128.77
+    }
+   },
+   "verdict": "pass",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-09-01T00:00:00+00:00",
+   "prev": "6521cbbcf14d92eb9864e15c8dcfb6a83b52fcc97b4668ec2d30a9408dde6a46",
+   "hash": "b45c5d5e0aa14653ab550c2438f0991c2e44fc67310f54370f8b61900da6a35d"
+  }
+ ]
+}

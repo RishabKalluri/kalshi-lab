@@ -1,0 +1,21 @@
+{
+  "slug": "settle-avg-btcdoge",
+  "name": "Settlement-average taker, BTC+DOGE",
+  "series": [
+    "KXBTC15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "settle-avg",
+  "class": "SettleAvg",
+  "status": "developing",
+  "description": "settle-avg's rule unchanged (last 45 s, partial-average model from Binance 1 s, buy the 60-98c favourite when model beats ask+fee by 3c) on the two coins the original full test left out for runtime only: BTC and DOGE.",
+  "hypothesis": "Same mechanism as settle-avg: late quoters don't know how much of the 60 s settlement average is already fixed. Dev screen on trade prints (net of fee): BTC +1.9c, DOGE +1.7c, smaller than ETH +4.1c / SOL +3.2c, so BTC (efficient, deep) may be near zero. Fixed in advance, no tuning on these coins. Wrong if pooled full CI includes 0, months flip, or 2x latency kills it.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-23",
+  "next": "smoke -> quick -> full 1/3 (BTC+DOGE pooled), lockbox only if promising."
+}

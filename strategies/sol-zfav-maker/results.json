@@ -1,0 +1,448 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "sol-zfav-maker-1102-013858",
+   "started": "2026-11-02T01:39:02.268086+00:00",
+   "finished": "2026-11-02T01:39:04.544357+00:00",
+   "git": "f303b56+dirty",
+   "code": "ae34a6e254d5a4bb",
+   "code_v": 2,
+   "series": [
+    "KXSOL15M"
+   ],
+   "derived_from": "sol-zfav",
+   "params": [],
+   "note": "v1 smoke: zmin 1.5, post-only inside spread, tau 420..150, ttl 30",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-09-30T18:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": 6.13,
+     "contracts": 120.0,
+     "markets": 12,
+     "fees": 0.0,
+     "pnl_per_contract_c": 5.108,
+     "t_stat": 11.7,
+     "max_drawdown": 0.0,
+     "rejects": 0,
+     "ci95_c": [
+      4.325,
+      5.959
+     ],
+     "days_positive": "2/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "",
+   "hash": "a9e6f41ac23118746250346558528fd433723249de3c8ef718d54ebab3e36e54"
+  },
+  {
+   "stage": "quick",
+   "job": "sol-zfav-maker-1102-013917",
+   "started": "2026-11-02T01:39:22.204408+00:00",
+   "finished": "2026-11-02T01:39:38.966871+00:00",
+   "git": "f303b56+dirty",
+   "code": "ae34a6e254d5a4bb",
+   "code_v": 2,
+   "series": [
+    "KXSOL15M"
+   ],
+   "derived_from": "sol-zfav",
+   "params": [],
+   "note": "v1 quick",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-09-28T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": -22.73,
+     "contracts": 1201.83,
+     "markets": 141,
+     "fees": 0.0,
+     "pnl_per_contract_c": -1.891,
+     "t_stat": -0.8,
+     "max_drawdown": 44.86,
+     "rejects": 0,
+     "ci95_c": [
+      -6.903,
+      2.462
+     ],
+     "days_positive": "3/4"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "a9e6f41ac23118746250346558528fd433723249de3c8ef718d54ebab3e36e54",
+   "hash": "e674b299420f29bf1ef2ef4b1d45f2b557c2c39e556b48839674d6ae6e702b40"
+  },
+  {
+   "stage": "full",
+   "job": "sol-zfav-maker-1102-013957",
+   "started": "2026-11-02T12:37:52.667836+00:00",
+   "finished": "2026-11-02T17:04:27.729804+00:00",
+   "git": "f303b56+dirty",
+   "code": "ae34a6e254d5a4bb",
+   "code_v": 2,
+   "series": [
+    "KXSOL15M"
+   ],
+   "derived_from": "sol-zfav",
+   "params": [],
+   "note": "v1 full 1/3: sol-zfav signal, maker entry",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-01": [
+     "2026-01-09T00:00:00+00:00",
+     "2026-02-01T00:00:00+00:00"
+    ],
+    "wf-2026-02": [
+     "2026-02-01T00:00:00+00:00",
+     "2026-03-01T00:00:00+00:00"
+    ],
+    "wf-2026-03": [
+     "2026-03-01T00:00:00+00:00",
+     "2026-04-01T00:00:00+00:00"
+    ],
+    "wf-2026-04": [
+     "2026-04-01T00:00:00+00:00",
+     "2026-05-01T00:00:00+00:00"
+    ],
+    "wf-2026-05": [
+     "2026-05-01T00:00:00+00:00",
+     "2026-06-01T00:00:00+00:00"
+    ],
+    "wf-2026-06": [
+     "2026-06-01T00:00:00+00:00",
+     "2026-07-01T00:00:00+00:00"
+    ],
+    "wf-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "wf-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "wf-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-07": [
+     "2026-07-01T00:00:00+00:00",
+     "2026-08-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-08": [
+     "2026-08-01T00:00:00+00:00",
+     "2026-09-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-01": {
+     "pnl": 121.27,
+     "contracts": 1602.0,
+     "markets": 181,
+     "fees": 0.0,
+     "pnl_per_contract_c": 7.57,
+     "t_stat": 2.14,
+     "max_drawdown": 22.89,
+     "rejects": 18,
+     "ci95_c": [
+      2.008,
+      14.332
+     ],
+     "days_positive": "17/18"
+    },
+    "wf-2026-02": {
+     "pnl": 180.03,
+     "contracts": 9083.0,
+     "markets": 1004,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.982,
+     "t_stat": 2.92,
+     "max_drawdown": 43.79,
+     "rejects": 0,
+     "ci95_c": [
+      0.645,
+      3.191
+     ],
+     "days_positive": "19/29"
+    },
+    "wf-2026-03": {
+     "pnl": 3.7,
+     "contracts": 7755.0,
+     "markets": 953,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.048,
+     "t_stat": 0.06,
+     "max_drawdown": 70.66,
+     "rejects": 0,
+     "ci95_c": [
+      -1.554,
+      1.581
+     ],
+     "days_positive": "17/31"
+    },
+    "wf-2026-04": {
+     "pnl": 51.36,
+     "contracts": 4422.25,
+     "markets": 563,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.161,
+     "t_stat": 1.01,
+     "max_drawdown": 37.32,
+     "rejects": 105,
+     "ci95_c": [
+      -1.049,
+      3.383
+     ],
+     "days_positive": "21/30"
+    },
+    "wf-2026-05": {
+     "pnl": 52.29,
+     "contracts": 4324.17,
+     "markets": 543,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.209,
+     "t_stat": 1.28,
+     "max_drawdown": 38.36,
+     "rejects": 0,
+     "ci95_c": [
+      -0.67,
+      2.949
+     ],
+     "days_positive": "21/31"
+    },
+    "wf-2026-06": {
+     "pnl": 33.95,
+     "contracts": 5971.49,
+     "markets": 739,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.569,
+     "t_stat": 0.73,
+     "max_drawdown": 59.13,
+     "rejects": 0,
+     "ci95_c": [
+      -1.033,
+      2.003
+     ],
+     "days_positive": "18/30"
+    },
+    "wf-2026-07": {
+     "pnl": 25.17,
+     "contracts": 4910.9,
+     "markets": 566,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.513,
+     "t_stat": 0.61,
+     "max_drawdown": 29.0,
+     "rejects": 0,
+     "ci95_c": [
+      -1.253,
+      2.095
+     ],
+     "days_positive": "20/31"
+    },
+    "wf-2026-08": {
+     "pnl": 87.05,
+     "contracts": 6519.05,
+     "markets": 772,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.335,
+     "t_stat": 1.81,
+     "max_drawdown": 28.77,
+     "rejects": 0,
+     "ci95_c": [
+      -0.183,
+      2.69
+     ],
+     "days_positive": "23/31"
+    },
+    "wf-2026-09": {
+     "pnl": 112.88,
+     "contracts": 12156.84,
+     "markets": 1293,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.929,
+     "t_stat": 1.56,
+     "max_drawdown": 49.95,
+     "rejects": 0,
+     "ci95_c": [
+      -0.162,
+      2.026
+     ],
+     "days_positive": "21/31"
+    },
+    "lat2x-2026-07": {
+     "pnl": 25.27,
+     "contracts": 4913.86,
+     "markets": 566,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.514,
+     "t_stat": 0.61,
+     "max_drawdown": 29.03,
+     "rejects": 0,
+     "ci95_c": [
+      -1.252,
+      2.093
+     ],
+     "days_positive": "20/31"
+    },
+    "lat2x-2026-08": {
+     "pnl": 85.52,
+     "contracts": 6504.46,
+     "markets": 767,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.315,
+     "t_stat": 1.77,
+     "max_drawdown": 28.36,
+     "rejects": 0,
+     "ci95_c": [
+      -0.147,
+      2.608
+     ],
+     "days_positive": "23/31"
+    },
+    "lat2x-2026-09": {
+     "pnl": 118.21,
+     "contracts": 12207.72,
+     "markets": 1288,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.968,
+     "t_stat": 1.64,
+     "max_drawdown": 45.99,
+     "rejects": 0,
+     "ci95_c": [
+      -0.222,
+      2.057
+     ],
+     "days_positive": "20/31"
+    },
+    "POOLED": {
+     "pnl": 667.7,
+     "contracts": 56744.7,
+     "markets": 6614,
+     "pnl_per_contract_c": 1.177,
+     "ci95_c": [
+      0.598,
+      1.734
+     ],
+     "days_positive": "176/261",
+     "max_drawdown": 70.66
+    },
+    "POOLED-lat2x": {
+     "pnl": 229.0,
+     "contracts": 23626.04,
+     "markets": 2621,
+     "pnl_per_contract_c": 0.969,
+     "ci95_c": [
+      0.122,
+      1.716
+     ],
+     "days_positive": "63/93",
+     "max_drawdown": 45.99
+    }
+   },
+   "verdict": "promising",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "e674b299420f29bf1ef2ef4b1d45f2b557c2c39e556b48839674d6ae6e702b40",
+   "hash": "b796519b1a3b6ec1f365bcc2563c849cb3af200392818656d93403f835708c68"
+  },
+  {
+   "stage": "lockbox",
+   "job": "sol-zfav-maker-1103-005853",
+   "started": "2026-11-03T00:58:55.522456+00:00",
+   "finished": "2026-11-03T02:19:20.452689+00:00",
+   "git": "f303b56+dirty",
+   "code": "ae34a6e254d5a4bb",
+   "code_v": 2,
+   "series": [
+    "KXSOL15M"
+   ],
+   "derived_from": "sol-zfav",
+   "params": [],
+   "note": "lockbox: v1 sol-zfav maker entry, full 1/3 promising +1.18c 9/9 months",
+   "iteration": 2,
+   "windows": {
+    "lockbox-2026-10": [
+     "2026-10-01T00:00:00+00:00",
+     "2026-11-01T00:00:00+00:00"
+    ],
+    "lockbox-recorded": [
+     "2026-10-01T02:00:00+00:00",
+     "2026-11-03T00:38:55.518109+00:00"
+    ]
+   },
+   "cards": {
+    "lockbox-2026-10": {
+     "pnl": 150.87,
+     "contracts": 11237.05,
+     "markets": 1143,
+     "fees": 0.0,
+     "pnl_per_contract_c": 1.343,
+     "t_stat": 2.37,
+     "max_drawdown": 29.23,
+     "rejects": 0,
+     "ci95_c": [
+      0.168,
+      2.41
+     ],
+     "days_positive": "19/31"
+    },
+    "lockbox-recorded": {
+     "pnl": 64.36,
+     "contracts": 14253.82,
+     "markets": 1499,
+     "fees": 0.0,
+     "pnl_per_contract_c": 0.452,
+     "t_stat": 0.73,
+     "max_drawdown": 66.94,
+     "rejects": 0,
+     "ci95_c": [
+      -0.739,
+      1.638
+     ],
+     "days_positive": "16/33"
+    },
+    "POOLED": {
+     "pnl": 150.87,
+     "contracts": 11237.05,
+     "markets": 1143,
+     "pnl_per_contract_c": 1.343,
+     "ci95_c": [
+      0.168,
+      2.41
+     ],
+     "days_positive": "19/31",
+     "max_drawdown": 29.23
+    }
+   },
+   "verdict": "strong pass",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "b796519b1a3b6ec1f365bcc2563c849cb3af200392818656d93403f835708c68",
+   "hash": "97f03819d9afa925f6bd290576614b6692ce29bac3a275051d868d570a0ee121"
+  }
+ ]
+}

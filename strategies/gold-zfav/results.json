@@ -1,0 +1,182 @@
+{
+ "runs": [
+  {
+   "stage": "smoke",
+   "job": "gold-zfav-1102-010500",
+   "started": "2026-11-02T01:05:06.601297+00:00",
+   "finished": "2026-11-02T01:05:10.900240+00:00",
+   "git": "f303b56+dirty",
+   "code": "da8ca6766089572b",
+   "code_v": 2,
+   "series": [
+    "KXGOLD15M"
+   ],
+   "derived_from": "xrp-zfav",
+   "params": [],
+   "note": "v1: xrp-zfav rule unchanged, point basis",
+   "iteration": 1,
+   "windows": {
+    "smoke": [
+     "2026-09-30T18:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "smoke": {
+     "pnl": -1.28,
+     "contracts": 98.0,
+     "markets": 5,
+     "fees": 1.05,
+     "pnl_per_contract_c": -1.306,
+     "t_stat": -0.09,
+     "max_drawdown": 10.56,
+     "rejects": 0,
+     "ci95_c": [
+      -16.069,
+      27.574
+     ],
+     "days_positive": "1/2"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "ecc85f9a9efb0279c3878fd523bc52a7c98cbd1e75e58b977225f416670338c0",
+   "hash": "551db0f3d71f319447a92c121785b18963b853664c9c8566305d3c96c7bf2565"
+  },
+  {
+   "stage": "quick",
+   "job": "gold-zfav-1102-010518",
+   "started": "2026-11-02T01:05:31.664140+00:00",
+   "finished": "2026-11-02T01:05:54.663661+00:00",
+   "git": "f303b56+dirty",
+   "code": "da8ca6766089572b",
+   "code_v": 2,
+   "series": [
+    "KXGOLD15M"
+   ],
+   "derived_from": "xrp-zfav",
+   "params": [],
+   "note": "v1 quick",
+   "iteration": 1,
+   "windows": {
+    "quick-backfill": [
+     "2026-09-28T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "quick-backfill": {
+     "pnl": -10.1,
+     "contracts": 903.0,
+     "markets": 75,
+     "fees": 8.07,
+     "pnl_per_contract_c": -1.118,
+     "t_stat": -0.28,
+     "max_drawdown": 35.04,
+     "rejects": 0,
+     "ci95_c": [
+      -9.017,
+      6.784
+     ],
+     "days_positive": "2/4"
+    }
+   },
+   "verdict": "passed",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "551db0f3d71f319447a92c121785b18963b853664c9c8566305d3c96c7bf2565",
+   "hash": "c4bb65c026d3f3e49ff9a2526d236bb59577fdb0d7052444fa46887959ecf901"
+  },
+  {
+   "stage": "full",
+   "job": "gold-zfav-1102-010609",
+   "started": "2026-11-02T01:06:11.899198+00:00",
+   "finished": "2026-11-02T01:38:38.135186+00:00",
+   "git": "f303b56+dirty",
+   "code": "da8ca6766089572b",
+   "code_v": 2,
+   "series": [
+    "KXGOLD15M"
+   ],
+   "derived_from": "xrp-zfav",
+   "params": [],
+   "note": "v1 full 1/3: rule fixed in advance, one dev month",
+   "iteration": 1,
+   "windows": {
+    "wf-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ],
+    "lat2x-2026-09": [
+     "2026-09-01T00:00:00+00:00",
+     "2026-10-01T00:00:00+00:00"
+    ]
+   },
+   "cards": {
+    "wf-2026-09": {
+     "pnl": 66.26,
+     "contracts": 7074.0,
+     "markets": 562,
+     "fees": 52.42,
+     "pnl_per_contract_c": 0.937,
+     "t_stat": 0.63,
+     "max_drawdown": 109.7,
+     "rejects": 5,
+     "ci95_c": [
+      -1.931,
+      3.989
+     ],
+     "days_positive": "19/30"
+    },
+    "lat2x-2026-09": {
+     "pnl": 62.49,
+     "contracts": 6697.0,
+     "markets": 531,
+     "fees": 50.04,
+     "pnl_per_contract_c": 0.933,
+     "t_stat": 0.61,
+     "max_drawdown": 99.54,
+     "rejects": 5,
+     "ci95_c": [
+      -2.108,
+      3.884
+     ],
+     "days_positive": "20/30"
+    },
+    "POOLED": {
+     "pnl": 66.26,
+     "contracts": 7074.0,
+     "markets": 562,
+     "pnl_per_contract_c": 0.937,
+     "ci95_c": [
+      -1.931,
+      3.989
+     ],
+     "days_positive": "19/30",
+     "max_drawdown": 109.7
+    },
+    "POOLED-lat2x": {
+     "pnl": 62.49,
+     "contracts": 6697.0,
+     "markets": 531,
+     "pnl_per_contract_c": 0.933,
+     "ci95_c": [
+      -2.108,
+      3.884
+     ],
+     "days_positive": "20/30",
+     "max_drawdown": 99.54
+    }
+   },
+   "verdict": "inconclusive",
+   "gate": null,
+   "crashed": false,
+   "lockbox_start": "2026-10-01T00:00:00+00:00",
+   "prev": "c4bb65c026d3f3e49ff9a2526d236bb59577fdb0d7052444fa46887959ecf901",
+   "hash": "66fcb95beeb62e0c183009abb4fc974d747cc6354a07ac630ff872ab04db2eab"
+  }
+ ]
+}

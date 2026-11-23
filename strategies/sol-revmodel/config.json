@@ -1,0 +1,22 @@
+{
+  "slug": "sol-revmodel",
+  "name": "SOL open-reversal ridge model",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-midrev",
+  "class": "RevModel",
+  "status": "developing",
+  "description": "SOL: a ridge model (refit monthly on earlier windows) scores the open-reversal setup from the previous window's move size, its late confirmation into the boundary, Binance volume vs the same slot's 14-day median and the clock; buy the reversal side when the predicted net PnL beats 4c.",
+  "hypothesis": "The surviving SOL open-reversal pockets (late-confirmed burst: sol-midrev; heavy-volume move: sol-volrev) are facets of one forced-flow overshoot, so a single fitted score concentrates the edge better than separate hard thresholds and adapts as it decays. Losers: opening takers treating the new window as a coin flip. Dev screen (research, walk-forward Apr-Aug, refit monthly): score>4c +5.2c (se 2.2, n=466, 5/5 months positive). Wrong if the engine walk-forward CI <= 0 (research fills at first-minute prints flatter engine fills: sol-overreact research +4c vs engine +0.3c in Jun-Aug), or the lockbox loses. Shares lockbox history with the sol-midrev/volrev/overreact family.",
+  "params": [
+    "thr=0.07"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-23",
+  "next": "smoke -> quick -> full 1/3."
+}

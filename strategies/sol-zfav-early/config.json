@@ -1,0 +1,15 @@
+{
+  "slug": "sol-zfav-early",
+  "name": "SOL zfav maker, early window",
+  "series": ["KXSOL15M"],
+  "derived_from": "sol-zfav-maker",
+  "class": "ZFavEarly",
+  "status": "developing",
+  "description": "sol-zfav-maker's rule (post-only bid one tick inside the spread on the side SOL spot is >=1.5 sigma past the strike) restricted to 540..300 s before close instead of 420..150 s.",
+  "hypothesis": "In sol-zfav-maker's Jun-Sep full-test fills the result improves with time to close: fills with 350-430 s left +2.5c, 280-350 s +0.85c, 200-280 s -0.1c, under 200 s -2.4c. Late fills are adversely selected (informed flow and settlement-average dynamics near the close), early ones earn the favourite premium. Restricting to 540..300 s keeps the early fills. Wrong if the full walk-forward is not above the parent's +1.18c, or months before June are negative (the diagnosis used Jun-Sep fills).",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {"full_tests": 3, "lockbox_runs": 1},
+  "created": "2026-11-05",
+  "next": "smoke, quick, full 1/3"
+}

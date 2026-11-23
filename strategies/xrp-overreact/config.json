@@ -1,0 +1,23 @@
+{
+  "slug": "xrp-overreact",
+  "name": "XRP plain open reversal",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "eth-overreact",
+  "class": "ReversalOpen",
+  "status": "developing",
+  "description": "XRP: right after a 15-minute window opens, if the previous window moved more than 1.25 of its usual standard deviations, buy the reversal side (taker, hold to settlement). sol-overreact's rule moved unchanged to XRP, no tuning.",
+  "hypothesis": "15-minute returns reverse after big moves on every coin (sign autocorrelation negative every month) and Kalshi's opening quote treats the window as a coin flip. XRP's Kalshi market is thinner than ETH's, and wkend-rev's screen found XRP weekday reversal worth about +1.2c after May. Rule fixed in advance (sol-overreact params, no tuning). Wrong if full CI<=0, <60% months positive, 2x latency loses; the same rule decayed to ~0 on SOL/ETH/BTC since June, so a flat Jun-Aug here would end the idea.",
+  "params": [
+    "maker=0",
+    "relv_thr=0"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-27",
+  "next": "smoke, quick, full 1/3"
+}

@@ -1,0 +1,20 @@
+{
+  "slug": "doge-volfav-early",
+  "name": "DOGE VolFavorite, early checkpoints",
+  "series": [
+    "KXDOGE15M"
+  ],
+  "derived_from": "xrp-volfav-early",
+  "class": "VolFavorite",
+  "status": "developing",
+  "description": "xrp-volfav-early (VolFavorite, checkpoints 480/360/300/240 s before close, monthly refit on own history) moved unchanged to DOGE.",
+  "hypothesis": "Retail-heavy thin 15-minute markets overprice short-horizon vol (ETH, XRP passed lockbox; BTC efficient). XRP's early-horizon variant beat the full-horizon rule (+2.10c vs +1.33c; lockbox +2.50c) on the stated reason that late buyers are informed. DOGE's unpruned VolFavorite was inconclusive (+0.57c, 3,157 mkts); this tests whether the early-only variant lifts it. Rule fixed in advance, no tuning. Wrong if the pooled full CI <= 0 or <60% months positive.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-24",
+  "next": "quick -> full 1/3"
+}

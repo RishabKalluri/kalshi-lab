@@ -1,0 +1,20 @@
+{
+  "slug": "sol-zfav",
+  "name": "SOL late spot-confirmed favourite",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "btc-zfav",
+  "class": "ZFav",
+  "status": "developing",
+  "description": "Buys the SOL favourite (YES or NO) once per market with 4-6 minutes left, only when spot is at least 1.5 sigma (15-min realized vol) past the strike. Such favourites win more often than their ~95c ask implies; held to settlement.",
+  "hypothesis": "SOL 15m favourites at tau 240-360 s priced ~95c with spot >=1.5 sigma beyond the strike win ~97-98%: screen (Jan-Aug, taker next fills net of fee) +2.9c at tau 360 (850 trades, se 0.44, 8/8 months), +2.1c at 240 (576, 8/8), +0.9c at 300 (864, 5/8). Other side: flat-vol quoters and favourite-longshot payers who pay for lottery tails or exit early. Wrong if the engine's thin depth and 150 ms latency remove it, <60% months positive, 2x latency negative, or it decays like sol-favbias.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-30",
+  "next": "smoke, quick, full 1/3."
+}

@@ -1,0 +1,20 @@
+{
+  "slug": "sol-zfav-edge",
+  "name": "SOL favourite taker, model-edge entry",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav-px",
+  "class": "ZFavEdge",
+  "status": "developing",
+  "description": "Buys the SOL favourite when the normal-model probability Phi(z) exceeds the ask by at least 3c (z>=1.0, ask<=95c), checkpoints 600..240 s, held to settlement. Entry depends on price relative to the spot-implied probability instead of a fixed z cut.",
+  "hypothesis": "Dev screen (Jan-Sep, taker next fills net of fee, ask<=0.95): net return rises monotonically with Phi(z)-ask: -0.05..0 +0.3c, 0..0.03 +0.8c, 0.03..0.06 +2.0c (1,278), >0.06 +2.8c (605). The market under-prices settled-ness most where it is furthest below the model. Wrong if full <+1c/CI incl. 0 or the sol-zfav family decay (lockbox 0 for sol-zfav-px) repeats; honest prior is that it does, since it is the same family.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-09",
+  "next": "smoke, quick, full 1/3"
+}

@@ -1,0 +1,20 @@
+{
+  "slug": "xrp-tiemodel",
+  "name": "XRP tie model (spot-average)",
+  "series": [
+    "KXXRP15M"
+  ],
+  "derived_from": "xrp-tie",
+  "class": "XrpTieModel",
+  "status": "developing",
+  "description": "Taker: in the last 4-30 s of an XRP 15-minute window, estimate the CF 60 s average from the spot feed (basis-corrected from recent strikes), turn it into P(YES) including the half-tick tie shift, and buy YES at the fresh ask when the model probability exceeds ask + fee by a margin. Unlike xrp-tie it does not copy late buyers: it trades only where the model says the tie rule makes YES cheap.",
+  "hypothesis": "XRP strike and settlement are rounded to 4 decimals and ties resolve YES, so P(YES) = P(avg >= K - 0.5 tick). XRP traded $1.1-1.4 in the dev months, where a tick is 0.7-0.9 bp against a ~1.1 bp residual sd of the basis-corrected Binance estimate, so the half-tick shift is worth ~+12c at 50% when the estimate is within +-3 ticks of the strike (16% of markets, ~14/day). Dev screen: unconditional P(YES | est-K in -0.5..0.5 ticks) = 0.63 vs ~0.5 priced; YES takers there earned +5..+13c, NO takers -10..-20c, every month Feb-Aug. Wrong if the walk-forward CI <= 0, 2x latency loses, or the lockbox loses. Main risk: the backfill book is synthetic (last trade = ask), late informed buyers may be gone after 150 ms.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-19",
+  "next": "smoke, quick, full 1/3"
+}

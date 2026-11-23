@@ -1,0 +1,29 @@
+{
+  "slug": "wx-late-fav",
+  "name": "KXHIGH late-afternoon favourite carry",
+  "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHLAX",
+    "KXHIGHMIA",
+    "KXHIGHAUS",
+    "KXHIGHTDAL",
+    "KXHIGHTPHX",
+    "KXHIGHTHOU",
+    "KXHIGHTATL",
+    "KXHIGHTBOS"
+  ],
+  "derived_from": "",
+  "class": "WxLateFav",
+  "status": "rejected",
+  "description": "Taker buy of the KXHIGH bracket priced 85-97c, 6-10 h before the local-midnight close (first taker-buy print proves the ask), one entry per bracket, held to settlement.",
+  "hypothesis": "Late-afternoon favourites in temperature ladders win more often than priced (development trade screen +1..+3c net at 6-10 h; 4-6 h bucket negative because informed takers are on the other side by then). Counterparty: retail bracket-spreaders pricing off the NWS point forecast. Wrong if the walk-forward pooled CI <= 0, <60% months positive, or the lockbox loses. Risk: screen used trade prices, not asks.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-22",
+  "next": "Rejected at full 1/3: -1.00c/ct (CI -2.60..+0.56, 1,425 mkts, 95/200 days). Trade-price screen (+1..+3c) ignored the spread/ask; do not retry."
+}

@@ -1,0 +1,20 @@
+{
+  "slug": "sol-zfav-drift",
+  "name": "SOL zfav maker, drift-only filter",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav-maker",
+  "class": "ZFavDrift",
+  "status": "developing",
+  "description": "sol-zfav-maker's rule (post-only bid one tick inside on the side SOL spot is >=1.5 sigma past the strike, 420..150 s) but only when the displacement since the window open is drift-like: the largest 10 s move is at most 45% of the total move since open. Jump-driven displacements are skipped.",
+  "hypothesis": "The spot-confirmed favourite is underpriced when the displacement came from steady drift (persistent order flow) but fairly priced or adversely selected when one 10 s jump produced most of it (liquidation/news spike: informed takers already moved the book, fills come from people who know more). Screen on sol-zfav-maker's 6,614 dev fills (Jan-Sep, 5 quintiles of jump share): fills with jump share <=0.45 net +1.85c (3,922, se 0.30) vs +0.07c (2,594, se 0.43) above; low side positive in 8/9 months and in Jun-Sep +2.3/+1.2/+1.7/+1.7 vs -1.5/-0.7/+0.6/-0.7. Threshold 0.45 is the quintile edge from that screen (0.35 and 0.55 give the same picture: +1.95/+0.58 and +1.51/-0.03). Wrong if the engine run does not improve on the parent's +1.18c pooled with a CI above zero, or the gain disappears in the lockbox. Multiple-screen caveat: three filters screened (market-wide agreement, flow, jump share); only this one separated.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-06",
+  "next": "smoke -> quick -> full 1/3 (20261106 agent run 20261106-0100-2)"
+}

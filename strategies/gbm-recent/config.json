@@ -1,0 +1,24 @@
+{
+  "slug": "gbm-recent",
+  "name": "GBM edge, rolling 90-day fit",
+  "series": [
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "gbm-edge",
+  "class": "GbmRecent",
+  "status": "developing",
+  "description": "gbm-edge's learned-edge taker (two GBM edge regressors on spot-distance z, mid, time left; thin SOL/XRP/DOGE 15m) refit monthly on only the previous 90 days instead of all earlier data, because the edge decayed through the dev months (Aug -2.4c, SOL ~0 from July) and an expanding window trains on a regime that no longer exists.",
+  "hypothesis": "The mispricing the GBM finds is regime-dependent and fading as Kalshi activity grows; a 90-day window tracks the current regime and should hold up better in later months than the all-history fit (+3.76c full, Jun-Aug ~+2.7c). Wrong if the full walk-forward isn't better than gbm-edge's later months, 2x latency loses, or lockbox loses. Reason stated from gbm-edge dev monthly PnL, not from lockbox. Risk: fewer training rows (~90 days x 3 coins) -> noisier model; synthetic last-trade books flatter stale quotes.",
+  "params": [
+    "thr=0.03"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-28",
+  "next": "Full 1/3 (job gbm-recent-1028-010522) still running at agent deadline; read verdict in results.json. Lockbox only if promising and better than gbm-edge in Jun-Aug; family already used the lockbox."
+}

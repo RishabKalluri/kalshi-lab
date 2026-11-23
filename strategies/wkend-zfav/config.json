@@ -1,0 +1,24 @@
+{
+  "slug": "wkend-zfav",
+  "name": "Weekend z-favourite (5 coins)",
+  "series": [
+    "KXSOL15M",
+    "KXETH15M",
+    "KXBTC15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "sol-zfav",
+  "class": "WkendZFav",
+  "status": "developing",
+  "description": "On Saturdays and Sundays (UTC window open), buy the side spot is already >=1.5 sigma (15-min realised vol) past the strike at 6, 5 and 4 minutes before close, on SOL, ETH, BTC, XRP and DOGE; hold to settlement. Weekend books are thin and retail-driven, so late favourites are under-priced more than on weekdays.",
+  "hypothesis": "sol-zfav's rule (unchanged) earns more on weekends: screen (next fills net of fee, z>=1.5, h 360/300/240, Jan-May / Jun-Aug) weekend +0.7..+1.9c vs weekday +0.3..+0.9c on all five coins, with Jun-Aug weekend BTC +1.7, ETH +1.9, SOL +1.2, XRP +1.4, DOGE +0.8. Losers: weekend quoters pricing off flat vol/last print. Wrong if pooled full CI includes 0, <60% months positive, 2x latency loses, or lockbox loses. Caveat: weekend split found by screening dev data (post hoc), and the weekday zfav lockbox edges were small.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-01",
+  "next": "Full 1/3 job wkend-zfav-1101-011945 running at run end; read results.json. promising -> lockbox (weekend subset of zfav family); else reject."
+}

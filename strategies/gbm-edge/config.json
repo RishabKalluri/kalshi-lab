@@ -1,0 +1,24 @@
+{
+  "slug": "gbm-edge",
+  "name": "Learned edge (GBM) on thin coins",
+  "series": [
+    "KXSOL15M",
+    "KXXRP15M",
+    "KXDOGE15M"
+  ],
+  "derived_from": "",
+  "class": "GbmEdge",
+  "status": "developing",
+  "description": "Taker on SOL/XRP/DOGE 15-minute markets driven by two gradient-boosted edge regressors (refit monthly on earlier data): predicted net edge of buying YES at the ask / NO at the bid from the spot distance to the strike in 5-min and 60-min vol units, mid and time left. Trades the better side when predicted edge > 3c, one entry per market at fixed checkpoints 600..60 s, held to settlement.",
+  "hypothesis": "Thin 15-minute markets (SOL/XRP/DOGE) are priced by retail off the last trade, not off the spot-vs-strike distance; a model of edge as a function of z-distance and mid should find systematic stale/overpriced quotes on both sides at all horizons (not just favourites late, as VolFavorite). Dev research (walk-forward by month on research dataset, next-trade fills, 3 coins): +1.5..+2.2c net, 4/5 months positive; a probability-calibration version of the same features is -0.4c (so the edge is in where the *ask* is wrong, not in a better probability). Wrong if the engine full walk-forward is not promising, 2x latency loses, or the lockbox loses. Risk: dataset fills (next taker print within 10 s) are selected; the engine is the judge.",
+  "params": [
+    "thr=0.03"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-25",
+  "next": "Full 1/3 (job gbm-edge-1025-010758) was still running at the agent's deadline (>5 h); read its verdict in results.json. Lockbox only if promising; research edge is larger on stale quotes, so synthetic books may flatter."
+}

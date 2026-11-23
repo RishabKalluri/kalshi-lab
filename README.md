@@ -13,6 +13,59 @@ backfill ──► ~/kalshi-data/backfill  (REST trades + 1m spot candles, no or
                               SimExchange (backtest, paper)  |  KalshiExchange (live)
 ```
 
+## Start here (new agent or new machine)
+
+Read in this order: this section → `CLAUDE.md` (rules you must follow) → `SYSTEM.md` (how it all fits) →
+`strategies/<slug>/NOTES.md` for whatever you're working on. The owner works entirely through chat: you write,
+test, run and report strategies; trading parameters are your call (explain briefly); **anything that touches real
+money (live orders, sizing/bankroll changes on the live trader, funding) needs the owner's explicit OK.**
+
+### Where everything is
+
+| What | Where | How to get it |
+|---|---|---|
+| Code, strategy folders, hash-chained test ledgers (`results/_ledger/`) | this GitHub repo | `git clone` |
+| All market data: recordings (`raw/`), history (`backfill/`, incl. Predexon order books), live model refits (`models/`) | S3 `s3://kalshi-data-531080694882/` (us-east-1) | `kalshi-lab pull <SERIES>` or `aws s3 sync` (large: don't sync all of it) |
+| Recorder, paper traders, **live trader**, dashboard | trading server, EC2 m7g.large (`ssh kalshi`) | `deploy/push.sh kalshi` to deploy |
+| Tests (official ledger), nightly downloads + refits, strategy agents | research server, EC2 (`ssh kalshi-research`), stops itself after 30 idle min | `deploy/research.sh start`, deploy `deploy/research/push.sh` |
+| Secrets | **never in git**: `.env`, `~/.kalshi/*.pem`, `~/.ssh/*.pem`, `~/.aws/credentials` | the owner provides them (below) |
+
+Research agents write new strategy folders on the research server; they reach the trading server via
+`kalshi-lab research-merge`. Pull them back into git periodically (rsync `kalshi:kalshi/strategies/` and
+`kalshi:kalshi/results/_ledger/` into the repo, check for conflicts with local edits, commit). Ledgers are
+append-only, so the longer copy wins.
+
+### Credentials an agent needs (pick only what the task needs)
+
+| Credential | Env var / file | Needed for |
+|---|---|---|
+| AWS access key | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION=us-east-1` | S3 data; starting the research server (EC2) |
+| SSH keys | `~/.ssh/kalshi-research.pem`, the trading server's key, plus `~/.ssh/config` host entries `kalshi`, `kalshi-research` | deploying, running tests, checking paper/live |
+| Predexon key | `PREDEXON_API_KEY` in `.env` | historical order book downloads only |
+| Kalshi API key | `KALSHI_KEY_ID`, `KALSHI_PRIVATE_KEY_PATH` in `.env` | **live trading only**. Lives on the trading server already; a research agent does not need it |
+
+Security groups only allow SSH from known IPs: `deploy/research.sh start` replaces the research server's rule with
+the caller's current IP; the trading server's rule must be updated by hand (EC2 console) for a new machine.
+
+### Current state (update this when it changes)
+
+- **Live (real money):** `eth-volfav-kelly`, quarter-Kelly ETH VolFavorite, systemd `kalshi-live-eth-volfav` on the
+  trading server (bankroll ~$1.07k, max loss $200). Started 2026-10-21. Kill switch: `touch ~/kalshi-data/KILL`.
+- **Paper:** `xrp-volfav-early`, `rain-maker`, `wkend-rev`, `xrp-tie` (`kalshi-paper@<id>`), NFL paper (`kalshi-nflpaper`).
+- **Recorders:** crypto 15M, weather, sports, alts (`kalshi-recorder*`).
+- **Pending (as of 2026-10-27):** lockbox audits of `xrp-volfav-early` and `eth-volfav-wide` (re-run with the fixed audit
+  windows, logs in `/home/ubuntu/audit/` on the research server); Kelly + top-40% backtest (`kellywide.log`, same place).
+  Next steps once clean: small live XRP-early (~$300, owner's OK), fold the top-40% bar into live Kelly if it holds.
+
+### First commands for a new agent
+
+```
+uv sync && uv run pytest                       # local install + tests
+deploy/research.sh start && ssh kalshi-research # research server
+ssh kalshi 'systemctl list-units "kalshi*"'     # what's running on the trading server
+deploy/dashboard.sh                             # dashboard at http://localhost:8501 (SSH tunnel)
+```
+
 ## Setup
 
 Credentials live outside the repo: `.env` points at `~/.kalshi/kalshi.pem` (chmod 600).

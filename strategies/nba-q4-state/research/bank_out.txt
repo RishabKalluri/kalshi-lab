@@ -1,0 +1,6 @@
+dev cap 50 start $1000 end 2030 95% range [1284. 2059. 2932.] P(up) 1.0
+dev cap 100 start $1000 end 2268 95% range [1369. 2440. 3781.] P(up) 1.0
+dev cap 200 start $1000 end 2257 95% range [1284. 2522. 4188.] P(up) 1.0
+test cap 50 start $1000 end 2192 95% range [1168. 2123. 3061.] P(up) 0.993
+test cap 100 start $1000 end 2625 95% range [1158. 2397. 4033.] P(up) 0.99
+test cap 200 start $1000 end 2629 95% range [1039. 2404. 4827.] P(up) 0.977

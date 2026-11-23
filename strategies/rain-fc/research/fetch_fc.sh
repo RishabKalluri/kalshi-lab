@@ -1,0 +1,3 @@
+cd /srv/kalshi/strategies/rain-obs/data
+for kv in ATL:33.64:-84.43 AUS:30.19:-97.67 BOS:42.36:-71.01 CHI:41.98:-87.90 DAL:32.90:-97.04 DC:38.85:-77.04 DEN:39.85:-104.66 EWR:40.69:-74.17 HOU:29.98:-95.34 LAX:33.94:-118.41 LV:36.08:-115.15 MIA:25.79:-80.29 MIN:44.88:-93.22 NOLA:29.99:-90.26 NYC:40.78:-73.97 OKC:35.39:-97.60 PHIL:39.87:-75.24 PHX:33.43:-112.01 SATX:29.53:-98.47 SEA:47.45:-122.31 SFO:37.62:-122.38 TTN:40.28:-74.82; do IFS=: read s la lo <<<"$kv"
+curl -s "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=$la&longitude=$lo&hourly=precipitation_previous_day1,precipitation_probability_previous_day1&start_date=2026-07-10&end_date=2026-10-20&timezone=UTC&format=csv" | tail -n +5 > fc_$s.csv; echo $s $(wc -l < fc_$s.csv); sleep 1; done

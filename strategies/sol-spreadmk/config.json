@@ -1,0 +1,20 @@
+{
+  "slug": "sol-spreadmk",
+  "name": "SOL early-window spread maker",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-screens",
+  "class": "",
+  "status": "rejected",
+  "description": "Join best bid and ask early in each KXSOL15M window (300-700 mills mid, spread >=2c), hold fills to settlement. Maker, no fee.",
+  "hypothesis": "Takers at mid prices lose ~3c per print, 1.2c of it gross to the counterparty in the first 5 min; a passive quoter keeps that. Wrong if the engine (which charges trade-through adverse selection) shows <=0 per contract.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-20",
+  "next": "Rejected ad hoc (-1.84c/ct, 47k ct, Jul 1-7, t -2.28). Revisit with real books once Oct data is development data (Nov 1)."
+}

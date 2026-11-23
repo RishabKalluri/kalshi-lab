@@ -1,0 +1,29 @@
+{
+  "slug": "wx-cheap-ask",
+  "name": "KXHIGH cheap-bracket offers (maker)",
+  "series": [
+    "KXHIGHNY",
+    "KXHIGHCHI",
+    "KXHIGHMIA"
+  ],
+  "derived_from": "wx-maker",
+  "class": "WxMaker",
+  "status": "paper_candidate",
+  "description": "wx-maker's code with offers only on cheap KXHIGH brackets (mid 2-10c), quoted from listing until 13:00 local on the market day: sell YES lottery tickets to retail YES buyers (who lose 1-2c per contract at every low band, both halves, all cities in the trade-print grid) with no maker fee.",
+  "hypothesis": "Taker YES buyers of <10c brackets lose 1-2c/ct net of fee consistently (grid, 10 cities, both halves); a resting offer collects that without fees, if adverse selection (brackets that become live) stays below it. wx-maker's wide mid band (5-50c) averaged -0.3..+0.9c; the cheap band is where takers lose most. Wrong if CI <= 0.",
+  "params": [
+    "sides=ask",
+    "min_mid=20",
+    "max_mid=100",
+    "min_spread=10",
+    "cutoff_h=13"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-22",
+  "next": "Lockbox weak pass (Sep 1-Oct 22): +0.64c/ct, CI -1.84..+2.84, 389 mkts, 28/40 days; Sep -0.04c (298 mkts), Oct +2.8c, recorded real books Oct 13-22 +2.8c (58 mkts, CI -0.8..+6.0). Dev full +1.00c (CI +0.09..+1.93, 8/8 months). Same code as wx-maker with a cheap-band param set: needs paper on recorded KXHIGH books to check real queue fills and adverse selection; extend to the other 7 cities (memory-limited here). User decides paper.",
+  "source": "books"
+}

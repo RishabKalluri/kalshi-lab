@@ -57,3 +57,29 @@ Net = engine pnl minus the exact maker fee per fill (engine charges makers 0; fe
 
 ## Current status
 - Stage: full test queued/running; no lockbox yet (lockbox needs a promising full).
+
+## Rerun (agent run 20261021-0058-2)
+Picked up as the next untaken testable item after the SOL screens: books pipeline no longer keeps the chart timeline (commit f2ef70b), so full 1/3 requeued, rule unchanged (job sports-tails-1021-011103).
+| 4 | 10-21 | v1 unchanged, full 1/3 (job sports-tails-1021-011103, books pipeline without timeline) | full | **inconclusive (mechanical)**: pooled +1.37c/ct, CI +0.36..+2.36, 1,801 mkts, $+2,212, 98/136 days positive. Months: Jan +1.70, Feb +0.40, Mar +3.28 (CI +1.8..+4.7), Apr -0.04, May +1.79, Jun -19.9 (11 mkts), Jul/Aug 0 mkts (off-season, books have no games). 4/6 months with games positive, 4/8 counting empty ones. POOLED-lat2x covers only Jun-Aug (11 mkts, -20c), so the 2x-latency gate fails for lack of games, not evidence | the pooled CI is above 0 on 1,801 markets, but the gate cannot pass: empty summer months and a latency run restricted to them. No lockbox (verdict not promising); 2 full tests left. A re-run would give the same verdict unless the latency run covers months with games. Needs the user/maintainer to decide whether to accept this as evidence (e.g. a lat2x run on Jan-May), or wait for the Oct-Nov games to become development data. |
+
+### Full-run decomposition (fills of wf-2026-01..06, per-fill gross PnL to settlement minus fee; not a new test)
+NBA bids +1.32c / offers +1.22c per contract; NHL bids +0.51c / offers +2.40c. By price: bids 900-940 +0.8c, 940-970 +2.5c, 970-1000 +1.9c; offers <=30 +1.1c, 30-60 +2.2c, 60-100 +1.7c. Edge appears on both sides and both sports (not one bucket), which supports it being real; Mar carries most of the dollars. EPL/NFL books are too small (EPL ~80 games Jan-May; sibling logic assumes 2-way markets) to extend the rule.
+
+### Spin-off screen: same extremes idea on weather (ad hoc, wx-maker code, books, NY+CHI, 2-week slices Mar 10, May 10, Jul 10)
+Bids on brackets >=90c (min_mid=900): -6.7 / -1.2 / -0.5 $ per traded market (t -0.9, -0.3, -0.1). Offers on brackets <=10c (min_mid=5 max_mid=100): -3.7 / +0.7 / +0.6 $ (t -1.4, +0.5, +0.4). Nothing; weather quoting is dead at the extremes too (no fee advantage there, adverse selection from observations). Not escalated.
+
+### 2x-latency check on game months (ad hoc, 300 ms, books, NBA+NHL, rule unchanged; the pipeline's lat2x only covered the empty Jun-Aug)
+Jan +1.74c/ct (t 1.8), Feb +0.43c (t 0.3), Mar +3.27c (t 4.4) vs normal latency in the full test +1.70 / +0.40 / +3.28. Latency does not matter for this strategy (post-only resting quotes). Ad hoc, not a pipeline record; evidence for the gate decision only.
+
+### Generalisation check (ad hoc, rule unchanged, books, Jan-May)
+KXEPLGAME: -3.5c/ct, 74 markets traded, t -1.0 (3-way markets, sibling exposure logic assumes 2-way). KXNFLGAME+KXNFLTOTAL: -4.4c/ct, 15 markets. Too small to conclude, but no support for extending the rule beyond NBA/NHL.
+
+### Game-level robustness of the full run (wf-2026-01..06 markets.csv, games with fills)
+1,015 games, total $+2,212, mean $+2.18/game, se $1.08 (t 2.0); game bootstrap 95% CI [+$19, +$4,280]. Not concentrated: top 10 games = 9% of PnL, dropping the best 20 leaves $+1,816. NBA $+2.04/game (552), NHL $+2.34/game (463). Tail risk: the worst 10 games lost $-1,889 together (comebacks against a 90c+ bid or a longshot offer), about 85% of the total profit: a thin edge with a fat left tail.
+
+## v2 (pre-registered before the run): stop=250
+Reason from development data (not a lockbox): the worst 10 games lost ~85% of total profit (comebacks). The strategy's existing `stop` param exits via IOC at the touch when a position is 250 mills under water (e.g. a 95c bid bought, price falls to 70c). Expect fewer catastrophic games but taker fee+slippage on the exits; full 2/3 decides. Everything else unchanged.
+| 5 | 10-21 | v2 stop=250 (job sports-tails-1021-015853) | full 2/3 | inconclusive: +0.01c/ct, CI -0.75..+0.76, 1,801 mkts, $+25 (v1 +1.37c, $+2,212) | The stop cuts the edge to zero: stopped positions pay the taker fee and the touch slippage and often would have recovered; the left tail is the price of the maker edge. Keep v1 (no stop). 1 full test left. |
+
+## v3 (pre-registered): flow_w=60 (pull the side that one-sided taker flow is hitting)
+Reason: the stop (v2) failed because exits are taker trades at the worst moment; the cheaper protection is not to be resting when informed flow arrives. Existing params: flow_w=60 s, flow_thr 0.6, flow_min 500 contracts. Mechanism-based default values, not tuned. Full 3/3 (last one) decides; v1 remains the reference.

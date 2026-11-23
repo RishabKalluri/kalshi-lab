@@ -1,0 +1,24 @@
+{
+  "slug": "revpool",
+  "name": "Open-reversal ridge score, BTC+ETH+SOL pooled",
+  "series": [
+    "KXSOL15M",
+    "KXETH15M",
+    "KXBTC15M"
+  ],
+  "derived_from": "sol-revmodel",
+  "class": "RevPool",
+  "status": "rejected",
+  "description": "BTC, ETH and SOL: after a window opens, one ridge score (pooled over the three coins, refit monthly on earlier windows) combines the previous window's move size, its late confirmation, Binance volume vs the slot's 14-day median and the clock; buy the reversal side when predicted net PnL beats 6c.",
+  "hypothesis": "sol-revmodel's score on SOL alone failed its lockbox (-6.7c, 99 mkts). Pooling the three coins with flow data triples the fit sample and trades, and the forced-flow overshoot into the boundary is common to them. Dev screen (walk-forward Apr-Aug, pooled fit, next real fills): thr 4c +3.4c (n=1101, se 1.4, BTC +2.3/ETH +4.9/SOL +3.4, 5/5 months positive); thr 7c +8.5c (n=199). thr 6c fixed in advance from that dose-response. Wrong if the engine walk-forward CI <= 0 or the lockbox loses; family lockbox history (sol-revmodel fail, midrev/volrev/overreact weak passes) makes any pass weak evidence.",
+  "params": [
+    "thr=0.06"
+  ],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-23",
+  "next": "Rejected: full 1/3 inconclusive -0.63c (CI -5.97..+4.79, 296 mkts); research screen (+3.4c at thr 4c, +8.5c at 7c) did not carry to the engine. No lockbox run. Don't retry."
+}

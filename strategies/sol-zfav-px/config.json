@@ -1,0 +1,20 @@
+{
+  "slug": "sol-zfav-px",
+  "name": "SOL favourite taker, price-capped",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav",
+  "class": "ZFavPx",
+  "status": "developing",
+  "description": "sol-zfav's taker rule (buy the SOL side spot is >=1.5 sigma past the strike, once per market, held to settlement) restricted to asks of 95c or less, checkpoints 600/480/360/300/240 s. Where the market has not priced the confirmation (ask <=95c) the taker edge is large; at 95-100c it is only fee-sized.",
+  "hypothesis": "Dev screen (Jan-Sep, taker next fills net of fee, z>=1.5, tau 240-600): ask 0.90-0.95 +2.6c (1,597 obs), 0.80-0.90 +6.6c (88), 0.95-0.98 +0.9c, >0.98 +0.2c; ask<=0.95 positive in 9/9 months (Sep +2.4c, n=388); monotone in z (z 1.5-2 +2.9c, 1.25-1.5 +0.7c, 1.0-1.25 +0.4c) and in model edge Phi(z)-ask. Market underprices settled-ness; counterparty = flat-vol quoters and nervous sellers. The 95c cap is dev-informed (disclosed). Wrong if full <+1c or CI includes 0, <60% months positive, 2x latency negative; family sol-zfav decayed to +0.66c in lockbox (Oct -0.2c), so expect decay.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-09",
+  "next": "smoke, quick, full 1/3"
+}

@@ -1,0 +1,22 @@
+{
+  "slug": "settle-avg",
+  "name": "Settlement-average lock-in taker",
+  "series": [
+    "KXETH15M",
+    "KXXRP15M",
+    "KXSOL15M"
+  ],
+  "derived_from": "",
+  "class": "SettleAvg",
+  "status": "developing",
+  "description": "In the last 45 seconds before close, price the 60-second settlement average from Binance 1-second data (the part already fixed plus a random walk for the rest) and buy the 60-98c favourite when the model's probability beats the ask by 3c after fees. Kalshi's late quotes are wide and sometimes stale relative to the accumulated average, so a buyer who knows the average earns the difference.",
+  "hypothesis": "Market makers in the last minute quote off the spot print and are uncertain how much of the average is fixed; quotes stay wide. Dev-data screen on 5 coins' trade prints: model probability >= ask+3c on a 60-98c favourite earns ETH +4.1c (CI wide of 0, 9/9 months), XRP +2.3c, DOGE +1.7c, SOL +3.2c per market. Wrong if engine fills (book depth, 150ms) kill it, or the full walk-forward is not promising / months flip as in settle-lockin's SOL.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-10-22",
+  "next": "Full promising (+3.66c, CI 1.9..5.3, 7/7 months, lat2x +3.95c). Lockbox job settle-avg-1022-060357 queued 06:04; read the verdict in results.json. If pass: paper candidate (needs live Binance 1s spot only, no flow stream). BTC/DOGE untested in engine (screen: BTC weaker, DOGE +1.7c)."
+}

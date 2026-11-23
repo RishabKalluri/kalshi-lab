@@ -1,0 +1,20 @@
+{
+  "slug": "sol-zfav-maker",
+  "name": "SOL spot-confirmed favourite, maker entry",
+  "series": [
+    "KXSOL15M"
+  ],
+  "derived_from": "sol-zfav",
+  "class": "ZFavMaker",
+  "status": "developing",
+  "description": "sol-zfav's signal (SOL spot at least 1.5 sigma past the strike) traded as a maker: a post-only order one tick inside the spread on the favourite's side between 420 s and 150 s to close, re-priced every 30 s, held to settlement.",
+  "hypothesis": "sol-zfav's taker rule nets about -0.5c on Jun-Sep development data (4,037 trades; May -1.0, Jun -0.7, Jul -1.0, Aug +0.4, Sep -0.5): the confirmed favourite is worth roughly +1..3c but the taker fee (about 0.6c at 90c) and half the spread (0.5-1c) consume it. A maker pays no fee and earns the spread; the seller who hits a bid on a spot-confirmed favourite is mostly a nervous holder. Wrong if backfill-engine fills are adversely selected as in every earlier maker test (sol-spreadmk, dog-seller, volfav-maker: -0.5..-1.1c), or the fill count is too low for a CI.",
+  "params": [],
+  "sizing": "pct:0.5",
+  "budget": {
+    "full_tests": 3,
+    "lockbox_runs": 1
+  },
+  "created": "2026-11-02",
+  "next": "Smoke ok, quick passed (noise). Full 1/3 queued (sol-zfav-maker-1102-013957) behind 5-coin full tests: read results.json. Ad hoc SOL is weak (Jul +0.0c, Sep +1.2c); the same rule is stronger on XRP/DOGE (see xrp-zfav-maker). Lockbox only if the full is promising."
+}
