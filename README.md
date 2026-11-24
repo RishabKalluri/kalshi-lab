@@ -27,7 +27,7 @@ money (live orders, sizing/bankroll changes on the live trader, funding) needs t
 | Code, strategy folders, hash-chained test ledgers (`results/_ledger/`) | this GitHub repo | `git clone` |
 | All market data: recordings (`raw/`), history (`backfill/`, incl. Predexon order books), live model refits (`models/`) | S3 `s3://kalshi-data-531080694882/` (us-east-1) | `kalshi-lab pull <SERIES>` or `aws s3 sync` (large: don't sync all of it) |
 | Recorder, paper traders, **live trader**, dashboard | trading server, EC2 m7g.large (`ssh kalshi`) | `deploy/push.sh kalshi` to deploy |
-| Tests (official ledger), nightly downloads + refits, strategy agents | research server, EC2 (`ssh kalshi-research`), stops itself after 30 idle min | `deploy/research.sh start`, deploy `deploy/research/push.sh` |
+| Tests (official ledger), downloads + refits, strategy agents | on-demand research server, EC2 (`ssh kalshi-research`), stops itself after 30 idle min | `deploy/research.sh start`, deploy `deploy/research/push.sh` |
 | Secrets | **never in git**: `.env`, `~/.kalshi/*.pem`, `~/.ssh/*.pem`, `~/.aws/credentials` | the owner provides them (below) |
 
 Research agents write new strategy folders on the research server; they reach the trading server via
@@ -193,4 +193,5 @@ Paper trading: `kalshi-lab paper-start <registry-id>` / `paper-stop` / `paper-li
 `uv run kalshi-lab jobs` lists jobs; the dashboard's **Validation jobs** panel shows each stage's report card
 (PnL, contracts, PnL/contract with a 95% CI bootstrapped over markets, days positive) and a verdict:
 **promising** (both halves > 0, CI above 0, survives 2x latency), **reject**, or **inconclusive**.
-Backfill history extends itself daily on the server (00:30 UTC).
+The trading server does not wake the research server. Start research on demand with `deploy/research.sh start`.
+On the research server, the 00:30 UTC backfill catches up after a missed run at boot; the 00:45 UTC agent batch only starts if the server is already running.

@@ -81,30 +81,15 @@ if [ -f /etc/systemd/system/kalshi-worker.service ]; then
   sudo systemctl disable --now kalshi-worker 2>/dev/null; sudo rm -f /etc/systemd/system/kalshi-worker.service
 fi
 
-# The nightly downloads moved to the research server (deploy/research/setup.sh), which this server wakes at 00:20 UTC.
+# Nightly downloads run on the research server when it is up (deploy/research/setup.sh).
 if [ -f /etc/systemd/system/kalshi-backfill.timer ]; then
   sudo systemctl disable --now kalshi-backfill.timer 2>/dev/null
   sudo rm -f /etc/systemd/system/kalshi-backfill.{timer,service}
 fi
-sudo tee /etc/systemd/system/kalshi-wake-research.service >/dev/null <<UNIT
-[Unit]
-Description=start the research server for its nightly downloads
-[Service]
-Type=oneshot
-User=$USER
-Environment=PATH=$HOME/.local/bin:/usr/bin:/bin
-ExecStart=/bin/sh -c 'aws ec2 start-instances --instance-ids \$\$(aws ec2 describe-instances --filters Name=tag:Name,Values=kalshi-research --query "Reservations[0].Instances[0].InstanceId" --output text)'
-StandardOutput=append:$HOME/kalshi-data/logs/wake-research.log
-StandardError=append:$HOME/kalshi-data/logs/wake-research.log
-UNIT
-sudo tee /etc/systemd/system/kalshi-wake-research.timer >/dev/null <<UNIT
-[Unit]
-Description=wake the research server nightly
-[Timer]
-OnCalendar=*-*-* 00:20:00 UTC
-[Install]
-WantedBy=timers.target
-UNIT
+# Research is started on demand; disable the wake timer on existing installs.
+if [ -f /etc/systemd/system/kalshi-wake-research.timer ]; then
+  sudo systemctl disable --now kalshi-wake-research.timer
+fi
 # The research server's worker pushes results into ~/lab-inbox with a key that can write nothing else (rrsync);
 # research-merge copies them into this repo for the dashboard, never touching paper/live strategies or results.
 mkdir -p ~/lab-inbox/results ~/lab-inbox/strategies ~/.ssh  # rsync creates no parent folders
@@ -208,7 +193,7 @@ unit kalshi-dashboard "kalshi-lab dashboard" "$UV run streamlit run src/kalshi_l
 sudo systemctl daemon-reload
 SERVICES="kalshi-recorder kalshi-dashboard"
 sudo systemctl daemon-reload
-sudo systemctl enable --now $SERVICES kalshi-recorder-weather kalshi-recorder-sports kalshi-recorder-alts kalshi-health.timer kalshi-s3.timer kalshi-wake-research.timer kalshi-research-merge.timer
+sudo systemctl enable --now $SERVICES kalshi-recorder-weather kalshi-recorder-sports kalshi-recorder-alts kalshi-health.timer kalshi-s3.timer kalshi-research-merge.timer
 for f in deploy/paper/*.json; do
   [ -e "$f" ] && sudo systemctl enable --now "kalshi-paper@$(basename "$f" .json)"
 done

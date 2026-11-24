@@ -66,7 +66,7 @@ def settled_markets(rest: KalshiREST, series: str, start: datetime, end: datetim
         t = t2
 
 
-def backfill_kalshi(rest: KalshiREST, root: Path, series: str, start: datetime, end: datetime):
+def backfill_kalshi(rest: KalshiREST, root: Path, series: str, start: datetime, end: datetime, *, strict=False):
     cutoff = datetime.fromisoformat(rest.get("/historical/cutoff")["trades_created_ts"].replace("Z", "+00:00"))
     markets = sorted(settled_markets(rest, series, start, end, cutoff), key=lambda x: x[0]["close_time"])
     log.info("%s: %d settled markets in range", series, len(markets))
@@ -82,6 +82,8 @@ def backfill_kalshi(rest: KalshiREST, root: Path, series: str, start: datetime, 
             trades = list(rest.paginate("/historical/trades" if historical else "/markets/trades", "trades",
                                         ticker=m["ticker"], limit=1000))
         except Exception:
+            if strict:
+                raise
             log.exception("%s: failed, skipping (re-run backfill to retry)", m["ticker"])
             continue
         trades.sort(key=lambda tr: tr["created_time"])
@@ -341,6 +343,7 @@ def main(argv=None):
     p.add_argument("--start", help="ISO date/time (UTC), overrides --days")
     p.add_argument("--end", help="ISO date/time (UTC), default now")
     p.add_argument("--only", choices=["kalshi", "spot", "flow"], help="only backfill one kind of data")
+    p.add_argument("--strict", action="store_true", help="fail if a Kalshi market's trades cannot be downloaded")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -361,4 +364,4 @@ def main(argv=None):
         if args.only in (None, "flow"):
             backfill_flow(root, s, start, end)
         if args.only in (None, "kalshi"):
-            backfill_kalshi(rest, root, s, start, end)
+            backfill_kalshi(rest, root, s, start, end, strict=args.strict)

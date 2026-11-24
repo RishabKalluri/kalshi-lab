@@ -20,12 +20,15 @@ flowchart LR
 
     subgraph SRV[Server: AWS EC2, Virginia, always on]
         REC[Recorder]
-        BF[Nightly backfill]
         PAPER[Paper trader<br/>kalshi-paper@eth-volfav]
         DASH[Dashboard]
         RAW[(raw recordings<br/>~/kalshi-data/raw)]
-        HIST[(history<br/>~/kalshi-data/backfill)]
         RES[(results/)]
+    end
+
+    subgraph RESEARCH[Research server: on demand]
+        BF[Scheduled backfill]
+        HIST[(history<br/>/srv/kalshi-data/backfill)]
     end
 
     subgraph LAP[Your laptop: M2, fast]
@@ -57,6 +60,8 @@ flowchart LR
 | **Laptop** | Claude Code, deploys, the dashboard tunnel | No tests or data jobs. |
 
 You can turn the laptop off at any time: recording and paper trading keep going on the server.
+The trading server no longer wakes the research server. Start it on demand with `deploy/research.sh start`;
+missed 00:30 UTC backfills catch up at boot, but the 00:45 UTC agent batch only starts if the research server is already running.
 
 ---
 
@@ -329,9 +334,10 @@ Credentials: ~/.kalshi/kalshi.pem + .env (KALSHI_KEY_ID)
 
 ## 10. Open items
 
-- **Monthly model refits** (Oct 14): `research/refit_live.py` runs in the research server's nightly job and acts on the
-  1st (UTC): refits eth-volfav2 / xrp-volfav on all earlier markets, sanity-checks, uploads to `s3://.../models/`; the
-  trading server pulls hourly (`kalshi-lab models-pull`) and live/paper traders re-read the file without a restart.
+- **Monthly model refits** (Oct 14): `research/refit_live.py` catches up once the nightly backfill covers the start of
+  the UTC month, even after a missed 1st. It fits the configured vol models on markets closing before the month began,
+  sanity-checks, and uploads to `s3://.../models/`. The trading server pulls hourly (`kalshi-lab models-pull`) and
+  live/paper traders re-read the file without a restart.
 
 - **Category survey (Oct 13, `research/category_survey.py`)**: scored every trade in ~150 settled markets per
   series (38 series, Jan-Aug 19) against settlement. Weather takers overpay consistently (-0.3 to -1.6¢/contract,
