@@ -142,7 +142,7 @@ OnCalendar=*-*-* *:20:00 UTC
 [Install]
 WantedBy=timers.target
 UNIT
-# nightly downloads (moved here from the trading server, which wakes this server at 00:20 UTC)
+# nightly downloads while the research server is running; missed schedules catch up at boot
 sudo tee /etc/systemd/system/kalshi-nightly.service >/dev/null <<UNIT
 [Unit]
 Description=kalshi-lab nightly downloads -> S3
@@ -196,7 +196,7 @@ OOMPolicy=continue
 StandardOutput=append:$D/logs/agents.log
 StandardError=append:$D/logs/agents.log
 UNIT
-# after the nightly downloads (woken at 00:20 UTC); not Persistent: a manual boot later doesn't start a batch
+# after the nightly downloads, if the server is running; not Persistent, so a later boot doesn't start a batch
 sudo tee /etc/systemd/system/kalshi-agents.timer >/dev/null <<UNIT
 [Unit]
 Description=daily autonomous agents batch

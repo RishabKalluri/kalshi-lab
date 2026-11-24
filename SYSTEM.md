@@ -20,12 +20,15 @@ flowchart LR
 
     subgraph SRV[Server: AWS EC2, Virginia, always on]
         REC[Recorder]
-        BF[Nightly backfill]
         PAPER[Paper trader<br/>kalshi-paper@eth-volfav]
         DASH[Dashboard]
         RAW[(raw recordings<br/>~/kalshi-data/raw)]
-        HIST[(history<br/>~/kalshi-data/backfill)]
         RES[(results/)]
+    end
+
+    subgraph RESEARCH[Research server: on demand]
+        BF[Scheduled backfill]
+        HIST[(history<br/>/srv/kalshi-data/backfill)]
     end
 
     subgraph LAP[Your laptop: M2, fast]
@@ -57,6 +60,8 @@ flowchart LR
 | **Laptop** | Claude Code, deploys, the dashboard tunnel | No tests or data jobs. |
 
 You can turn the laptop off at any time: recording and paper trading keep going on the server.
+The trading server no longer wakes the research server. Start it on demand with `deploy/research.sh start`;
+missed 00:30 UTC backfills catch up at boot, but the 00:45 UTC agent batch only starts if the research server is already running.
 
 ---
 
