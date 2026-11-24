@@ -8,9 +8,9 @@ tmux ls 2>/dev/null | grep -qE "^(agent|head)" && busy="agents"
 pgrep -u agent >/dev/null && busy="$busy agent-user"
 # (one ls per folder: `ls a/*.json b/*.json` fails when either glob is empty, which read running jobs as idle)
 for q in running queue; do ls /srv/kalshi/results/_jobs/$q/*.json >/dev/null 2>&1 && busy="$busy tests-$q"; done
-for u in kalshi-nightly kalshi-data-pull; do systemctl is-active --quiet $u && busy="$busy $u"; done
-# one-off downloads: systemd-run --unit=kalshi-data-<name> ...
-systemctl list-units --type=service --state=active --no-legend 'kalshi-data-*' | grep -q . && busy="$busy data-jobs"
+# Oneshot downloads are activating while running, including the persistent nightly catch-up.
+systemctl list-units --type=service --state=active,activating,reloading --no-legend \
+  kalshi-nightly.service 'kalshi-data-*.service' | grep -q . && busy="$busy data-jobs"
 [ -n "$(who)" ] && busy="$busy ssh"
 # If a scheduled batch or download starts within 45 min: stay up.
 for t in kalshi-nightly kalshi-agents; do
