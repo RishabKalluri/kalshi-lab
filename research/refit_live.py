@@ -77,20 +77,22 @@ def main(argv=None):
     now = datetime.now(timezone.utc)
     month = now.strftime("%Y-%m")
     cutoff = now.replace(day=now.day if a.force else 1, hour=0, minute=0, second=0, microsecond=0)
-    try:
-        through = datetime.fromisoformat((DATA / "logs" / "nightly-backfill-through").read_text().strip())
-    except FileNotFoundError:
-        through = None
-    if through is None or through < cutoff:
-        print(f"{now:%F %T} refit_live: waiting for backfill coverage through {cutoff.isoformat()}")
-        return 0
+    automatic = not (a.force or a.dry_run)
+    if automatic:
+        try:
+            through = datetime.fromisoformat((DATA / "logs" / "nightly-backfill-through").read_text().strip())
+        except FileNotFoundError:
+            through = None
+        if through is None or through < cutoff:
+            print(f"{now:%F %T} refit_live: waiting for backfill coverage through {cutoff.isoformat()}")
+            return 0
     until = cutoff.strftime("%Y-%m-%dT00:00")
     failed = False
     for slug in a.slug:
         series = REFIT[slug]
         out = DATA / "models" / slug
         checked = out / "_refit_month"
-        if not a.force and checked.exists() and checked.read_text().strip() == month:
+        if automatic and checked.exists() and checked.read_text().strip() == month:
             print(f"{now:%F %T} refit_live: {slug} already checked for {month}")
             continue
         vf = _vol_fit(slug)
@@ -118,9 +120,10 @@ def main(argv=None):
             files.append(out / name)
         for f in files:
             subprocess.check_call([aws(), "s3", "cp", "--only-show-errors", str(f), f"s3://{BUCKET}/models/{slug}/{f.name}"])
-        tmp = checked.with_suffix(".tmp")
-        tmp.write_text(month + "\n")
-        tmp.replace(checked)
+        if automatic:
+            tmp = checked.with_suffix(".tmp")
+            tmp.write_text(month + "\n")
+            tmp.replace(checked)
     return 1 if failed else 0
 
 

@@ -86,6 +86,20 @@ def test_refit_dry_run_and_failed_upload_do_not_mark_month(refit):
     assert refit.fit.call_args.args == ("KXXRP15M", "2026-11-07T00:00")
 
 
+@pytest.mark.parametrize("coverage", [None, "2026-10-31T23:45:00+00:00"])
+@pytest.mark.parametrize(("flag", "day", "uploads"), [("--force", "07", 2), ("--dry-run", "01", 0)])
+def test_manual_refit_ignores_nightly_checkpoint(refit, coverage, flag, day, uploads):
+    if coverage is None:
+        refit.checkpoint.unlink()
+    else:
+        refit.checkpoint.write_text(coverage)
+
+    assert refit.run(flag) == 0
+    assert refit.fit.call_args.args == ("KXXRP15M", f"2026-11-{day}T00:00")
+    assert refit.upload.call_count == uploads
+    assert not refit.marker.exists()
+
+
 def test_refit_rejection_keeps_old_model_and_does_not_repeat_daily(refit):
     refit.model["ratio_threshold"] = 4
     assert refit.run() == 1
